@@ -90,7 +90,7 @@ Sazon/Diseno       Sistema de diseño: espaciado, tipografía, movimiento, temas
 Sazon/Pantallas    Una vista por pantalla
 Sazon/Datos        alimentos-ins.json (tabla del INS)
 Pruebas            Pruebas automáticas de la lógica
-herramientas       Temas (temas.json), generador, verificador de contraste y conversor del INS
+herramientas       Temas (temas.json), generador, verificador de contraste, conversor del INS y dibujo del ícono
 Marca              Ícono de la app
 ```
 
