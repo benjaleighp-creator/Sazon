@@ -49,6 +49,7 @@ targets:
     sources:
       - path: Pruebas
       - path: Sazon/Modelo/Modelos.swift
+      - path: Sazon/Modelo/ModelosExtra.swift
       - path: Sazon/Logica
     settings:
       base:

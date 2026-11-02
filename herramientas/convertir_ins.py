@@ -190,6 +190,11 @@ def macros(valores):
     return kcal, prot, cho, grasa
 
 
+def extras(valores):
+    """Fibra dietaria (g, columna 8) y sodio (mg, columna 14)."""
+    return numero(valores[7]), numero(valores[13])
+
+
 def elegir_carbohidratos(kcal, prot, grasa, cho_tot, cho_disp):
     """Disponibles si existen; pero si la energía declarada cuadra mucho
     mejor con los totales (por ejemplo, «disponibles» = 0,0 por un error del
@@ -233,6 +238,7 @@ def main(ruta_pdf):
                             nombres_tabla[fila[0].strip() + fila[1].strip()] = limpiar_nombre(fila[2])
             for f in filas_de_pagina(pagina, preparados=False)[0]:
                 kcal, prot, cho, grasa = macros(f["valores"])
+                fibra, sodio = extras(f["valores"])
                 otro = nombres_tabla.get(f["codigo"], "")
                 if len(otro) > len(f["nombre"]):
                     f["nombre"] = otro
@@ -240,7 +246,7 @@ def main(ruta_pdf):
                     continue
                 alimentos[f["codigo"]] = dict(
                     codigo=f["codigo"], nombre=f["nombre"], grupo=grupos[letra],
-                    kcal=kcal, prot=prot, cho=cho, grasa=grasa, pagina=n, estratos=1)
+                    kcal=kcal, prot=prot, cho=cho, grasa=grasa, fibra=fibra, sodio=sodio, pagina=n, estratos=1)
 
     # Grupo S: agrupar las filas de cada plato (estratos A→E) y su código.
     platos = []
@@ -276,7 +282,7 @@ def main(ruta_pdf):
         if not nombres:
             continue
         nombre = max(set(nombres), key=lambda x: (nombres.count(x), len(x)))
-        valores = [macros(f["valores"]) for f in p["filas"]]
+        valores = [macros(f["valores"]) + extras(f["valores"]) for f in p["filas"]]
         def promedio(i):
             datos = [v[i] for v in valores if v[i] is not None]
             return round(sum(datos) / len(datos), 1) if datos else None
@@ -288,6 +294,7 @@ def main(ruta_pdf):
         alimentos[p["codigo"]] = dict(
             codigo=p["codigo"], nombre=nombre, grupo=grupo,
             kcal=round(kcal), prot=promedio(1), cho=promedio(2), grasa=promedio(3),
+            fibra=promedio(4), sodio=promedio(5),
             pagina=p["pagina"], estratos=len(p["filas"]))
 
     def orden(c):
@@ -318,6 +325,8 @@ def main(ruta_pdf):
                 "proteina": a["prot"] if a["prot"] is not None else 0.0,
                 "carbohidratos": a["cho"] if a["cho"] is not None else 0.0,
                 "grasas": a["grasa"] if a["grasa"] is not None else 0.0,
+                "fibra": a["fibra"] if a["fibra"] is not None else 0.0,
+                "sodio": a["sodio"] if a["sodio"] is not None else 0.0,
             },
         } for a in lista],
     }

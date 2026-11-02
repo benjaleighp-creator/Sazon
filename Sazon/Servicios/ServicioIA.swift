@@ -12,6 +12,8 @@ protocol ProveedorIA {
     /// Lee la tabla nutricional de un envase (para productos que no están
     /// en Open Food Facts).
     func leerEtiqueta(fotoJPEG: Data) async throws -> EtiquetaLeida
+    /// Conversación con el coach (texto libre).
+    func conversar(mensajes: [MensajeCoach], contexto: String?) async throws -> String
 }
 
 enum ServicioIA {
@@ -52,6 +54,12 @@ struct ProveedorGemini: ProveedorIA {
     func leerEtiqueta(fotoJPEG: Data) async throws -> EtiquetaLeida {
         let cuerpo = try LectorIA.cuerpoPeticionEtiqueta(imagenJPEGBase64: fotoJPEG.base64EncodedString(), formato: formato)
         return try LectorIA.etiqueta(desde: try await pedirTexto(cuerpo))
+    }
+
+    func conversar(mensajes: [MensajeCoach], contexto: String?) async throws -> String {
+        let cuerpo = try LectorIA.cuerpoCoach(mensajes: mensajes, contexto: contexto)
+        let texto = try await pedirTexto(cuerpo)
+        return texto.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func enviar(_ cuerpo: Data) async throws -> [AlimentoIdentificado] {

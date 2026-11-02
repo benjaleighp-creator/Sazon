@@ -390,3 +390,48 @@ extension LectorIA {
         )
     }
 }
+
+// MARK: - Coach
+
+extension LectorIA {
+
+    static let instruccionesCoach = """
+    Eres «Coach Sazón», un asistente de nutrición dentro de una app personal de registro de comidas en Perú.
+    Respondes en español de Perú, en tono cercano y práctico, con respuestas cortas (máximo 8 líneas) y \
+    sugerencias concretas con alimentos peruanos comunes cuando sirva.
+    Reglas: no eres médico ni nutricionista; no diagnostiques ni indiques tratamientos. Si la persona menciona \
+    síntomas, enfermedades, embarazo, trastornos de la conducta alimentaria o metas extremas, recomienda con \
+    amabilidad consultar a un profesional de salud. No propongas dietas por debajo de 1200 kcal. Las calorías \
+    son estimaciones. Si no sabes algo, dilo.
+    """
+
+    /// Resumen del día que se envía solo si lo permites en Ajustes (sin nombre ni datos personales).
+    static func contextoCoach(consumido: Nutrientes, meta: Nutrientes?, aguaMl: Double, metaAguaMl: Double,
+                              objetivo: Objetivo?, dieta: TipoDieta?) -> String {
+        var lineas = ["Resumen de hoy (estimaciones):"]
+        lineas.append("- Consumido: \(Formato.entero(consumido.kcal)) kcal, proteína \(Formato.entero(consumido.proteina)) g, carbohidratos \(Formato.entero(consumido.carbohidratos)) g, grasas \(Formato.entero(consumido.grasas)) g.")
+        if let meta {
+            lineas.append("- Meta: \(Formato.entero(meta.kcal)) kcal, proteína \(Formato.entero(meta.proteina)) g, carbohidratos \(Formato.entero(meta.carbohidratos)) g, grasas \(Formato.entero(meta.grasas)) g.")
+        }
+        lineas.append("- Agua: \(Formato.entero(aguaMl)) de \(Formato.entero(metaAguaMl)) ml.")
+        if let objetivo { lineas.append("- Objetivo: \(objetivo.nombre.lowercased()).") }
+        if let dieta { lineas.append("- Tipo de dieta: \(dieta.nombre.lowercased()).") }
+        return lineas.joined(separator: "\n")
+    }
+
+    /// Cuerpo para conversar: instrucciones, contexto opcional y los últimos mensajes.
+    static func cuerpoCoach(mensajes: [MensajeCoach], contexto: String?, limite: Int = 12) throws -> Data {
+        var sistema = instruccionesCoach
+        if let contexto, !contexto.isEmpty { sistema += "\n\n" + contexto }
+        let recientes = mensajes.suffix(limite)
+        var contenidos: [[String: Any]] = []
+        for m in recientes {
+            let parte: [String: Any] = ["text": m.texto]
+            contenidos.append(["role": m.autor == .usuario ? "user" : "model", "parts": [parte]])
+        }
+        let parteSistema: [String: Any] = ["text": sistema]
+        let instrucciones: [String: Any] = ["parts": [parteSistema]]
+        let cuerpo: [String: Any] = ["systemInstruction": instrucciones, "contents": contenidos]
+        return try JSONSerialization.data(withJSONObject: cuerpo, options: [])
+    }
+}

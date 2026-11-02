@@ -9,21 +9,28 @@ import Foundation
 
 // MARK: - Nutrientes
 
-/// Energía y macronutrientes. Según el contexto son "por 100 g" o el total
-/// de una porción; el nombre de la variable lo deja claro.
+/// Energía y macronutrientes (más fibra y sodio cuando la fuente los trae).
+/// Según el contexto son "por 100 g" o el total de una porción; el nombre de
+/// la variable lo deja claro. Fibra y sodio valen 0 si la fuente no los informa.
 struct Nutrientes: Codable, Equatable, Hashable {
     var kcal: Double
     var proteina: Double
     var carbohidratos: Double
     var grasas: Double
+    /// Fibra dietaria en gramos.
+    var fibra: Double
+    /// Sodio en miligramos.
+    var sodio: Double
 
     static let cero = Nutrientes(kcal: 0, proteina: 0, carbohidratos: 0, grasas: 0)
 
-    init(kcal: Double, proteina: Double, carbohidratos: Double, grasas: Double) {
+    init(kcal: Double, proteina: Double, carbohidratos: Double, grasas: Double, fibra: Double = 0, sodio: Double = 0) {
         self.kcal = kcal
         self.proteina = proteina
         self.carbohidratos = carbohidratos
         self.grasas = grasas
+        self.fibra = fibra
+        self.sodio = sodio
     }
 
     init(from decoder: Decoder) throws {
@@ -32,16 +39,20 @@ struct Nutrientes: Codable, Equatable, Hashable {
         proteina = try c.decodeIfPresent(Double.self, forKey: .proteina) ?? 0
         carbohidratos = try c.decodeIfPresent(Double.self, forKey: .carbohidratos) ?? 0
         grasas = try c.decodeIfPresent(Double.self, forKey: .grasas) ?? 0
+        fibra = try c.decodeIfPresent(Double.self, forKey: .fibra) ?? 0
+        sodio = try c.decodeIfPresent(Double.self, forKey: .sodio) ?? 0
     }
 
     static func + (a: Nutrientes, b: Nutrientes) -> Nutrientes {
         Nutrientes(kcal: a.kcal + b.kcal, proteina: a.proteina + b.proteina,
-                   carbohidratos: a.carbohidratos + b.carbohidratos, grasas: a.grasas + b.grasas)
+                   carbohidratos: a.carbohidratos + b.carbohidratos, grasas: a.grasas + b.grasas,
+                   fibra: a.fibra + b.fibra, sodio: a.sodio + b.sodio)
     }
 
     static func * (a: Nutrientes, factor: Double) -> Nutrientes {
         Nutrientes(kcal: a.kcal * factor, proteina: a.proteina * factor,
-                   carbohidratos: a.carbohidratos * factor, grasas: a.grasas * factor)
+                   carbohidratos: a.carbohidratos * factor, grasas: a.grasas * factor,
+                   fibra: a.fibra * factor, sodio: a.sodio * factor)
     }
 
     /// Energía que dan los macros con los factores generales de Atwater
@@ -322,15 +333,17 @@ struct Perfil: Codable, Equatable {
     var tallaCm: Double
     var actividad: NivelActividad
     var objetivo: Objetivo
+    var dieta: TipoDieta
 
     init(sexo: Sexo = .masculino, edad: Int = 20, pesoKg: Double = 70, tallaCm: Double = 170,
-         actividad: NivelActividad = .ligero, objetivo: Objetivo = .mantener) {
+         actividad: NivelActividad = .ligero, objetivo: Objetivo = .mantener, dieta: TipoDieta = .equilibrada) {
         self.sexo = sexo
         self.edad = edad
         self.pesoKg = pesoKg
         self.tallaCm = tallaCm
         self.actividad = actividad
         self.objetivo = objetivo
+        self.dieta = dieta
     }
 
     init(from decoder: Decoder) throws {
@@ -341,6 +354,7 @@ struct Perfil: Codable, Equatable {
         tallaCm = try c.decodeIfPresent(Double.self, forKey: .tallaCm) ?? 170
         actividad = try c.decodeIfPresent(NivelActividad.self, forKey: .actividad) ?? .ligero
         objetivo = try c.decodeIfPresent(Objetivo.self, forKey: .objetivo) ?? .mantener
+        dieta = try c.decodeIfPresent(TipoDieta.self, forKey: .dieta) ?? .equilibrada
     }
 }
 
@@ -399,6 +413,48 @@ struct DatosApp: Codable, Equatable {
     /// Productos con código de barras que ya registraste (clave: código).
     var productos: [String: ProductoGuardado]
 
+    // Agua
+    var agua: [RegistroAgua]
+    /// Meta de agua escrita a mano (ml). Si es nil se calcula con el peso.
+    var metaAguaManual: Double?
+    /// Tamaño del vaso para el botón rápido (ml).
+    var vasoMl: Double
+
+    // Progreso
+    var pesos: [RegistroPeso]
+    var medidas: [RegistroMedidas]
+    var fotos: [FotoProgreso]
+    /// Ajuste automático de calorías según la evolución del peso.
+    var ajusteAutomatico: Bool
+    /// Ajuste aplicado a la meta calculada (kcal por día, puede ser negativo).
+    var ajusteKcal: Double
+
+    // Ayuno
+    var ayunos: [SesionAyuno]
+    var horasAyuno: Double
+
+    // Alimentos propios, recetas, plan y compras
+    var alimentosPropios: [AlimentoPropio]
+    var recetas: [Receta]
+    var plan: [PlanDia]
+    /// Ajusta las porciones del plan que faltan según lo que ya comiste.
+    var ajustarPorcionesPlan: Bool
+    /// Elementos de la lista de compras ya marcados (por nombre normalizado).
+    var comprasMarcadas: [String]
+
+    // Recordatorios
+    var recordatorios: ConfigRecordatorios
+
+    // Coach
+    var coach: [MensajeCoach]
+    /// Si es true, el coach recibe tu resumen del día (sin nombre ni datos personales).
+    var coachCompartirResumen: Bool
+
+    // Apple Salud
+    var saludActiva: Bool
+    /// Suma a la meta las calorías activas que registra Apple Salud.
+    var sumarActividad: Bool
+
     static let modeloPorDefecto = "gemini-3.8-flash"
 
     init() {
@@ -416,6 +472,26 @@ struct DatosApp: Codable, Equatable {
         recientes = []
         nombre = ""
         productos = [:]
+        agua = []
+        metaAguaManual = nil
+        vasoMl = 250
+        pesos = []
+        medidas = []
+        fotos = []
+        ajusteAutomatico = false
+        ajusteKcal = 0
+        ayunos = []
+        horasAyuno = 16
+        alimentosPropios = []
+        recetas = []
+        plan = []
+        ajustarPorcionesPlan = true
+        comprasMarcadas = []
+        recordatorios = ConfigRecordatorios()
+        coach = []
+        coachCompartirResumen = false
+        saludActiva = false
+        sumarActividad = false
     }
 
     init(from decoder: Decoder) throws {
@@ -435,5 +511,25 @@ struct DatosApp: Codable, Equatable {
         recientes = try c.decodeIfPresent([Registro].self, forKey: .recientes) ?? []
         nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? ""
         productos = try c.decodeIfPresent([String: ProductoGuardado].self, forKey: .productos) ?? [:]
+        agua = try c.decodeIfPresent([RegistroAgua].self, forKey: .agua) ?? []
+        metaAguaManual = try c.decodeIfPresent(Double.self, forKey: .metaAguaManual)
+        vasoMl = try c.decodeIfPresent(Double.self, forKey: .vasoMl) ?? 250
+        pesos = try c.decodeIfPresent([RegistroPeso].self, forKey: .pesos) ?? []
+        medidas = try c.decodeIfPresent([RegistroMedidas].self, forKey: .medidas) ?? []
+        fotos = try c.decodeIfPresent([FotoProgreso].self, forKey: .fotos) ?? []
+        ajusteAutomatico = try c.decodeIfPresent(Bool.self, forKey: .ajusteAutomatico) ?? false
+        ajusteKcal = try c.decodeIfPresent(Double.self, forKey: .ajusteKcal) ?? 0
+        ayunos = try c.decodeIfPresent([SesionAyuno].self, forKey: .ayunos) ?? []
+        horasAyuno = try c.decodeIfPresent(Double.self, forKey: .horasAyuno) ?? 16
+        alimentosPropios = try c.decodeIfPresent([AlimentoPropio].self, forKey: .alimentosPropios) ?? []
+        recetas = try c.decodeIfPresent([Receta].self, forKey: .recetas) ?? []
+        plan = try c.decodeIfPresent([PlanDia].self, forKey: .plan) ?? []
+        ajustarPorcionesPlan = try c.decodeIfPresent(Bool.self, forKey: .ajustarPorcionesPlan) ?? true
+        comprasMarcadas = try c.decodeIfPresent([String].self, forKey: .comprasMarcadas) ?? []
+        recordatorios = try c.decodeIfPresent(ConfigRecordatorios.self, forKey: .recordatorios) ?? ConfigRecordatorios()
+        coach = try c.decodeIfPresent([MensajeCoach].self, forKey: .coach) ?? []
+        coachCompartirResumen = try c.decodeIfPresent(Bool.self, forKey: .coachCompartirResumen) ?? false
+        saludActiva = try c.decodeIfPresent(Bool.self, forKey: .saludActiva) ?? false
+        sumarActividad = try c.decodeIfPresent(Bool.self, forKey: .sumarActividad) ?? false
     }
 }
