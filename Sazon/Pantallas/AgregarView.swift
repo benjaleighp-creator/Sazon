@@ -19,9 +19,16 @@ struct Candidato: Hashable {
     init(alimento: AlimentoBase) {
         nombre = alimento.nombre
         por100g = alimento.por100g
-        origen = .ins
-        codigoINS = alimento.codigo
+        // Tus alimentos ("P:") y recetas ("R:") no son de la tabla del INS.
+        let propio = alimento.codigo.hasPrefix("P:") || alimento.codigo.hasPrefix("R:")
+        origen = propio ? .manual : .ins
+        codigoINS = propio ? nil : alimento.codigo
         medidas = alimento.medidas
+        if propio, let porcion = alimento.medidas.first, alimento.codigo.hasPrefix("R:") {
+            gramos = porcion.gramos
+            medida = porcion
+            cantidadMedida = 1
+        }
     }
 
     init(producto: ProductoEnvasado) {

@@ -24,12 +24,20 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>GrupoCompartido</key>
+	<string>group.pe.benjamin.sazon</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Sazón usa la cámara para tomar fotos de tus platos y para escanear códigos de barras de productos envasados.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Sazón lee tus pasos, calorías activas y peso de Apple Salud para ajustar tu meta del día. No sale de tu iPhone.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Sazón guarda en Apple Salud el peso que anotas en la app.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sazón usa tu galería solo para que elijas una foto de tu plato y la IA identifique los alimentos.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

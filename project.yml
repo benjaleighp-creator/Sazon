@@ -2,8 +2,10 @@
 # Sazón — especificación de XcodeGen.
 # El proyecto de Xcode (.xcodeproj) no se sube al repositorio: lo
 # genera GitHub Actions con `xcodegen generate`.
-# Una sola app, sin extensiones ni App Group: usa 1 espacio de app y
-# 1 identificador de la cuenta gratuita de Apple.
+# La app y una extensión de widgets (calorías, agua, ayuno y la
+# Actividad en vivo). Comparten datos por el App Group
+# group.pe.benjamin.sazon. Los permisos se agregan al pseudo-firmar en
+# GitHub Actions (Configuracion/*.entitlements).
 # ============================================================
 name: Sazon
 
@@ -32,6 +34,10 @@ targets:
     platform: iOS
     sources:
       - path: Sazon
+      - path: Compartido
+    dependencies:
+      - target: SazonWidget
+        embed: true
     settings:
       base:
         PRODUCT_NAME: Sazon
@@ -40,6 +46,20 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_PREVIEWS: "YES"
+
+  SazonWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: SazonWidget
+      - path: Compartido
+    settings:
+      base:
+        PRODUCT_NAME: SazonWidget
+        PRODUCT_BUNDLE_IDENTIFIER: pe.benjamin.sazon.widget
+        INFOPLIST_FILE: Configuracion/SazonWidget-Info.plist
+        SKIP_INSTALL: "YES"
+        APPLICATION_EXTENSION_API_ONLY: "YES"
 
   # Pruebas automáticas de la lógica (sin interfaz). Compila directamente
   # los archivos de lógica pura, así no necesita abrir la app.

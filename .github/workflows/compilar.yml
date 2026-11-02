@@ -75,27 +75,42 @@ jobs:
             CURRENT_PROJECT_VERSION=${{ github.run_number }} \
             build | tee build.log
 
-      - name: Pseudo-firmar (ad-hoc)
-        # Sazón no usa App Group ni otros permisos especiales: basta una
-        # firma ad-hoc; Sideloadly firma de verdad con tu Apple ID.
+      - name: Pseudo-firmar y empaquetar las dos versiones
+        # Se arman dos .ipa:
+        # - Sazon-completa.ipa: con widgets, Actividad en vivo, App Group y
+        #   permiso de Apple Salud (Sideloadly lee estos permisos al firmar).
+        # - Sazon-sencilla.ipa: sin extensión ni permisos especiales, por si
+        #   tu cuenta gratuita o Sideloadly no aceptan la completa.
         run: |
+          set -e
           APP="build/Build/Products/Release-iphoneos/Sazon.app"
-          ls -la "$APP"
-          codesign --force --sign - "$APP"
           test -f "$APP/alimentos-ins.json" && echo "Tabla del INS incluida en la app."
+          test -d "$APP/PlugIns/SazonWidget.appex" && echo "Extensión de widgets incluida."
 
-      - name: Empaquetar el .ipa
-        run: |
-          mkdir -p Payload
-          cp -R build/Build/Products/Release-iphoneos/Sazon.app Payload/
-          zip -qry Sazon.ipa Payload
-          ls -lh Sazon.ipa
+          rm -rf completa sencilla && mkdir -p completa/Payload sencilla/Payload
+          cp -R "$APP" completa/Payload/
+          cp -R "$APP" sencilla/Payload/
 
-      - name: Subir el .ipa como artefacto descargable
+          codesign --force --sign - --entitlements Configuracion/SazonWidget.entitlements \
+            completa/Payload/Sazon.app/PlugIns/SazonWidget.appex
+          codesign --force --sign - --entitlements Configuracion/Sazon.entitlements \
+            completa/Payload/Sazon.app
+          codesign -d --entitlements - completa/Payload/Sazon.app | head -30
+
+          rm -rf sencilla/Payload/Sazon.app/PlugIns
+          codesign --force --sign - sencilla/Payload/Sazon.app
+
+          (cd completa && zip -qry ../Sazon-completa.ipa Payload)
+          (cd sencilla && zip -qry ../Sazon-sencilla.ipa Payload)
+          ls -lh Sazon-*.ipa
+
+      - name: Subir los .ipa como artefacto descargable
         uses: actions/upload-artifact@v4
         with:
           name: Sazon-ipa-version-${{ github.run_number }}
-          path: Sazon.ipa
+          path: |
+            Sazon-completa.ipa
+            Sazon-sencilla.ipa
           retention-days: 14
 
       - name: Mostrar errores de compilación

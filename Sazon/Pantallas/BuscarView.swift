@@ -16,7 +16,7 @@ struct BuscarView: View {
                     .listRowInsets(EdgeInsets())
             } else if consulta.trimmingCharacters(in: .whitespaces).isEmpty {
                 EstadoVacio(icono: "magnifyingglass", titulo: "Busca un alimento",
-                            texto: "\(almacen.tabla.alimentos.count) alimentos y platos de las Tablas Peruanas de Composición de Alimentos (INS). Prueba «palta», «pan francés» o «ají de gallina».")
+                            texto: "\(almacen.tabla.alimentos.count) alimentos y platos de las Tablas Peruanas de Composición de Alimentos (INS), más tus alimentos y recetas. Prueba «palta», «pan francés» o «ají de gallina».")
                     .listRowBackground(Color.clear)
             } else if resultados.isEmpty {
                 EstadoVacio(icono: "questionmark.circle", titulo: "Sin resultados",
@@ -31,7 +31,7 @@ struct BuscarView: View {
                                     .font(Tipo.cuerpo)
                                     .foregroundStyle(paleta.texto)
                                     .multilineTextAlignment(.leading)
-                                Text(r.alimento.grupo + " · " + r.alimento.codigo)
+                                Text(r.alimento.codigo.contains(":") ? r.alimento.grupo : r.alimento.grupo + " · " + r.alimento.codigo)
                                     .font(Tipo.pie)
                                     .foregroundStyle(paleta.textoSecundario)
                             }
@@ -50,7 +50,7 @@ struct BuscarView: View {
         }
         .listStyle(.insetGrouped)
         .fondoDePantalla()
-        .navigationTitle("Tabla del INS")
+        .navigationTitle("Buscar alimento")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $consulta, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar alimento o plato")
         .autocorrectionDisabled()
@@ -58,7 +58,7 @@ struct BuscarView: View {
             // Pequeña espera para no buscar en cada letra.
             try? await Task.sleep(nanoseconds: 150_000_000)
             guard !Task.isCancelled else { return }
-            resultados = almacen.tabla.buscar(consulta)
+            resultados = almacen.buscarTodo(consulta)
         }
     }
 }

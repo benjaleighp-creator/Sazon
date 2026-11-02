@@ -14,6 +14,7 @@ final class Almacen {
         didSet {
             guardar()
             EstiloActivo.actual = tema.estilo
+            avisarCambios()
         }
     }
 
@@ -25,6 +26,11 @@ final class Almacen {
 
     /// Último error al guardar (se muestra en Ajustes si ocurre).
     var errorGuardado: String?
+
+    /// Calorías activas de hoy según Apple Salud (0 si no está conectado).
+    var actividadSalud: Double = 0
+    /// Pasos de hoy según Apple Salud.
+    var pasosSalud: Double = 0
 
     private static let nombreArchivo = "datos-sazon.json"
 
@@ -38,7 +44,7 @@ final class Almacen {
 
     var tema: Tema { CatalogoTemas.tema(id: datos.temaID) }
 
-    var meta: Nutrientes? { CalculoMeta.metaVigente(datos) }
+    var meta: Nutrientes? { CalculoMeta.metaVigente(datos, actividadSalud: actividadSalud) }
 
     var resumenVisible: ResumenDia { Diario.resumen(de: diaVisible, en: datos.registros) }
 

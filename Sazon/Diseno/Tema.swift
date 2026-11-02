@@ -38,6 +38,8 @@ struct Paleta: Equatable {
     let heroFin: Color
     let textoHero: Color
     let textoHeroSecundario: Color
+    /// Los mismos colores del encabezado en hexadecimal (para widgets y la Actividad en vivo).
+    let hexHero: [String]
 
     init(fondo: String, superficie: String, superficieAlta: String, borde: String,
          texto: String, textoSecundario: String, acento: String, textoSobreAcento: String,
@@ -64,6 +66,7 @@ struct Paleta: Equatable {
         self.heroFin = Color(hex: heroFin)
         self.textoHero = Color(hex: textoHero)
         self.textoHeroSecundario = Color(hex: textoHeroSecundario)
+        self.hexHero = [heroInicio, heroFin, textoHero, textoHeroSecundario]
     }
 
     /// Degradado del encabezado (el contraste del texto se verifica en ambos extremos).
