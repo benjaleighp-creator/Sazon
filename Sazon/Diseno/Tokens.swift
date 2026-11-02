@@ -102,6 +102,8 @@ enum Opacidad {
     /// Relleno suave de los azulejos de color.
     static let azulejoFuerte: Double = 0.22
     static let azulejoSuave: Double = 0.10
+    /// Borde punteado de la caja de un alimento detectado.
+    static let bordeCaja: Double = 0.85
 }
 
 /// Tamaños de las piezas del rediseño (se escalan con @ScaledMetric donde aplica).
@@ -114,4 +116,11 @@ extension Medida {
     static let iconoEstampado: CGFloat = 22
     /// Separación entre íconos del estampado.
     static let pasoEstampado: CGFloat = 46
+    /// Distancia mínima de una etiqueta de detección a los bordes de la foto.
+    static let margenEtiquetaX: CGFloat = 60
+    static let margenEtiquetaY: CGFloat = 18
+    /// Alto máximo de la foto en pantallas de IA.
+    static let altoFoto: CGFloat = 340
+    /// Radio base de los puntos de la animación.
+    static let puntoDeteccion: CGFloat = 2.5
 }

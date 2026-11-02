@@ -150,6 +150,10 @@ struct RegistroFotoView: View {
     @State private var revisar = false
     @State private var envios = 0
     @State private var errorFoto: String?
+    @State private var fase: FaseDeteccion = .inactiva
+    @State private var visibles = 0
+    @State private var exitos = 0
+    @Environment(\.accessibilityReduceMotion) private var reducir
 
     private var camaraDisponible: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
@@ -159,10 +163,16 @@ struct RegistroFotoView: View {
                 if let imagen {
                     Image(uiImage: imagen)
                         .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 320)
+                        .aspectRatio(contentMode: .fit)
+                        .overlay {
+                            CapaDeteccion(fase: fase, alimentos: analisis.alimentos, visibles: visibles)
+                        }
                         .clipShape(RoundedRectangle(cornerRadius: Radio.tarjeta, style: .continuous))
+                        .frame(maxWidth: .infinity, maxHeight: Medida.altoFoto)
                         .accessibilityLabel("Foto del plato elegida")
+                    if case .detectando = fase {
+                        ListaDetectados(alimentos: analisis.alimentos, visibles: visibles)
+                    }
                 } else {
                     EstadoVacio(icono: "camera", titulo: "Toma o elige una foto",
                                 texto: "Que se vea todo el plato, con buena luz y desde arriba o un poco inclinada.")
@@ -194,7 +204,7 @@ struct RegistroFotoView: View {
                 Label("Analizar con IA", systemImage: "sparkles")
             }
             .buttonStyle(.principal)
-            .disabled(imagen == nil || estado == .analizando)
+            .disabled(imagen == nil || estado == .analizando || esDetectando)
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
         }
@@ -202,6 +212,7 @@ struct RegistroFotoView: View {
             Camara { foto in
                 imagen = foto
                 estado = .inactivo
+                fase = .inactiva
             }
             .ignoresSafeArea()
         }
@@ -212,6 +223,7 @@ struct RegistroFotoView: View {
                     imagen = foto
                     errorFoto = nil
                     estado = .inactivo
+                    fase = .inactiva
                 } else {
                     errorFoto = "No se pudo abrir esa foto. Prueba con otra."
                 }
@@ -221,9 +233,35 @@ struct RegistroFotoView: View {
             RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
+        .sensoryFeedback(.selection, trigger: visibles)
+        .sensoryFeedback(.success, trigger: exitos)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
             if case .error = nuevo { return true } else { return false }
         }
+        .onChange(of: revisar) { _, abierto in
+            // Al volver de la revisión, la foto queda limpia.
+            if !abierto { fase = .inactiva; visibles = 0 }
+        }
+    }
+
+    private var esDetectando: Bool {
+        if case .detectando = fase { return true }
+        return false
+    }
+
+    /// Revela las etiquetas una tras otra y pasa a la revisión.
+    private func revelar() async {
+        let n = analisis.alimentos.count
+        let paso = Deteccion.intervaloEtiquetas(n)
+        // Los puntos tardan 0,6 s en reunirse (0,2 s con Reducir movimiento).
+        try? await Task.sleep(nanoseconds: UInt64((reducir ? 0.2 : 0.6) * 1e9))
+        for i in 0..<n {
+            withAnimation(Movimiento.estandar.animacion(reducir: reducir)) { visibles = i + 1 }
+            try? await Task.sleep(nanoseconds: UInt64(paso * 1e9))
+        }
+        try? await Task.sleep(nanoseconds: 350_000_000)
+        exitos += 1
+        revisar = true
     }
 
     @ViewBuilder
@@ -246,18 +284,26 @@ struct RegistroFotoView: View {
         }
         envios += 1
         estado = .analizando
+        visibles = 0
+        analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
+        let inicio = Date()
+        fase = .esperando(inicio: inicio)
         Task {
             do {
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos)
                 analisis = try await proveedor.analizar(fotoJPEG: jpeg)
                 estado = .inactivo
-                revisar = true
+                fase = .detectando(inicio: Date(), desdeEspera: Date().timeIntervalSince(inicio))
+                await revelar()
             } catch let e as ErrorIA {
                 estado = .error(e)
+                fase = .detenida
             } catch is CancellationError {
                 estado = .inactivo
+                fase = .inactiva
             } catch {
                 estado = .error(.desconocido(error.localizedDescription))
+                fase = .detenida
             }
         }
     }

@@ -16,9 +16,11 @@ struct AlimentoIdentificado: Equatable, Identifiable {
     /// Rango probable de la porción (la foto no muestra el peso real).
     var gramosMin: Double? = nil
     var gramosMax: Double? = nil
+    /// Dónde está en la foto (solo si Gemini devolvió una caja válida).
+    var caja: CajaFoto? = nil
 
     static func == (a: AlimentoIdentificado, b: AlimentoIdentificado) -> Bool {
-        a.gramosMin == b.gramosMin && a.gramosMax == b.gramosMax &&
+        a.gramosMin == b.gramosMin && a.gramosMax == b.gramosMax && a.caja == b.caja &&
         a.nombre == b.nombre && a.gramos == b.gramos && a.confianza == b.confianza &&
         a.medida == b.medida && a.cantidadMedida == b.cantidadMedida && a.por100g == b.por100g
     }
@@ -121,6 +123,8 @@ enum LectorIA {
 
     - "gramos_min" y "gramos_max": el rango probable de la porción. Una foto no muestra el peso real ni lo que hay dentro \
     (rellenos, lo que está debajo), así que el rango debe ser realista; "gramos" va dentro del rango.
+    - "caja": si hay foto, la caja delimitadora del alimento como [ymin, xmin, ymax, xmax] normalizada de 0 a 1000. \
+    Si no hay foto o no puedes ubicarlo, lista vacía. No adivines posiciones.
     Cómo estimar las porciones: razona paso a paso antes de responder. Compara el tamaño con lo que se ve (un plato llano \
     mide unos 26 cm, una cuchara unos 15 cm) y, si no se puede saber, asume una porción estándar de un restaurante o una casa en Perú. \
     No subestimes los platos grandes.
@@ -152,7 +156,12 @@ enum LectorIA {
                 "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
                 "grasas_100g": numero("Grasas por 100 g", 0, 100),
                 "gramos_min": numero("Mínimo probable de la porción en gramos", 0, 5000),
-                "gramos_max": numero("Máximo probable de la porción en gramos", 0, 5000)
+                "gramos_max": numero("Máximo probable de la porción en gramos", 0, 5000),
+                "caja": [
+                    "type": "array",
+                    "description": "[ymin, xmin, ymax, xmax] de 0 a 1000, o vacía",
+                    "items": numero("Coordenada de 0 a 1000", 0, 1000)
+                ] as [String: Any]
             ] as [String: Any],
             "required": ["nombre", "gramos", "confianza", "medida", "cantidad", "gramos_por_medida",
                          "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g", "gramos_min", "gramos_max"]
@@ -306,7 +315,8 @@ enum LectorIA {
                 cantidadMedida: cantidad,
                 por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g),
                 gramosMin: minimo,
-                gramosMax: maximo
+                gramosMax: maximo,
+                caja: CajaFoto.desdeGemini(item["caja"])
             ))
         }
         return resultado

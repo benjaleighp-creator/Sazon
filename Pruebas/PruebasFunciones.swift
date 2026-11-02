@@ -356,3 +356,57 @@ final class PruebasRangosYOcultos: XCTestCase {
         for e in ExtraOculto.todos { XCTAssertTrue(codigos.contains(e.codigoINS), "Falta \(e.codigoINS)") }
     }
 }
+
+final class PruebasDeteccion: XCTestCase {
+    func testCajaValida() throws {
+        let c = try XCTUnwrap(CajaFoto.desdeGemini([100, 200, 500, 800]))
+        XCTAssertEqual(c.ymin, 0.1, accuracy: 0.0001)
+        XCTAssertEqual(c.xmin, 0.2, accuracy: 0.0001)
+        XCTAssertEqual(c.centro.x, 0.5, accuracy: 0.0001)
+        XCTAssertEqual(c.centro.y, 0.3, accuracy: 0.0001)
+    }
+
+    func testCajasInvalidasSeIgnoran() {
+        XCTAssertNil(CajaFoto.desdeGemini([]))
+        XCTAssertNil(CajaFoto.desdeGemini([0, 0, 0, 0]))
+        XCTAssertNil(CajaFoto.desdeGemini([500, 100, 400, 300]), "ymax menor que ymin")
+        XCTAssertNil(CajaFoto.desdeGemini([100, 100, 1200, 300]), "fuera de 0–1000")
+        XCTAssertNil(CajaFoto.desdeGemini([1, 2, 3]))
+        XCTAssertNil(CajaFoto.desdeGemini("100,200,300,400"))
+    }
+
+    func testRespuestaConCaja() throws {
+        let json = #"{"alimentos":[{"nombre":"Arroz","gramos":150,"confianza":0.8,"medida":"","cantidad":0,"gramos_por_medida":0,"kcal_100g":130,"proteina_100g":2,"carbohidratos_100g":28,"grasas_100g":0,"caja":[300,100,700,500]},{"nombre":"Pollo","gramos":120,"confianza":0.8,"medida":"","cantidad":0,"gramos_por_medida":0,"kcal_100g":180,"proteina_100g":25,"carbohidratos_100g":0,"grasas_100g":8,"caja":[]}],"posibles_ocultos":[]}"#
+        let a = try LectorIA.analisis(desde: json)
+        XCTAssertNotNil(a.alimentos[0].caja)
+        XCTAssertNil(a.alimentos[1].caja)
+    }
+
+    func testIntervaloNoAlargaLaEspera() {
+        XCTAssertEqual(Deteccion.intervaloEtiquetas(0), 0)
+        XCTAssertEqual(Deteccion.intervaloEtiquetas(2), 0.32, accuracy: 0.001)
+        XCTAssertLessThanOrEqual(Deteccion.intervaloEtiquetas(10) * 10, 1.2001)
+    }
+
+    func testPuntosDentroDeLaFotoYReunion() {
+        for i in 0..<40 {
+            for t in stride(from: 0.0, through: 30, by: 1.7) {
+                let p = Deteccion.deambular(i, t: t)
+                XCTAssertTrue((0...1).contains(p.x) && (0...1).contains(p.y))
+            }
+        }
+        let caja = CajaFoto(xmin: 0.2, ymin: 0.2, xmax: 0.4, ymax: 0.4)
+        let final = Deteccion.reunir(3, desde: 5, avance: 1, cajas: [caja])
+        XCTAssertTrue((0.2...0.4).contains(final.x) && (0.2...0.4).contains(final.y))
+        let inicio = Deteccion.reunir(3, desde: 5, avance: 0, cajas: [caja])
+        let p = Deteccion.deambular(3, t: 5)
+        XCTAssertEqual(inicio.x, p.x, accuracy: 0.0001)
+        XCTAssertEqual(Deteccion.cantidadPuntos(ahorro: true) < Deteccion.cantidadPuntos(ahorro: false), true)
+    }
+
+    func testSinCajasSeReunenEnElCentro() {
+        let d = Deteccion.destino(5, cajas: [nil, nil])
+        XCTAssertEqual(d.x, 0.5, accuracy: 0.07)
+        XCTAssertEqual(d.y, 0.5, accuracy: 0.07)
+    }
+}
