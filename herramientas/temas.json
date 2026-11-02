@@ -1,0 +1,68 @@
+{
+  "nota": "Paletas de Sazón. Edita aquí, ejecuta verificar_contraste.py y luego generar_temas.py. Nunca edites CatalogoTemas.swift a mano.",
+  "campos": [
+    "fondo", "superficie", "superficieAlta", "borde",
+    "texto", "textoSecundario",
+    "acento", "textoSobreAcento", "acentoSuave",
+    "exito", "aviso", "peligro",
+    "calorias", "proteina", "carbohidratos", "grasas"
+  ],
+  "temas": [
+    {
+      "id": "mercado",
+      "nombre": "Mercado",
+      "concepto": "Puestos de mercado: crema, terracota y los colores de los ingredientes.",
+      "estilo": {
+        "diseno": "redondeada",
+        "pesoTitulo": "bold",
+        "radioTarjeta": 22,
+        "radioControl": 14,
+        "sombra": "suave",
+        "transicion": "fluida",
+        "cifrasMono": false
+      },
+      "claro": [
+        "F7F1E8", "FFFCF7", "F0E7DA", "E2D5C3",
+        "2A1D14", "6B5545",
+        "A8401C", "FFFFFF", "F6E1D6",
+        "2F7A3D", "8F5400", "B3261E",
+        "C2501F", "7A3E9D", "A07000", "4E7D2E"
+      ],
+      "oscuro": [
+        "17120E", "211A15", "2E251E", "433629",
+        "F6EEE4", "C8B7A6",
+        "F08A5D", "1E120B", "3D2419",
+        "7BC98A", "F0B44C", "FF8A80",
+        "F2875A", "C79BE6", "F2C14E", "9CCB6E"
+      ]
+    },
+    {
+      "id": "chicha",
+      "nombre": "Chicha",
+      "concepto": "Morado de maíz, noche limeña y un toque de ají.",
+      "estilo": {
+        "diseno": "redondeada",
+        "pesoTitulo": "heavy",
+        "radioTarjeta": 26,
+        "radioControl": 16,
+        "sombra": "suave",
+        "transicion": "elastica",
+        "cifrasMono": false
+      },
+      "claro": [
+        "F6F2F8", "FFFFFF", "EEE6F3", "DCCFE6",
+        "21142B", "5E4E6B",
+        "6D2F8E", "FFFFFF", "EEE1F5",
+        "2C7A43", "8F5A00", "B0262B",
+        "B5481F", "6D2F8E", "9C7000", "3F7A33"
+      ],
+      "oscuro": [
+        "140E19", "1E1625", "2A2033", "3F3249",
+        "F4EEF8", "C3B5CF",
+        "C49BE3", "1C1024", "33243F",
+        "7DCB92", "F0B44C", "FF8C8C",
+        "F2875A", "C49BE3", "F0C24B", "9ACB6C"
+      ]
+    }
+  ]
+}

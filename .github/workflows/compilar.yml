@@ -1,0 +1,173 @@
+# ============================================================
+# Compila Sazón en una máquina macOS de GitHub y produce un archivo
+# Sazon.ipa SIN firma real, listo para firmarlo en tu PC con Sideloadly
+# usando tu Apple ID gratuito.
+#
+# Se ejecuta:
+# - solo, cada vez que subes cambios de código a la rama principal
+#   (los cambios en README, Marca o herramientas no compilan), y
+# - a mano: pestaña "Actions" > "Compilar IPA" > "Run workflow".
+# ============================================================
+name: Compilar IPA
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "README.md"
+      - "Marca/**"
+      - "herramientas/**"
+  workflow_dispatch:
+
+jobs:
+  compilar:
+    name: Compilar Sazón
+    # macos-15 tiene más máquinas disponibles que macos-26. Si la imagen
+    # trae Xcode 26, se usa ese (estilo de iOS 26).
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Usar Xcode 26 si está instalado (estilo de iOS 26)
+        run: |
+          NUEVO=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -viE "beta|release_candidate" | sort -V | tail -1)
+          if [ -n "$NUEVO" ]; then
+            sudo xcode-select -s "$NUEVO"
+          else
+            echo "No hay Xcode 26 en esta imagen; se usa el Xcode por defecto."
+          fi
+          echo "::notice::Xcode usado: $(xcodebuild -version | head -1), SDK iOS $(xcrun --sdk iphoneos --show-sdk-version)"
+
+      - name: Verificar la tabla del INS dentro de la app
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("Sazon/Datos/alimentos-ins.json", encoding="utf-8"))
+          n = len(d["alimentos"])
+          print(f"Tabla del INS: {n} alimentos y platos")
+          if n < 1000:
+              print("::error::La tabla del INS tiene muy pocos alimentos")
+              sys.exit(1)
+          PY
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar el proyecto de Xcode
+        run: xcodegen generate --spec project.yml
+
+      - name: Compilar (sin firma)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Sazon.xcodeproj \
+            -scheme Sazon \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            build | tee build.log
+
+      - name: Pseudo-firmar (ad-hoc)
+        # Sazón no usa App Group ni otros permisos especiales: basta una
+        # firma ad-hoc; Sideloadly firma de verdad con tu Apple ID.
+        run: |
+          APP="build/Build/Products/Release-iphoneos/Sazon.app"
+          ls -la "$APP"
+          codesign --force --sign - "$APP"
+          test -f "$APP/alimentos-ins.json" && echo "Tabla del INS incluida en la app."
+
+      - name: Empaquetar el .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/Sazon.app Payload/
+          zip -qry Sazon.ipa Payload
+          ls -lh Sazon.ipa
+
+      - name: Subir el .ipa como artefacto descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sazon-ipa-version-${{ github.run_number }}
+          path: Sazon.ipa
+          retention-days: 14
+
+      - name: Mostrar errores de compilación
+        if: failure()
+        run: |
+          grep -E "error:|fatal error" build.log | sort -u | head -40 | while IFS= read -r linea; do
+            echo "::error::${linea}"
+          done || true
+
+      - name: Subir el registro si algo falló
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registro-de-compilacion
+          path: build.log
+          if-no-files-found: ignore
+
+  pruebas:
+    name: Pruebas automáticas
+    # Va aparte: si una prueba falla, el .ipa se compila igual, pero la
+    # ejecución queda en rojo para revisar qué se rompió.
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Verificar el contraste de los temas
+        run: python3 herramientas/verificar_contraste.py
+
+      - name: Usar Xcode 26 si está instalado
+        run: |
+          NUEVO=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -viE "beta|release_candidate" | sort -V | tail -1)
+          if [ -n "$NUEVO" ]; then sudo xcode-select -s "$NUEVO"; fi
+          xcodebuild -version
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar el proyecto de Xcode
+        run: xcodegen generate --spec project.yml
+
+      - name: Elegir un simulador de iPhone disponible
+        id: simulador
+        run: |
+          ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          datos = json.load(sys.stdin)["devices"]
+          for runtime in sorted(datos, reverse=True):
+              if "iOS" not in runtime:
+                  continue
+              for d in datos[runtime]:
+                  if d["name"].startswith("iPhone"):
+                      print(d["udid"]); sys.exit(0)
+          ')
+          echo "Simulador: $ID"
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+
+      - name: Ejecutar las pruebas
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Sazon.xcodeproj \
+            -scheme Pruebas \
+            -destination "id=${{ steps.simulador.outputs.id }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee pruebas.log
+
+      - name: Mostrar pruebas fallidas
+        if: failure()
+        run: |
+          grep -E "error:|failed|XCTAssert" pruebas.log | sort -u | head -40 | while IFS= read -r linea; do
+            echo "::error::${linea}"
+          done || true

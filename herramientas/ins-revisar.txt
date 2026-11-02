@@ -1,0 +1,52 @@
+Filas para revisar contra el PDF (no son necesariamente errores).
+
+  B109  p.38   Estragón, secos  — kcal 269 vs macros 327
+  B113  p.39   Llampun Cjana "Cjana-cjana"  — kcal 254 vs macros 319
+  B129  p.40   Orégano, seco  — kcal 306 vs macros 223
+  C106  p.48   Cocona, jugo natural, cocido, sin azúcar  — faltan: proteína, grasa (se usó 0)
+  C118  p.49   Manzana, jugo natural, envasado  — faltan: proteína, grasa (se usó 0)
+  C123  p.49   Maracuyá, jugo natural, envasado  — faltan: proteína, grasa (se usó 0)
+  C126  p.49   Naranja, jugo natural, envasado  — faltan: proteína, grasa (se usó 0)
+  C127  p.50   Naranja, néctar envasado  — faltan: proteína, grasa (se usó 0)
+   E14  p.58   Langostino blanco  — faltan: carbohidratos (se usó 0)
+   E19  p.59   Pescado atún, en conserva  — faltan: carbohidratos (se usó 0)
+   E20  p.59   Pescado atún, enlatado en agua  — faltan: carbohidratos (se usó 0)
+   E21  p.59   Pescado atún, enlatado en aceite  — faltan: carbohidratos (se usó 0)
+   E22  p.59   Pescado atún, fresco  — faltan: carbohidratos (se usó 0)
+   E24  p.59   Pescado bacalao fresco  — faltan: carbohidratos (se usó 0)
+   E25  p.59   Pescado bacalao seco salado  — faltan: carbohidratos (se usó 0)
+   E26  p.59   Pescado bagre  — faltan: carbohidratos (se usó 0)
+   E27  p.59   Pescado bonito  — faltan: carbohidratos (se usó 0)
+   E34  p.60   Pescado caballa, en conserva  — faltan: carbohidratos (se usó 0)
+   E37  p.60   Pescado cabinza  — faltan: carbohidratos (se usó 0)
+   E38  p.60   Pescado cabrilla  — faltan: carbohidratos (se usó 0)
+   E41  p.60   Pescado chita  — faltan: carbohidratos (se usó 0)
+   E42  p.60   Pescado chita, huevera de  — faltan: carbohidratos (se usó 0)
+   E44  p.61   Pescado coco  — faltan: carbohidratos (se usó 0)
+   E46  p.61   Pescado congrio  — faltan: carbohidratos (se usó 0)
+   E51  p.61   Pescado lenguado  — faltan: carbohidratos (se usó 0)
+   E52  p.61   Pescado lisa  — faltan: carbohidratos (se usó 0)
+   E55  p.61   Pescado machete  — faltan: carbohidratos (se usó 0)
+   E57  p.62   Pescado merluza, fresco  — faltan: carbohidratos (se usó 0)
+   E58  p.62   Pescado merluza, seco  — faltan: carbohidratos (se usó 0)
+   E63  p.62   Pescado pejerrey  — faltan: carbohidratos (se usó 0)
+   E64  p.62   Pescado pejesapo  — faltan: carbohidratos (se usó 0)
+   E71  p.63   Pescado róbalo  — faltan: carbohidratos (se usó 0)
+   E74  p.63   Pescado sardina, en grated, conserva  — faltan: carbohidratos (se usó 0)
+   E75  p.63   Pescado sardina, filete, conserva  — faltan: carbohidratos (se usó 0)
+   E78  p.63   Pescado toyo, fresco  — faltan: carbohidratos (se usó 0)
+   E81  p.63   Pescado trucha rosada  — faltan: carbohidratos (se usó 0)
+   E83  p.63   Pescado trucha, fresca  — faltan: carbohidratos (se usó 0)
+   F30  p.68   Pollo, sangre cruda de  — faltan: carbohidratos (se usó 0)
+   F46  p.69   Carnero, carne seca sin hueso (chalona)  — faltan: carbohidratos (se usó 0)
+   F47  p.69   Chicharrón de cerdo, cocido  — faltan: carbohidratos (se usó 0)
+   F48  p.69   Chicharrón de prensa  — faltan: carbohidratos (se usó 0)
+   F54  p.69   Queso de chancho  — faltan: carbohidratos (se usó 0)
+   H14  p.79   Vino blanco (grado alcohólico: 12.0)  — faltan: proteína, grasa, carbohidratos (se usó 0)
+   H15  p.80   Vino tinto (grado alcohólico: 10.2)  — faltan: proteína, grasa, carbohidratos (se usó 0)
+    L2  p.85   Algas  — kcal 249 vs macros 391
+    L4  p.85   Café grano sin tostar  — kcal 203 vs macros 417
+   L20  p.86   Canela, molida  — kcal 261 vs macros 364
+   L22  p.86   Cushuro o nostoc deshidratada (alga)  — kcal 242 vs macros 308
+   L29  p.87   Vainilla, extracto  — kcal 288 vs macros 52
+   L38  p.87   Chocolate simple con azúcar (para taza)  — kcal 248 vs macros 467

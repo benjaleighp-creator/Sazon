@@ -1,0 +1,1693 @@
+codigo,nombre,grupo,kcal,proteina,carbohidratos,grasas,pagina,filas_promediadas
+A1,"Kiwicha, achita o achis o amaranto",Cereales y derivados,351.0,12.8,59.8,6.6,16,1
+A2,Arroz pilado o pulido cocido,Cereales y derivados,115.0,2.4,25.2,0.1,16,1
+A3,Arroz blanco corriente,Cereales y derivados,358.0,7.8,77.6,0.7,16,1
+A4,Arroz con cáscara,Cereales y derivados,332.0,5.9,71.6,2.0,16,1
+A5,Avena envasada,Cereales y derivados,380.0,13.7,71.3,4.7,16,1
+A6,"Avena, hojuela cocida",Cereales y derivados,54.0,1.3,10.9,0.5,16,1
+A7,"Avena, hojuela cruda",Cereales y derivados,333.0,13.3,61.6,4.0,16,1
+A8,"Cañihua, variedad amarilla",Cereales y derivados,381.0,15.7,62.5,7.5,16,1
+A9,Cañihua gris,Cereales y derivados,356.0,14.0,64.0,4.5,16,1
+A10,"Cañihua, hojuela de",Cereales y derivados,318.0,14.5,45.5,8.9,16,1
+A11,Cañihua parda,Cereales y derivados,355.0,13.8,66.2,3.5,16,1
+A12,Cebada con cáscara,Cereales y derivados,284.0,8.4,60.2,2.0,16,1
+A13,"Cebada, llunka de (morón americano)",Cereales y derivados,249.0,1.9,59.8,0.7,16,1
+A14,"Cebada, mashka o machica",Cereales y derivados,302.0,8.6,67.3,0.7,17,1
+A15,"Cebada para mote, pelada",Cereales y derivados,328.0,8.2,73.3,1.1,17,1
+A16,"Cebada tostada, harina integral",Cereales y derivados,274.0,8.7,54.8,3.2,17,1
+A17,Cebada perlada o resbalada cocida,Cereales y derivados,59.0,1.0,13.9,0.1,17,1
+A18,Cebada perlada o resbalada cruda,Cereales y derivados,277.0,5.3,64.2,0.6,17,1
+A19,Cebada tostada y molida (chaquepa),Cereales y derivados,349.0,7.7,79.7,0.8,17,1
+A20,Chancay (bizcocho),Cereales y derivados,355.0,8.8,64.4,6.9,17,1
+A21,Fideo crudo fortificado con hierro,Cereales y derivados,337.0,9.4,74.5,0.2,17,1
+A22,Fideo tallarín crudo fortificado con hierro,Cereales y derivados,305.0,9.5,66.4,0.1,17,1
+A23,Fideo tallarín sancochado fortificado con hierro,Cereales y derivados,90.0,3.1,19.5,0.0,17,1
+A24,Galleta de soda (salada),Cereales y derivados,433.0,10.1,65.0,14.7,17,1
+A25,Galleta de vainilla (dulce),Cereales y derivados,434.0,6.0,73.8,12.7,17,1
+A26,Maíz alazán,Cereales y derivados,346.0,8.2,72.7,3.7,17,1
+A27,"Maíz alazán, jora fresca de",Cereales y derivados,289.0,5.4,62.3,2.8,17,1
+A28,"Maíz alazán, jora seca de",Cereales y derivados,347.0,7.0,73.8,3.6,18,1
+A29,Maíz amarillo,Cereales y derivados,355.0,6.7,73.6,4.8,18,1
+A30,Maíz blanco crudo,Cereales y derivados,343.0,5.9,72.9,4.0,18,1
+A31,Maíz blanco tostado,Cereales y derivados,389.0,7.2,82.1,4.6,18,1
+A32,Maíz cancha tostada de,Cereales y derivados,342.0,6.7,74.6,2.7,18,1
+A33,"Maíz, chochoca de, sin moler",Cereales y derivados,349.0,5.2,78.0,2.5,18,1
+A34,"Maíz, grano fresco (choclo)",Cereales y derivados,104.0,3.3,25.1,0.8,18,1
+A35,"Maíz, germinado seco",Cereales y derivados,314.0,6.2,67.0,3.2,18,1
+A36,"Maíz, harina de",Cereales y derivados,326.0,8.7,61.6,6.5,18,1
+A37,"Maíz, maicena",Cereales y derivados,365.0,0.3,90.4,0.1,18,1
+A38,"Maíz, morado sin coronta",Cereales y derivados,355.0,7.3,76.2,3.4,18,1
+A39,"Maíz, mote de, sancochado",Cereales y derivados,103.0,2.6,21.1,1.3,18,1
+A40,"Maíz, pachuco de",Cereales y derivados,349.0,7.3,73.5,3.9,18,1
+A41,"Maíz, para mote pelado",Cereales y derivados,349.0,5.9,78.3,2.1,18,1
+A42,"Maíz, para mote sin pelar",Cereales y derivados,345.0,5.7,78.7,1.5,19,1
+A43,"Maíz, polenta cruda de",Cereales y derivados,324.0,8.3,72.4,1.2,19,1
+A44,"Maíz, tocosh crudo",Cereales y derivados,205.0,2.8,41.1,3.0,19,1
+A45,Pan de cebada (serrano),Cereales y derivados,295.0,7.2,66.2,0.2,19,1
+A46,Pan de labranza,Cereales y derivados,328.0,9.6,71.8,0.3,19,1
+A47,Pan de molde,Cereales y derivados,317.0,6.8,66.8,2.5,19,1
+A48,Pan bollo o bollitos de queso de Huancavelica,Cereales y derivados,310.0,9.5,51.7,7.3,19,1
+A49,Pan francés fortificado con hierro,Cereales y derivados,277.0,8.4,60.5,0.2,19,1
+A50,"Quinua, afrecho de",Cereales y derivados,351.0,10.7,65.9,4.5,19,1
+A51,"Quinua blanca, (Junín)",Cereales y derivados,334.0,12.5,56.0,6.5,19,1
+A52,Quinua blanca (Puno),Cereales y derivados,355.0,13.3,61.2,6.1,19,1
+A53,Quinua cocida,Cereales y derivados,89.0,2.8,16.3,1.3,19,1
+A54,Quinua,Cereales y derivados,351.0,13.6,60.7,5.8,19,1
+A55,"Quinua dulce, blanca (Junín)",Cereales y derivados,361.0,11.1,61.5,7.7,19,1
+A56,"Quinua dulce, blanca (Puno)",Cereales y derivados,349.0,11.6,63.0,5.3,20,1
+A57,"Quinua dulce, rosada (Junín)",Cereales y derivados,360.0,12.3,61.2,7.2,20,1
+A58,"Quinua, harina de",Cereales y derivados,337.0,12.4,57.9,6.0,20,1
+A59,"Quinua, hojuela de",Cereales y derivados,376.0,13.9,63.1,7.4,20,1
+A60,Quinua rosada (Puno),Cereales y derivados,356.0,12.5,61.7,6.4,20,1
+A61,"Quinua, sémola de",Cereales y derivados,362.0,19.5,47.9,10.7,20,1
+A62,Sorgo,Cereales y derivados,309.0,8.0,66.5,4.0,20,1
+A63,"Trigo, harina fortificada con hierro de",Cereales y derivados,362.0,10.5,73.6,2.0,20,1
+A64,"Trigo, llunka de",Cereales y derivados,312.0,9.1,71.8,1.0,20,1
+A65,"Trigo, harina tostada de (machica)",Cereales y derivados,330.0,7.9,77.2,1.2,20,1
+A66,"Trigo, mote de, sancochado",Cereales y derivados,154.0,2.5,37.0,0.6,20,1
+A67,Trigo para mote pelado cocido,Cereales y derivados,63.0,1.9,14.7,0.1,20,1
+A68,Trigo para mote pelado crudo,Cereales y derivados,325.0,9.8,74.6,0.9,20,1
+A69,"Trigo, pelado",Cereales y derivados,330.0,8.4,76.1,1.4,20,1
+A70,Trigo resbalado cocido,Cereales y derivados,83.0,2.8,18.6,0.3,21,1
+A71,Trigo resbalado crudo,Cereales y derivados,327.0,11.4,71.8,1.8,21,1
+A72,"Trigo, sémola de",Cereales y derivados,319.0,7.8,74.5,1.1,21,1
+A73,Trigo,Cereales y derivados,289.0,10.3,62.5,1.9,21,1
+A74,Barra de cereales (avena y arrocillo) con maní y pasas,Cereales y derivados,391.0,5.8,70.9,9.4,21,1
+A75,Barra de cereales con sabor a chocolate y chocochips,Cereales y derivados,386.0,4.9,72.4,8.5,21,1
+A76,"Barra de cereales (avena, arroz) con aguaymanto",Cereales y derivados,371.0,5.3,71.0,7.3,21,1
+A77,"Barra de cereales (maíz, trigo, arroz) sabor a miel con leche, vitaminas y minerales",Cereales y derivados,397.0,4.4,75.5,8.5,21,1
+A78,Bollito de maíz de Huánuco,Cereales y derivados,426.0,9.6,57.5,17.5,21,1
+A79,Bollito de yema de Huánuco,Cereales y derivados,384.0,9.9,57.5,12.6,21,1
+A80,"Cañihua, harina de",Cereales y derivados,327.0,15.2,48.2,8.3,21,1
+A81,"Cañihua, variedad roja",Cereales y derivados,381.0,15.4,62.7,7.5,21,1
+A82,"Cañihua, variedad blanca",Cereales y derivados,382.0,15.4,62.5,7.7,21,1
+A83,Galleta de soda (San Jorge),Cereales y derivados,440.0,9.3,70.8,13.3,21,1
+A84,Galleta de vainilla (Field),Cereales y derivados,462.0,7.3,73.1,15.6,22,1
+A85,Galleta dulce con avena y base sabor a chocolate (con fibra),Cereales y derivados,461.0,6.7,64.1,19.8,22,1
+A86,Galleta dulce con avena y base sabor a frutos rojos,Cereales y derivados,465.0,6.7,62.8,20.8,22,1
+A87,Galleta dulce con avena y granola (con fibra),Cereales y derivados,444.0,8.0,65.2,16.9,22,1
+A88,"Galleta dulce con avena, manzana y canela (con fibra)",Cereales y derivados,426.0,7.2,67.4,14.3,22,1
+A89,Galleta dulce con avena y uvas pasas (con fibra),Cereales y derivados,433.0,7.2,67.6,14.9,22,1
+A90,Galleta dulce con relleno (Casino),Cereales y derivados,499.0,4.7,70.5,22.0,22,1
+A91,"Galleta dulce con relleno ""chocolate"" (Coronita)",Cereales y derivados,492.0,5.7,69.8,21.1,22,1
+A92,Galletas nutritivas de maca,Cereales y derivados,443.0,7.0,67.6,16.1,22,1
+A93,Hiwicto marfil oscuro,Cereales y derivados,368.0,9.0,76.8,2.0,22,1
+A94,Hiwicto negro,Cereales y derivados,365.0,9.0,74.6,2.7,22,1
+A95,Kara ceniza o kala,Cereales y derivados,367.0,11.6,73.6,2.3,22,1
+A96,Kara color pajizo,Cereales y derivados,366.0,7.2,76.9,2.5,22,1
+A97,"Kiwicha, harina de",Cereales y derivados,352.0,12.2,58.0,7.9,22,1
+A98,Kiwicha pop de Huánuco (listo para consumo),Cereales y derivados,370.0,13.1,59.5,8.9,23,1
+A99,"Kiwicha, precocida, hojuela de",Cereales y derivados,400.0,13.4,68.0,8.1,23,1
+A100,"Kiwicha, precocida, hojuela de (orgánica)",Cereales y derivados,352.0,11.9,58.9,7.6,23,1
+A101,"Llipta sara, variedad de maíz",Cereales y derivados,370.0,7.4,75.9,4.2,23,1
+A102,"Maíz blanco, harina",Cereales y derivados,343.0,5.5,71.0,5.0,23,1
+A103,"Maíz blanco precocido, harina de (chochoca)",Cereales y derivados,328.0,6.8,65.9,5.2,23,1
+A104,"Maíz morado, harina de (api)",Cereales y derivados,318.0,8.5,64.5,4.2,23,1
+A105,Pan árabe,Cereales y derivados,290.0,10.3,54.3,3.5,23,1
+A106,Pan cachanga,Cereales y derivados,445.0,7.7,47.4,26.1,23,1
+A107,Pan campesino de Lima,Cereales y derivados,276.0,10.0,46.0,5.7,23,1
+A108,Pan ciabatta,Cereales y derivados,265.0,9.2,52.6,2.0,23,1
+A109,Pan chapla,Cereales y derivados,321.0,9.3,63.2,3.5,23,1
+A110,Pan chuta,Cereales y derivados,387.0,9.5,62.3,11.1,23,1
+A111,Pan cortadillo de Cajamarca,Cereales y derivados,361.0,6.9,67.2,7.1,23,1
+A112,Pan cuay de trigo de Carhuaz,Cereales y derivados,358.0,10.0,53.4,11.6,24,1
+A113,Pan cuay de trigo de Huaraz,Cereales y derivados,297.0,7.6,43.8,10.1,24,1
+A114,Pan de calabaza de Huancavelica,Cereales y derivados,274.0,11.5,48.4,3.9,24,1
+A115,Pan de chicharrón de Chiclayo,Cereales y derivados,338.0,9.9,54.3,9.0,24,1
+A116,Pan de girasol de Lima,Cereales y derivados,267.0,10.7,38.7,7.7,24,1
+A117,Pan de hamburguesa de Iquitos,Cereales y derivados,316.0,10.8,57.7,4.7,24,1
+A118,Pan de huevo,Cereales y derivados,336.0,9.3,59.4,6.9,24,1
+A119,Pan de maíz,Cereales y derivados,319.0,7.7,52.6,8.7,24,1
+A120,Pan de maíz de Carhuaz,Cereales y derivados,323.0,9.2,53.5,8.0,24,1
+A121,Pan de maíz de Huaraz,Cereales y derivados,359.0,8.0,47.5,15.2,24,1
+A122,Pan de quinua de Lima,Cereales y derivados,241.0,9.5,47.0,1.7,24,1
+A123,Pan de trigo artesanal de Carhuaz,Cereales y derivados,286.0,8.8,52.4,4.6,24,1
+A124,Pan de yema,Cereales y derivados,321.0,9.4,52.5,8.1,24,1
+A125,Pan de yema de Cajamarca,Cereales y derivados,365.0,9.2,52.9,12.9,24,1
+A126,Pan dulce de Lima,Cereales y derivados,290.0,11.9,49.5,5.0,25,1
+A127,Pan huaro,Cereales y derivados,338.0,9.9,62.2,5.5,25,1
+A128,Pan Huascarán de Lima,Cereales y derivados,265.0,9.4,46.3,4.8,25,1
+A129,Pan integral,Cereales y derivados,339.0,9.1,55.5,9.0,25,1
+A130,Pan marraqueta de Chiclayo,Cereales y derivados,321.0,6.4,68.9,2.2,25,1
+A131,Pan mestizo de Huánuco,Cereales y derivados,399.0,9.6,54.8,15.7,25,1
+A132,Pan mishtishongo de Huánuco,Cereales y derivados,410.0,9.1,48.5,20.0,25,1
+A133,Pan mollete de Chiclayo,Cereales y derivados,284.0,10.2,52.3,3.8,25,1
+A134,"Pan mollete, ""chico""de Huaraz",Cereales y derivados,364.0,9.6,44.7,16.3,25,1
+A135,Pan torta de Cajamarca,Cereales y derivados,355.0,9.4,61.5,8.0,25,1
+A136,kiwicha) de Lima,Cereales y derivados,219.0,8.6,40.5,2.5,25,1
+A137,Pan vico,Cereales y derivados,343.0,9.3,56.1,9.1,25,1
+A138,Pan vico de Iquitos,Cereales y derivados,333.0,11.6,62.4,4.1,25,1
+A139,"Pasta con huevo sin fortificar, cruda",Cereales y derivados,375.0,14.2,68.0,4.4,25,1
+A140,"Pasta con huevo fortificada, cruda",Cereales y derivados,375.0,14.2,68.0,4.4,26,1
+A141,"Pasta fortificada, cruda",Cereales y derivados,360.0,13.0,71.5,1.5,26,1
+A142,"Pasta sin fortificar, cruda",Cereales y derivados,360.0,13.0,71.5,1.5,26,1
+A143,"Quinua, variedad real",Cereales y derivados,331.0,14.2,56.7,5.1,26,1
+A144,"Quinua, variedad Ayara (Puno)",Cereales y derivados,276.0,14.0,41.1,6.3,26,1
+A145,"Quinua, variedad blanca de Juli (Puno)",Cereales y derivados,347.0,11.6,63.7,4.8,26,1
+A146,"Quinua, variedad CICA-18 (Puno)",Cereales y derivados,345.0,14.4,58.7,5.7,26,1
+A147,"Quinua, variedad CICA-127 (Puno)",Cereales y derivados,360.0,15.8,62.0,5.2,26,1
+A148,"Quinua, variedad Cuchiwilla (Puno)",Cereales y derivados,317.0,15.2,52.1,5.2,26,1
+A149,"Quinua, variedad Choclito (Puno)",Cereales y derivados,342.0,13.4,59.9,5.2,26,1
+A150,"Quinua, variedad Chullpi- roja (Puno)",Cereales y derivados,330.0,13.7,55.9,5.5,26,1
+A151,"Quinua, variedad Misa Jiura (Puno)",Cereales y derivados,349.0,12.3,62.2,5.4,26,1
+A152,"Quinua, variedad Pasankalla-roja (Puno)",Cereales y derivados,355.0,12.7,61.6,6.2,26,1
+A153,"Quinua, variedad Q' OITU-negra (Puno)",Cereales y derivados,308.0,11.6,53.9,4.9,26,1
+A154,"Quinua, variedad Wariponcho (Puno)",Cereales y derivados,347.0,12.6,61.2,5.5,27,1
+A155,"Quinua, variedad Witulla (Puno)",Cereales y derivados,350.0,13.7,60.2,5.9,27,1
+A156,Rosquita de almidón de Iquitos,Cereales y derivados,469.0,1.8,74.2,18.3,27,1
+A157,"Siete harinas (trigo, habas, arvejas, kiwicha, cañihua, cebada, quinua)",Cereales y derivados,347.0,8.8,70.8,3.2,27,1
+A158,"Trigo, hojuela de (chaque)",Cereales y derivados,322.0,10.0,70.2,2.5,27,1
+A159,Trigo sin tostar (chaquepa),Cereales y derivados,338.0,7.0,77.9,2.2,27,1
+A160,Trigo tostado (chaquepa),Cereales y derivados,369.0,7.6,84.9,2.5,27,1
+A161,"Alfajor con relleno de leche y maní cubierto con chocolate, envasado",Cereales y derivados,502.0,8.1,57.6,26.5,27,1
+A162,"Avena cañihua, hojuela de",Cereales y derivados,347.0,12.2,53.2,10.2,27,1
+A163,"Avena con chía, hojuela precocida de",Cereales y derivados,381.0,11.2,49.5,16.5,27,1
+A164,"Avena con kiwicha, canela y clavo en polvo, hojuela precocida de",Cereales y derivados,342.0,12.4,56.9,7.7,27,1
+A165,"Avena con maca, hojuela precocida de",Cereales y derivados,365.0,10.6,57.4,11.0,27,1
+A166,"Avena con cereales andinos (cañihua, kiwicha y quinua), hojuela precocida de",Cereales y derivados,349.0,11.2,54.3,10.4,27,1
+A167,"Avena con quinua, hojuela precocida de",Cereales y derivados,369.0,11.1,58.3,10.8,27,1
+A168,"Avena con quinua, canela y clavo en polvo, hojuela precocida de",Cereales y derivados,337.0,11.9,57.0,7.3,28,1
+A169,Croissant de mantequilla o cachito de mantequilla,Cereales y derivados,373.0,8.3,43.4,18.5,28,1
+A170,Galletas con salvado de trigo con sabor a miel,Cereales y derivados,429.0,7.6,63.9,15.9,28,1
+A171,"Galleta cubierta con higo,confites, grageas y miel (Turrón de Doña Pepa). envasado",Cereales y derivados,473.0,5.7,59.9,23.4,28,1
+A172,Galleta de agua,Cereales y derivados,411.0,10.0,79.4,5.9,28,1
+A173,"Granola de avena con cebada, pasas, maní y almendras",Cereales y derivados,450.0,10.8,56.7,20.0,28,1
+A174,Galleta de soda con cobertura sabor a chocolate,Cereales y derivados,497.0,5.0,70.3,21.8,28,1
+A175,"Galleta dulce, rellena con crema sabor coco",Cereales y derivados,499.0,4.4,72.1,21.4,28,1
+A176,"Galleta sabor chocolate, rellena con crema sabor vainilla",Cereales y derivados,480.0,5.3,73.7,18.2,28,1
+A177,Kiwicha pop de Lima (listo para consumo),Cereales y derivados,410.0,14.0,73.5,6.7,28,1
+A178,"Kiwicha tostada, harina de",Cereales y derivados,364.0,13.2,59.7,8.6,28,1
+A179,"Maíz, extruído con cocoa, sabor chocolate (listo para consumo)",Cereales y derivados,384.0,7.0,85.1,1.8,28,1
+A180,"Maíz, hojuela azucarada (listo para consumo)",Cereales y derivados,376.0,6.4,87.2,0.2,28,1
+A181,"Maíz, hojuela para desayuno (listo para consumo)",Cereales y derivados,381.0,7.5,84.3,1.6,28,1
+A182,"Maíz pop corn, para cancha, crudo",Cereales y derivados,308.0,9.6,58.7,3.5,29,1
+A183,"Masa para wantán, cruda",Cereales y derivados,288.0,8.6,59.9,1.0,29,1
+A184,"Palitos de harina de trigo con ajonjolí, envasado",Cereales y derivados,443.0,14.2,60.3,16.1,29,1
+A185,"Palomitas de maíz, sabor natural con sal y aceite vegetal, para microondas (Pop corn)",Cereales y derivados,401.0,8.4,50.1,18.6,29,1
+A186,Pan de molde integral,Cereales y derivados,274.0,12.4,42.8,5.9,29,1
+A187,"Pan pita, envasado",Cereales y derivados,238.0,16.1,41.8,0.7,29,1
+A188,"Pastel sabor chocolate, relleno con crema sabor vainilla y decorado con glase, envasado",Cereales y derivados,340.0,4.7,63.2,7.6,29,1
+A189,Panetón relleno con chispas de chocolate,Cereales y derivados,381.0,8.9,47.9,17.1,29,1
+A190,Panetón relleno de pasas y frutas confitadas,Cereales y derivados,365.0,7.6,53.4,13.4,29,1
+A191,"Queque marmoleado con sabor chocolate y vainilla, envasado",Cereales y derivados,323.0,6.5,50.3,10.6,29,1
+A192,"Queque sabor naranja, envasado",Cereales y derivados,336.0,6.4,54.5,10.3,29,1
+A193,"Queque sabor vainilla, mezcla en polvo para preparar, envasado",Cereales y derivados,380.0,6.1,66.5,9.9,29,1
+A194,"Queque sabor vainilla, sin relleno, envasado",Cereales y derivados,352.0,6.9,55.3,11.4,29,1
+A195,"Tostada de pan blanco, envasada",Cereales y derivados,401.0,12.7,76.7,4.9,29,1
+A196,"Trigo, inflado sin miel (listo para consumo)",Cereales y derivados,367.0,14.7,74.7,1.1,30,1
+A197,"Trigo, ""tortilla"" de harina de, precocida, envasada",Cereales y derivados,290.0,7.4,47.4,7.8,30,1
+A198,Wafer relleno con crema sabor vainilla * Imputado tabla INCAP 2012.,Cereales y derivados,503.0,3.5,72.5,22.2,30,1
+B1,"Acelga, hojas de, sin tallo","Verduras, hortalizas y derivados",8.0,2.1,0.8,0.1,31,1
+B2,"Acelga, tallos de","Verduras, hortalizas y derivados",9.0,0.7,1.2,0.3,31,1
+B3,Ají amarillo fresco,"Verduras, hortalizas y derivados",39.0,0.9,8.8,0.7,31,1
+B4,"Ají amarillo fresco, molido sin sal","Verduras, hortalizas y derivados",52.0,1.9,9.2,1.7,31,1
+B5,Ají amarillo seco,"Verduras, hortalizas y derivados",199.0,7.3,36.1,6.3,31,1
+B6,Ají panca,"Verduras, hortalizas y derivados",189.0,7.0,29.8,7.8,31,1
+B7,"Ají colorado, no picante, molido con sal","Verduras, hortalizas y derivados",43.0,1.9,7.7,1.3,31,1
+B8,"Ají colorado, picante molido con sal","Verduras, hortalizas y derivados",37.0,2.1,6.5,1.0,31,1
+B9,Ají de mesa,"Verduras, hortalizas y derivados",40.0,1.8,7.2,1.2,31,1
+B10,Ají de vaina,"Verduras, hortalizas y derivados",58.0,2.6,11.9,1.1,31,1
+B11,Ají dulce,"Verduras, hortalizas y derivados",17.0,0.9,3.1,0.5,31,1
+B12,Ají verde,"Verduras, hortalizas y derivados",57.0,2.5,12.4,0.8,31,1
+B13,Ajo sin cáscara,"Verduras, hortalizas y derivados",121.0,5.6,28.3,0.8,31,1
+B14,Albahaca sin tallo,"Verduras, hortalizas y derivados",29.0,2.9,3.4,1.2,31,1
+B15,Alcachofa,"Verduras, hortalizas y derivados",24.0,2.2,4.9,0.2,32,1
+B16,Alfalfa brotes tiernos,"Verduras, hortalizas y derivados",20.0,4.0,1.3,0.7,32,1
+B17,"Apio, tallo sin hojas","Verduras, hortalizas y derivados",8.0,1.0,1.1,0.2,32,1
+B18,Berenjena,"Verduras, hortalizas y derivados",12.0,1.0,2.3,0.1,32,1
+B19,Berenjena Costeña o tomate de árbol,"Verduras, hortalizas y derivados",41.0,1.3,9.8,0.3,32,1
+B20,Berro,"Verduras, hortalizas y derivados",31.0,3.4,4.5,0.8,32,1
+B21,Brocoli,"Verduras, hortalizas y derivados",32.0,3.9,3.3,1.3,32,1
+B22,Caigua,"Verduras, hortalizas y derivados",15.0,0.5,3.3,0.2,32,1
+B23,Caigua serrana,"Verduras, hortalizas y derivados",19.0,1.5,4.1,0.1,32,1
+B24,Calabaza china,"Verduras, hortalizas y derivados",13.0,0.7,2.9,0.1,32,1
+B25,Calabaza italiana,"Verduras, hortalizas y derivados",15.0,0.5,3.2,0.3,32,1
+B26,Cebolla blanca,"Verduras, hortalizas y derivados",24.0,0.9,6.0,0.1,32,1
+B27,Cebolla chilena,"Verduras, hortalizas y derivados",19.0,0.8,4.5,0.1,32,1
+B28,Cebollita china,"Verduras, hortalizas y derivados",36.0,2.3,7.5,0.4,32,1
+B29,Cebolla de cabeza,"Verduras, hortalizas y derivados",40.0,1.4,9.9,0.2,33,1
+B30,Cebolla de cola,"Verduras, hortalizas y derivados",26.0,0.9,6.4,0.1,33,1
+B31,Col blanca,"Verduras, hortalizas y derivados",19.0,1.0,2.3,1.1,33,1
+B32,"Col crespa o repollo, sin cogollo","Verduras, hortalizas y derivados",15.0,1.5,2.6,0.3,33,1
+B33,Col china sin tallo,"Verduras, hortalizas y derivados",22.0,1.8,4.3,0.3,33,1
+B34,"Col de ""Bruselas""","Verduras, hortalizas y derivados",45.0,4.6,8.5,0.4,33,1
+B35,"Col, hojas de","Verduras, hortalizas y derivados",32.0,2.7,5.6,0.6,33,1
+B36,Col negra,"Verduras, hortalizas y derivados",14.0,1.7,1.9,0.4,33,1
+B37,Col silvestre,"Verduras, hortalizas y derivados",54.0,2.5,12.1,0.6,33,1
+B38,Coliflor sin tallo y sin hojas,"Verduras, hortalizas y derivados",17.0,2.2,1.9,0.6,33,1
+B39,Culantro sin tallo,"Verduras, hortalizas y derivados",34.0,3.3,4.2,1.3,33,1
+B40,"Chiclayo, calabaza","Verduras, hortalizas y derivados",16.0,0.6,3.9,0.1,33,1
+B41,Chonta,"Verduras, hortalizas y derivados",49.0,3.4,9.7,0.7,33,1
+B42,Escarola,"Verduras, hortalizas y derivados",7.0,1.2,0.7,0.2,33,1
+B43,Esparragos,"Verduras, hortalizas y derivados",15.0,2.2,2.1,0.3,34,1
+B44,Espinaca blanca,"Verduras, hortalizas y derivados",24.0,1.9,4.1,0.6,34,1
+B45,Espinaca negra sin tronco,"Verduras, hortalizas y derivados",24.0,2.8,2.7,0.9,34,1
+B46,Frejolito chino germinado,"Verduras, hortalizas y derivados",9.0,1.4,1.5,0.1,34,1
+B47,Hierbabuena,"Verduras, hortalizas y derivados",41.0,3.1,7.0,1.0,34,1
+B48,Huacatay sin tallo,"Verduras, hortalizas y derivados",50.0,5.0,8.8,0.8,34,1
+B49,"Janchoy, hojas de","Verduras, hortalizas y derivados",27.0,1.6,6.0,0.2,34,1
+B50,Jetka. hojas de,"Verduras, hortalizas y derivados",66.0,7.3,9.5,1.7,34,1
+B51,"Kailán, hojas de","Verduras, hortalizas y derivados",48.0,3.2,9.1,0.9,34,1
+B52,"Kailán, tallos de","Verduras, hortalizas y derivados",24.0,1.2,5.2,0.3,34,1
+B53,Lechuga americana,"Verduras, hortalizas y derivados",7.0,0.6,1.2,0.1,34,1
+B54,Lechuga larga,"Verduras, hortalizas y derivados",12.0,1.5,1.8,0.2,34,1
+B55,Lechuga redonda,"Verduras, hortalizas y derivados",8.0,1.3,0.8,0.2,34,1
+B56,Manchay,"Verduras, hortalizas y derivados",53.0,0.4,14.4,0.1,34,1
+B57,"Mastuerzo, hojas de","Verduras, hortalizas y derivados",44.0,1.8,8.1,1.3,35,1
+B58,"Mostaza, hojas de","Verduras, hortalizas y derivados",21.0,3.5,2.1,0.6,35,1
+B59,"Muña, seca","Verduras, hortalizas y derivados",268.0,3.2,66.3,2.8,35,1
+B60,Nabo,"Verduras, hortalizas y derivados",10.0,0.6,1.8,0.2,35,1
+B61,"Nabo, hojas de","Verduras, hortalizas y derivados",24.0,2.9,3.8,0.4,35,1
+B62,Orégano fresco,"Verduras, hortalizas y derivados",48.0,1.6,11.3,0.5,35,1
+B63,"Pacchoy, hojas de","Verduras, hortalizas y derivados",25.0,1.3,5.3,0.3,35,1
+B64,"Pacchoy, tallos de","Verduras, hortalizas y derivados",18.0,0.4,4.4,0.2,35,1
+B65,Paico,"Verduras, hortalizas y derivados",41.0,5.0,5.4,1.1,35,1
+B66,Pajuro,"Verduras, hortalizas y derivados",120.0,2.1,31.5,0.3,35,1
+B67,Pepinillo sin cáscara,"Verduras, hortalizas y derivados",9.0,0.5,1.9,0.1,35,1
+B68,Perejil sin tallo,"Verduras, hortalizas y derivados",41.0,4.8,6.6,0.7,35,1
+B69,Pimiento rojo,"Verduras, hortalizas y derivados",27.0,1.2,3.7,1.3,35,1
+B70,Pirca,"Verduras, hortalizas y derivados",42.0,4.0,7.6,0.6,35,1
+B71,Poro sin hojas,"Verduras, hortalizas y derivados",34.0,2.7,5.8,0.8,36,1
+B72,"Quinua, hojas de","Verduras, hortalizas y derivados",50.0,4.7,9.5,0.6,36,1
+B73,Rabanitos,"Verduras, hortalizas y derivados",7.0,0.8,1.3,0.1,36,1
+B74,Rabicol,"Verduras, hortalizas y derivados",22.0,2.0,4.2,0.2,36,1
+B75,Radicheta o achicoria,"Verduras, hortalizas y derivados",17.0,1.9,2.2,0.5,36,1
+B76,Rocoto fresco,"Verduras, hortalizas y derivados",36.0,1.2,8.2,0.5,36,1
+B77,Ruda,"Verduras, hortalizas y derivados",82.0,4.1,16.1,1.7,36,1
+B78,Siuca culantro,"Verduras, hortalizas y derivados",28.0,1.9,5.3,0.5,36,1
+B79,Tomate,"Verduras, hortalizas y derivados",15.0,0.8,3.1,0.2,36,1
+B80,Tomate italiano,"Verduras, hortalizas y derivados",12.0,0.8,2.4,0.2,36,1
+B81,"Tomate, con carne salsa de","Verduras, hortalizas y derivados",106.0,2.7,11.0,5.7,36,1
+B82,"Tomate, salsa de","Verduras, hortalizas y derivados",18.0,1.5,2.4,0.7,36,1
+B83,"Tomate, salsa concentrada de","Verduras, hortalizas y derivados",75.0,2.7,16.8,1.0,36,1
+B84,Vainitas,"Verduras, hortalizas y derivados",25.0,2.4,4.7,0.3,36,1
+B85,Zanahoria,"Verduras, hortalizas y derivados",19.0,1.0,3.6,0.3,37,1
+B86,"Zanahoria, harina de","Verduras, hortalizas y derivados",293.0,7.3,67.7,1.5,37,1
+B87,Zapallo italiano,"Verduras, hortalizas y derivados",14.0,0.9,2.9,0.2,37,1
+B88,Zapallo loche,"Verduras, hortalizas y derivados",58.0,2.6,13.9,0.2,37,1
+B89,Zapallo macre,"Verduras, hortalizas y derivados",47.0,2.2,11.4,0.1,37,1
+B90,"Ají charapita, con pepas y sin tronco","Verduras, hortalizas y derivados",30.0,2.4,1.7,2.1,37,1
+B91,"Ají cerezo, sin pepas y sin tronco","Verduras, hortalizas y derivados",30.0,1.8,5.2,0.8,37,1
+B92,"Ají colorado seco, sin pepas","Verduras, hortalizas y derivados",179.0,12.5,26.8,6.3,37,1
+B93,Ají uña de pava,"Verduras, hortalizas y derivados",57.0,3.0,12.5,0.7,37,1
+B94,Ajos variedad Barranquino,"Verduras, hortalizas y derivados",115.0,6.2,27.2,0.3,37,1
+B95,Ajos variedad Napuri,"Verduras, hortalizas y derivados",115.0,7.7,26.4,0.3,37,1
+B96,"Ajos variedad Napuri fresco, molido en aceite sin sal","Verduras, hortalizas y derivados",203.0,5.1,31.9,9.1,37,1
+B97,"Ajos variedad Napuri fresco, molido en aceite con sal","Verduras, hortalizas y derivados",185.0,4.8,36.3,5.2,37,1
+B98,"Ajos variedad Napuri fresco, molido en agua sin sal","Verduras, hortalizas y derivados",77.0,4.9,17.8,0.2,37,1
+B99,"Ajos variedad Napuri fresco, molido en agua con sal","Verduras, hortalizas y derivados",84.0,5.0,19.6,0.3,38,1
+B100,Alcaparras,"Verduras, hortalizas y derivados",31.0,2.3,5.8,0.6,38,1
+B101,Cebolla variedad americana,"Verduras, hortalizas y derivados",22.0,1.4,4.4,0.4,38,1
+B102,Cebolla variedad perilla,"Verduras, hortalizas y derivados",28.0,1.4,6.0,0.4,38,1
+B103,Chijchipa,"Verduras, hortalizas y derivados",45.0,3.3,9.3,0.4,38,1
+B104,"Chullcos, ajos silvestres","Verduras, hortalizas y derivados",92.0,1.8,23.5,0.5,38,1
+B105,Col china con hoja y tallo,"Verduras, hortalizas y derivados",15.0,1.4,0.7,1.1,38,1
+B106,Coliflor con tallo y sin hojas,"Verduras, hortalizas y derivados",20.0,2.1,2.9,0.6,38,1
+B107,"Culantro, con hojas y tallo","Verduras, hortalizas y derivados",15.0,3.5,1.2,0.2,38,1
+B108,"Espinaca, hojas sin tallo","Verduras, hortalizas y derivados",30.0,4.8,1.9,1.4,38,1
+B109,"Estragón, secos","Verduras, hortalizas y derivados",269.0,22.8,42.8,7.2,38,1
+B110,"Hinojo, tallo, fresco, crudo","Verduras, hortalizas y derivados",19.0,1.9,3.6,0.2,38,1
+B111,Kión sin cáscara,"Verduras, hortalizas y derivados",49.0,0.1,11.8,0.4,38,1
+B112,Lechuga de seda,"Verduras, hortalizas y derivados",10.0,1.3,1.7,0.1,38,1
+B113,"Llampun Cjana ""Cjana-cjana""","Verduras, hortalizas y derivados",254.0,29.5,36.8,6.0,39,1
+B114,Pacchoy con hojas y tallo,"Verduras, hortalizas y derivados",5.0,1.0,0.1,0.3,39,1
+B115,"Paico, hojas de","Verduras, hortalizas y derivados",28.0,5.7,3.2,0.3,39,1
+B116,Pimiento verde,"Verduras, hortalizas y derivados",19.0,1.1,4.3,0.1,39,1
+B117,"Rocoto fresco, molido con cáscara, en agua sin sal","Verduras, hortalizas y derivados",17.0,0.2,4.2,0.1,39,1
+B118,Romero fresco,"Verduras, hortalizas y derivados",81.0,3.3,6.6,5.9,39,1
+B119,Tomate de palito,"Verduras, hortalizas y derivados",44.0,1.6,10.8,0.2,39,1
+B120,"Tomate redondo, con cáscara","Verduras, hortalizas y derivados",18.0,0.7,4.0,0.3,39,1
+B121,Tomillo seco,"Verduras, hortalizas y derivados",181.0,9.1,26.9,7.4,39,1
+B122,Zapallito,"Verduras, hortalizas y derivados",57.0,1.9,14.3,0.1,39,1
+B123,Zapallo avinca,"Verduras, hortalizas y derivados",15.0,0.5,3.9,0.0,39,1
+B124,Zapallo criollo,"Verduras, hortalizas y derivados",28.0,0.6,7.1,0.2,39,1
+B125,Zapallo ombligo,"Verduras, hortalizas y derivados",21.0,0.9,4.8,0.2,39,1
+B126,"Atago, hojas sin tallo","Verduras, hortalizas y derivados",15.0,2.5,1.9,0.2,39,1
+B127,"Col morada, hojas sin tallo","Verduras, hortalizas y derivados",24.0,1.9,5.0,0.1,40,1
+B128,"Lechuga morada, hojas sin tallo","Verduras, hortalizas y derivados",11.0,1.2,1.9,0.1,40,1
+B129,"Orégano, seco","Verduras, hortalizas y derivados",306.0,11.0,21.6,10.3,40,1
+B130,Pepinillo japonés con cáscara y pepas,"Verduras, hortalizas y derivados",7.0,0.9,1.3,0.0,40,1
+B131,Pimiento amarillo,"Verduras, hortalizas y derivados",24.0,1.0,5.5,0.2,40,1
+B132,"Tomate italiano, sin pepas, sin cáscara","Verduras, hortalizas y derivados",18.0,0.8,4.2,0.1,40,1
+B133,"Vainita, sancochada, sin sal * Imputado Tabla INCAP 2012; **** FAO","Verduras, hortalizas y derivados",17.0,2.2,3.1,0.1,40,1
+C1,Abridores,Frutas y derivados,57.0,0.8,14.9,0.1,41,1
+C2,Aceituna de botija,Frutas y derivados,298.0,0.8,7.3,32.1,41,1
+C3,Aceitunas negras preparadas,Frutas y derivados,292.0,2.2,27.1,22.4,41,1
+C4,Airampo,Frutas y derivados,51.0,1.8,11.2,0.5,41,1
+C5,"Aguaje, pulpa de",Frutas y derivados,74.0,1.9,10.4,3.6,41,1
+C6,Anona,Frutas y derivados,45.0,1.1,10.5,0.4,41,1
+C7,Durazno-Melocotón,Frutas y derivados,43.0,0.8,10.8,0.2,41,1
+C8,Caimito,Frutas y derivados,49.0,1.8,10.8,0.5,41,1
+C9,Camu-camu,Frutas y derivados,24.0,0.5,5.9,0.1,41,1
+C10,Capulí,Frutas y derivados,63.0,0.7,15.9,0.4,41,1
+C11,Chambiro,Frutas y derivados,118.0,1.5,14.5,7.3,41,1
+C12,Chirimoya,Frutas y derivados,72.0,1.9,17.7,0.3,41,1
+C13,Ciruela,Frutas y derivados,82.0,1.0,21.5,0.2,41,1
+C14,Coco,Frutas y derivados,286.0,3.4,10.8,28.1,41,1
+C15,"Coco, agua de",Frutas y derivados,10.0,0.7,2.0,0.1,42,1
+C16,Cocona,Frutas y derivados,42.0,0.9,9.2,0.7,42,1
+C17,Dátiles,Frutas y derivados,195.0,1.4,51.8,0.5,42,1
+C18,Fresa,Frutas y derivados,34.0,0.7,6.9,0.8,42,1
+C19,Granada,Frutas y derivados,66.0,0.5,17.7,0.1,42,1
+C20,Granadilla,Frutas y derivados,51.0,2.5,5.7,2.7,42,1
+C21,"Granadilla, jugo enlatado de",Frutas y derivados,62.0,1.1,16.1,0.0,42,1
+C22,Guanábana,Frutas y derivados,44.0,0.9,11.0,0.2,42,1
+C23,Guayaba,Frutas y derivados,37.0,0.5,9.5,0.1,42,1
+C24,Guayaba amarilla con cáscara,Frutas y derivados,13.0,1.2,1.8,0.3,42,1
+C25,Guayaba rosada,Frutas y derivados,37.0,0.5,9.3,0.2,42,1
+C26,Guayaba verde,Frutas y derivados,36.0,0.5,9.3,0.1,42,1
+C27,Higo negro,Frutas y derivados,65.0,0.9,17.0,0.1,42,1
+C28,Higo seco,Frutas y derivados,146.0,3.6,36.8,0.2,42,1
+C29,Huito,Frutas y derivados,55.0,1.2,14.0,0.1,43,1
+C30,"Humarí / Umari, sin pepa y sin cáscara",Frutas y derivados,163.0,1.6,25.0,8.1,43,1
+C31,Kaki,Frutas y derivados,64.0,0.5,17.2,0.1,43,1
+C32,Kumuvi,Frutas y derivados,101.0,0.7,25.9,0.6,43,1
+C33,Lima,Frutas y derivados,13.0,0.6,3.1,0.4,43,1
+C34,"Limón, jugo de",Frutas y derivados,28.0,0.5,9.3,0.2,43,1
+C35,Lúcuma,Frutas y derivados,97.0,2.1,24.7,0.2,43,1
+C36,"Lúcuma, harina de",Frutas y derivados,329.0,4.0,82.0,2.4,43,1
+C37,"Macambo, pulpa y semilla",Frutas y derivados,177.0,6.7,21.5,9.2,43,1
+C38,"Macambo, pulpa de",Frutas y derivados,44.0,2.1,8.3,0.8,43,1
+C39,Mamey maduro,Frutas y derivados,27.0,0.5,6.7,0.1,43,1
+C40,Mandarina,Frutas y derivados,29.0,0.6,6.8,0.3,43,1
+C41,Mango,Frutas y derivados,54.0,0.4,14.1,0.2,43,1
+C42,Manzana nacional,Frutas y derivados,50.0,0.3,13.3,0.1,43,1
+C43,"Maracuyá, jugo puro de",Frutas y derivados,61.0,0.9,15.9,0.1,44,1
+C44,Marañón,Frutas y derivados,35.0,0.8,7.8,0.5,44,1
+C45,Melón,Frutas y derivados,21.0,0.5,5.0,0.1,44,1
+C46,Melón enano,Frutas y derivados,20.0,0.6,4.4,0.2,44,1
+C47,Membrillo,Frutas y derivados,36.0,0.3,9.6,0.1,44,1
+C48,Naranja,Frutas y derivados,31.0,0.6,7.7,0.2,44,1
+C49,"Naranja agria, jugo de",Frutas y derivados,32.0,0.5,8.0,0.2,44,1
+C50,Naranja de Guayaquil,Frutas y derivados,31.0,0.5,7.8,0.2,44,1
+C51,Naranja de Huando,Frutas y derivados,36.0,1.2,8.5,0.2,44,1
+C52,Níspero,Frutas y derivados,41.0,0.3,11.0,0.0,44,1
+C53,Nuzive,Frutas y derivados,138.0,2.7,17.7,7.8,44,1
+C54,Pacae o Guaba,Frutas y derivados,56.0,0.6,14.8,0.1,44,1
+C55,Palta,Frutas y derivados,130.0,1.7,5.6,12.5,44,1
+C56,Pan de árbol con semilla,Frutas y derivados,117.0,4.5,24.1,1.8,44,1
+C57,Pan de árbol sin semilla,Frutas y derivados,30.0,1.6,5.6,0.5,45,1
+C58,Pan-Meo,Frutas y derivados,78.0,1.3,19.9,0.2,45,1
+C59,Papaya,Frutas y derivados,25.0,0.4,6.4,0.1,45,1
+C60,Pasa sin pepa,Frutas y derivados,228.0,2.4,60.1,0.4,45,1
+C61,Pepino dulce,Frutas y derivados,26.0,0.3,7.0,0.0,45,1
+C62,Pera chilena,Frutas y derivados,38.0,0.3,10.1,0.1,45,1
+C63,Pera de agua,Frutas y derivados,42.0,0.4,9.9,0.6,45,1
+C64,Pera nacional,Frutas y derivados,55.0,0.4,14.5,0.2,45,1
+C65,Pera perilla,Frutas y derivados,58.0,0.6,14.4,0.5,45,1
+C66,Pero,Frutas y derivados,50.0,0.4,12.0,0.7,45,1
+C67,Pijuayo,Frutas y derivados,184.0,2.8,41.0,3.2,45,1
+C68,"Pijuayo sancochado, sin cáscara y sin pepas",Frutas y derivados,120.0,2.1,22.1,4.0,45,1
+C69,Piña,Frutas y derivados,33.0,0.4,8.4,0.2,45,1
+C70,Plátano de isla,Frutas y derivados,75.0,1.2,19.5,0.1,45,1
+C71,Plátano de seda,Frutas y derivados,74.0,1.5,18.4,0.3,46,1
+C72,Plátano guineo,Frutas y derivados,111.0,1.4,29.1,0.2,46,1
+C73,Plátano manzano,Frutas y derivados,90.0,1.2,23.7,0.1,46,1
+C74,"Plátano, harina de",Frutas y derivados,302.0,4.0,79.3,0.4,46,1
+C75,Plátano maduro,Frutas y derivados,103.0,1.2,27.0,0.2,46,1
+C76,Plátano morado,Frutas y derivados,97.0,1.0,25.5,0.2,46,1
+C77,Plátano seco (orejón),Frutas y derivados,232.0,3.7,58.3,1.2,46,1
+C78,Plátano verde,Frutas y derivados,144.0,1.0,38.6,0.2,46,1
+C79,Plátano verde asado,Frutas y derivados,243.0,1.5,65.7,0.2,46,1
+C80,Plátano verde sancochado,Frutas y derivados,129.0,0.7,34.5,0.3,46,1
+C81,Pomarosa,Frutas y derivados,33.0,0.5,7.9,0.4,46,1
+C82,Purunkari,Frutas y derivados,151.0,2.7,36.3,1.4,46,1
+C83,Sandia,Frutas y derivados,23.0,0.7,5.5,0.1,46,1
+C84,"Shiwawaco, semilla",Frutas y derivados,249.0,6.6,45.5,7.5,46,1
+C85,Tamarindo,Frutas y derivados,221.0,2.8,57.4,0.6,47,1
+C86,Mango ciruelo o taperibá,Frutas y derivados,56.0,0.6,14.2,0.3,47,1
+C87,Toronja,Frutas y derivados,33.0,0.6,7.7,0.4,47,1
+C88,Tumbo costeño,Frutas y derivados,22.0,0.4,5.8,0.0,47,1
+C89,Tumbo serrano sin cáscara o poro poro,Frutas y derivados,37.0,2.1,7.4,0.4,47,1
+C90,Tuna,Frutas y derivados,46.0,0.8,12.1,0.0,47,1
+C91,Tuna roja,Frutas y derivados,36.0,1.3,8.3,0.2,47,1
+C92,"Ungurauy, unguraui o ungurahui",Frutas y derivados,307.0,2.8,33.6,21.1,47,1
+C93,Uva blanca,Frutas y derivados,40.0,0.3,10.4,0.2,47,1
+C94,Uva borgoña,Frutas y derivados,79.0,0.9,20.4,0.3,47,1
+C95,Uva italia,Frutas y derivados,63.0,0.4,16.8,0.1,47,1
+C96,Uva negra,Frutas y derivados,63.0,0.2,17.2,0.1,47,1
+C97,Uva quebranta,Frutas y derivados,66.0,0.5,17.7,0.1,47,1
+C98,Uvilla,Frutas y derivados,64.0,0.3,16.7,0.3,47,1
+C99,Zapote,Frutas y derivados,73.0,0.9,18.8,0.3,48,1
+C100,Aguaymanto,Frutas y derivados,51.0,1.9,12.4,0.0,48,1
+C101,Blanquillo,Frutas y derivados,47.0,1.0,11.6,0.3,48,1
+C102,Carambola,Frutas y derivados,23.0,1.0,4.5,0.5,48,1
+C103,"Carambola, refresco natural, cocido, sin azúcar",Frutas y derivados,6.0,0.2,0.9,0.3,48,1
+C104,"Carambola, refresco natural, crudo, sin azúcar",Frutas y derivados,5.0,0.2,0.5,0.3,48,1
+C105,Coco rallado,Frutas y derivados,596.0,7.4,3.3,66.8,48,1
+C106,"Cocona, jugo natural, cocido, sin azúcar",Frutas y derivados,0.0,,0.1,,48,1
+C107,"Durazno, néctar envasado",Frutas y derivados,6.0,0.0,1.4,0.0,48,1
+C108,"Granadilla, jugo natural, sin azúcar",Frutas y derivados,25.0,1.1,5.4,0.2,48,1
+C109,Guindón sin pepa,Frutas y derivados,201.0,2.3,53.3,0.2,48,1
+C110,"Kiwi, sin cáscara",Frutas y derivados,39.0,2.9,7.3,0.3,48,1
+C111,"Limón dulce, sin cáscara",Frutas y derivados,20.0,1.4,4.8,0.4,48,1
+C112,"Limón, néctar envasado",Frutas y derivados,57.0,0.0,14.1,0.0,48,1
+C113,"Mango, néctar envasado",Frutas y derivados,44.0,0.0,11.0,0.0,49,1
+C114,Manzana chilena verde con cáscara,Frutas y derivados,38.0,0.2,9.7,0.3,49,1
+C115,"Manzana delicia ""helada"" con cáscara",Frutas y derivados,47.0,0.2,12.6,0.1,49,1
+C116,Manzana delicia roja con cáscara,Frutas y derivados,52.0,0.3,14.0,0.1,49,1
+C117,Manzana israel con cáscara,Frutas y derivados,40.0,0.4,10.5,0.1,49,1
+C118,"Manzana, jugo natural, envasado",Frutas y derivados,43.0,,10.7,,49,1
+C119,"Manzana, néctar envasado",Frutas y derivados,38.0,0.0,9.5,0.0,49,1
+C120,Manzana pero con cáscara (para agua),Frutas y derivados,31.0,0.3,8.3,0.1,49,1
+C121,"Manzana santa rosa, golden o caña con cáscara",Frutas y derivados,53.0,0.2,14.4,0.1,49,1
+C122,Manzana winter con cáscara,Frutas y derivados,44.0,0.3,12.0,0.1,49,1
+C123,"Maracuyá, jugo natural, envasado",Frutas y derivados,35.0,,8.7,,49,1
+C124,"Maracuyá, néctar envasado",Frutas y derivados,9.0,0.0,2.1,0.0,49,1
+C125,"Naranja, bebida envasada",Frutas y derivados,56.0,0.0,14.0,0.0,49,1
+C126,"Naranja, jugo natural, envasado",Frutas y derivados,16.0,,4.1,,49,1
+C127,"Naranja, néctar envasado",Frutas y derivados,43.0,,10.7,,50,1
+C128,Naranja tangelo,Frutas y derivados,24.0,1.0,5.2,0.2,50,1
+C129,"Naranja tangelo, jugo natural",Frutas y derivados,16.0,0.7,3.5,0.2,50,1
+C130,Naranjilla,Frutas y derivados,28.0,0.7,6.8,0.1,50,1
+C131,"Palta ""fuerte""",Frutas y derivados,104.0,1.9,6.5,8.9,50,1
+C132,Papaya arequipeña,Frutas y derivados,17.0,1.0,3.3,0.3,50,1
+C133,"Pera, néctar envasado",Frutas y derivados,46.0,0.0,11.4,0.0,50,1
+C134,"Piña, bebida envasada",Frutas y derivados,29.0,0.0,7.2,0.0,50,1
+C135,"Plátano ""bellaco""",Frutas y derivados,102.0,1.3,26.9,0.1,50,1
+C136,"Plátano ""moquicho""",Frutas y derivados,100.0,1.2,26.5,0.1,50,1
+C137,Plátano palillo,Frutas y derivados,105.0,0.9,27.8,0.3,50,1
+C138,"Plátano palillo maduro, harina de",Frutas y derivados,293.0,4.1,75.1,1.1,50,1
+C139,"Plátano palillo verde, harina de",Frutas y derivados,295.0,3.3,78.3,0.2,50,1
+C140,Sancayo,Frutas y derivados,17.0,0.8,2.7,0.6,50,1
+C141,Warr'a,Frutas y derivados,102.0,1.5,26.4,0.2,51,1
+C142,Yak'u,Frutas y derivados,116.0,1.8,25.3,2.2,51,1
+C143,Aceituna verde,Frutas y derivados,186.0,1.4,0.0,21.7,51,1
+C144,"Aguaje, néctar natural, sin azúcar",Frutas y derivados,7.0,0.1,0.3,0.6,51,1
+C145,Arándano,Frutas y derivados,51.0,0.6,13.2,0.1,51,1
+C146,"Arándano, néctar natural, con cáscara, sin azúcar",Frutas y derivados,20.0,0.3,4.3,0.3,51,1
+C147,Cereza,Frutas y derivados,30.0,1.2,7.3,0.0,51,1
+C148,"Ciruela albaricoque, con cáscara, sin pepa",Frutas y derivados,34.0,0.4,8.8,0.1,51,1
+C149,"Cidra o limón cidra, sin cáscara, sin pepas",Frutas y derivados,19.0,0.7,6.8,0.0,51,1
+C150,Frambuesa,Frutas y derivados,31.0,1.6,5.2,0.8,51,1
+C151,Mango criollo,Frutas y derivados,66.0,0.4,17.4,0.2,51,1
+C152,Mango Edward,Frutas y derivados,69.0,0.6,17.9,0.3,51,1
+C153,"Mango Edward, néctar natural, sin cáscara, sin azúcar",Frutas y derivados,29.0,0.1,6.5,0.4,51,1
+C154,Mango kafro,Frutas y derivados,64.0,0.7,16.4,0.4,51,1
+C155,Mango kent,Frutas y derivados,65.0,0.7,17.5,0.0,52,1
+C156,Manzana Royal o gala,Frutas y derivados,55.0,0.4,14.8,0.0,52,1
+C157,"Manzana verde nacional, refresco natural, cocido, sin azúcar",Frutas y derivados,2.0,0.3,0.0,0.2,52,1
+C158,Mora o zarzamora,Frutas y derivados,27.0,2.1,4.4,0.5,52,1
+C159,"Noni, con cáscara, sin pepas",Frutas y derivados,25.0,0.8,5.1,0.5,52,1
+C160,Palta dedo o cocktail,Frutas y derivados,166.0,1.8,0.0,19.1,52,1
+C161,Palta Hass,Frutas y derivados,204.0,1.0,1.0,23.5,52,1
+C162,"Papaya, néctar natural, sin azúcar",Frutas y derivados,15.0,0.4,2.4,0.5,52,1
+C163,Pasa rubia,Frutas y derivados,265.0,2.4,68.9,1.0,52,1
+C164,Piña Golden o baby golden,Frutas y derivados,55.0,0.6,14.3,0.1,52,1
+C165,Piña Hawaiana,Frutas y derivados,44.0,0.6,10.7,0.4,52,1
+C166,Piña Selva,Frutas y derivados,30.0,0.5,7.1,0.4,52,1
+C167,"Piña Selva, néctar natural, sin azúcar",Frutas y derivados,19.0,0.2,3.5,0.5,52,1
+C168,Pitajaya roja,Frutas y derivados,56.0,0.8,13.2,0.7,52,1
+C169,"Plátano bellaco maduro, frito en aceite vegetal",Frutas y derivados,173.0,1.1,33.7,3.7,53,1
+C170,"Uva Red Globe, con cáscara, sin pepas",Frutas y derivados,52.0,0.6,12.8,0.4,53,1
+D1,Aceite compuesto (vegetal 70% pescado 30% ),"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D2,"Aceite de pescado, hidrogenado","Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D3,Aceite vegetal de algodón,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D4,Aceite vegetal de girasol,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D5,Aceite vegetal de maíz,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D6,Aceite vegetal de maní,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D7,Aceite vegetal de olivo,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D8,Aceite vegetal de palma,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D9,Aceite vegetal de soya,"Grasas, aceites y oleaginosas",884.0,0.0,0.0,100.0,54,1
+D10,Almendra,"Grasas, aceites y oleaginosas",554.0,19.4,8.4,54.1,54,1
+D11,Avellana,"Grasas, aceites y oleaginosas",498.0,10.6,4.5,52.9,54,1
+D12,"Cacao, semillas secas","Grasas, aceites y oleaginosas",570.0,12.0,34.7,46.3,54,1
+D13,Castaña peruana o nuez de Brasil,"Grasas, aceites y oleaginosas",647.0,13.0,6.0,69.0,54,1
+D14,"Maní crudo, sin cáscara con piel","Grasas, aceites y oleaginosas",559.0,24.1,9.2,48.2,54,1
+D15,Maní sancochado,"Grasas, aceites y oleaginosas",374.0,15.9,13.1,27.5,55,1
+D16,"Maní tostado, sin piel","Grasas, aceites y oleaginosas",590.0,27.1,8.9,51.0,55,1
+D17,Manteca de cerdo,"Grasas, aceites y oleaginosas",879.0,0.0,0.0,99.4,55,1
+D18,Manteca vegetal,"Grasas, aceites y oleaginosas",880.0,0.0,0.0,99.5,55,1
+D19,Mantequilla,"Grasas, aceites y oleaginosas",729.0,2.0,0.0,82.0,55,1
+D20,Mantequilla con sal,"Grasas, aceites y oleaginosas",717.0,0.9,0.1,81.1,55,1
+D21,Margarina vegetal con sal,"Grasas, aceites y oleaginosas",720.0,0.6,0.3,81.0,55,1
+D22,Nuez,"Grasas, aceites y oleaginosas",654.0,14.8,6.0,69.1,55,1
+D23,Cashú o castaña de cashú,"Grasas, aceites y oleaginosas",574.0,16.5,21.8,51.1,55,1
+D24,"Chía, semilla de","Grasas, aceites y oleaginosas",362.0,19.9,5.2,32.5,55,1
+D25,"Linaza, semilla de","Grasas, aceites y oleaginosas",420.0,17.8,0.7,42.5,55,1
+D26,"Margarina, Astra de La Danesa 60% grasa vegetal","Grasas, aceites y oleaginosas",506.0,0.0,0.0,57.2,55,1
+D27,"Margarina, Dorina Batida al 70% de grasa","Grasas, aceites y oleaginosas",597.0,0.0,0.0,67.6,55,1
+D28,"Margarina, Dorina Clásica al 70% de grasa","Grasas, aceites y oleaginosas",578.0,0.0,0.0,65.4,55,1
+D29,"Margarina, Dorina Light al 50% de grasa","Grasas, aceites y oleaginosas",409.0,0.0,0.0,46.2,56,1
+D30,"Margarina, La Danesa 70% de grasa vegetal","Grasas, aceites y oleaginosas",590.0,0.0,0.0,66.8,56,1
+D31,"Margarina, La Preferida 70% grasa","Grasas, aceites y oleaginosas",598.0,0.0,0.0,67.6,56,1
+D32,"Margarina, Manty 40% de grasa vegetal","Grasas, aceites y oleaginosas",325.0,0.0,0.0,36.8,56,1
+D33,"Margarina, Sello de Oro","Grasas, aceites y oleaginosas",607.0,0.0,0.0,68.6,56,1
+D34,"Margarina, Swis Light","Grasas, aceites y oleaginosas",407.0,0.0,0.0,46.1,56,1
+D35,"Margarina, Swis 60% de grasa","Grasas, aceites y oleaginosas",479.0,0.0,0.0,54.1,56,1
+D36,Ñuña tostada,"Grasas, aceites y oleaginosas",385.0,17.2,53.1,13.1,56,1
+D37,Pecana,"Grasas, aceites y oleaginosas",670.0,9.1,5.2,73.8,56,1
+D38,Sacha Inchi tostado,"Grasas, aceites y oleaginosas",574.0,25.6,7.4,54.4,56,1
+D39,"Ajonjolí, semilla de","Grasas, aceites y oleaginosas",525.0,17.7,11.7,49.7,56,1
+D40,"Ajonjolí negro, semilla de","Grasas, aceites y oleaginosas",501.0,16.0,3.8,51.3,56,1
+D41,"Girasol, semilla de","Grasas, aceites y oleaginosas",587.0,20.2,6.6,58.6,56,1
+D42,Aceite vegetal de girasol con adición de EPA y DHA,"Grasas, aceites y oleaginosas",883.0,0.0,0.0,99.9,56,1
+D43,Aceite vegetal de girasol con canola,"Grasas, aceites y oleaginosas",883.0,0.0,0.0,99.9,57,1
+D44,Aceite vegetal de oliva extravirgen,"Grasas, aceites y oleaginosas",883.0,0.0,0.0,99.9,57,1
+D45,Aceite vegetal de sacha Inchi,"Grasas, aceites y oleaginosas",883.0,0.0,0.0,99.9,57,1
+D46,Mantequilla sin sal,"Grasas, aceites y oleaginosas",746.0,0.2,0.0,84.7,57,1
+D47,"Maní tostado, acaramelado con ajonjolí, envasado","Grasas, aceites y oleaginosas",473.0,13.4,53.0,23.0,57,1
+D48,Pasta untable de maní con sal,"Grasas, aceites y oleaginosas",642.0,26.0,18.5,51.6,57,1
+D49,Pistasho,"Grasas, aceites y oleaginosas",582.0,19.2,15.3,54.2,57,1
+E1,Almeja blanca,Pescados y mariscos,71.0,14.4,0.0,1.1,58,1
+E2,"Aska (crustáceo), al estado natural",Pescados y mariscos,462.0,56.6,11.1,19.4,58,1
+E3,"Aska, sometido a cocción (crustáceo)",Pescados y mariscos,467.0,56.0,10.9,20.3,58,1
+E4,Barquillos,Pescados y mariscos,89.0,18.5,1.3,0.5,58,1
+E5,Camaroncito seco (chino),Pescados y mariscos,247.0,52.3,1.6,1.9,58,1
+E6,Camarones frescos,Pescados y mariscos,88.0,17.8,2.6,0.2,58,1
+E7,Cangrejo,Pescados y mariscos,94.0,19.8,1.1,0.6,58,1
+E8,Cangrejo cocido,Pescados y mariscos,97.0,14.8,1.9,2.9,58,1
+E9,Caracol,Pescados y mariscos,87.0,16.9,1.9,0.8,58,1
+E10,"Chanque, loco o tolina",Pescados y mariscos,104.0,21.9,1.8,0.3,58,1
+E11,Choros,Pescados y mariscos,91.0,13.0,3.7,2.3,58,1
+E12,Concha de abanico,Pescados y mariscos,92.0,15.9,1.9,1.8,58,1
+E13,Erizo,Pescados y mariscos,147.0,16.3,1.4,7.9,58,1
+E14,Langostino blanco,Pescados y mariscos,69.0,14.5,,0.8,58,1
+E15,Lapas,Pescados y mariscos,86.0,18.5,0.9,0.4,59,1
+E16,Machas,Pescados y mariscos,130.0,23.2,4.7,1.3,59,1
+E17,"Pescado acarabuazú, salado deshidratado",Pescados y mariscos,292.0,47.5,0.0,9.9,59,1
+E18,Pescado anchoveta,Pescados y mariscos,156.0,19.1,0.0,8.2,59,1
+E19,"Pescado atún, en conserva",Pescados y mariscos,181.0,22.9,,9.9,59,1
+E20,"Pescado atún, enlatado en agua",Pescados y mariscos,116.0,25.5,,0.8,59,1
+E21,"Pescado atún, enlatado en aceite",Pescados y mariscos,186.0,26.5,,8.1,59,1
+E22,"Pescado atún, fresco",Pescados y mariscos,141.0,23.3,,4.6,59,1
+E23,Pescado ayanque o cachema,Pescados y mariscos,88.0,19.6,0.0,0.5,59,1
+E24,Pescado bacalao fresco,Pescados y mariscos,82.0,17.8,,0.7,59,1
+E25,Pescado bacalao seco salado,Pescados y mariscos,290.0,62.8,,2.4,59,1
+E26,Pescado bagre,Pescados y mariscos,80.0,15.2,,1.7,59,1
+E27,Pescado bonito,Pescados y mariscos,138.0,23.4,,4.2,59,1
+E28,"Pescado bonito, huevera de",Pescados y mariscos,101.0,17.2,0.0,3.0,59,1
+E29,"Pescado bonito fresco, músculo claro",Pescados y mariscos,115.0,23.5,0.7,1.3,60,1
+E30,"Pescado bonito fresco, músculo oscuro",Pescados y mariscos,106.0,23.1,0.2,0.7,60,1
+E31,"Pescado bonito, pulpa asada",Pescados y mariscos,136.0,24.0,0.0,3.7,60,1
+E32,"Pescado bonito, seco salado",Pescados y mariscos,184.0,32.3,0.0,5.1,60,1
+E33,"Pescado boquichico, salado deshidratado",Pescados y mariscos,287.0,47.9,0.0,9.1,60,1
+E34,"Pescado caballa, en conserva",Pescados y mariscos,225.0,24.8,,14.0,60,1
+E35,"Pescado caballa, fresco",Pescados y mariscos,182.0,21.5,0.0,10.0,60,1
+E36,"Pescado caballa, salado",Pescados y mariscos,132.0,21.4,0.8,4.1,60,1
+E37,Pescado cabinza,Pescados y mariscos,96.0,19.1,,1.6,60,1
+E38,Pescado cabrilla,Pescados y mariscos,96.0,18.6,,1.8,60,1
+E39,Pescado carachama,Pescados y mariscos,64.0,14.2,0.0,0.4,60,1
+E40,Pescado cazón,Pescados y mariscos,98.0,21.8,0.0,0.5,60,1
+E41,Pescado chita,Pescados y mariscos,88.0,19.8,,0.4,60,1
+E42,"Pescado chita, huevera de",Pescados y mariscos,62.0,12.3,,1.0,60,1
+E43,"Pescado chita, pulpa asada",Pescados y mariscos,99.0,21.0,0.0,1.0,61,1
+E44,Pescado coco,Pescados y mariscos,99.0,17.4,,2.7,61,1
+E45,Pescado cojinova,Pescados y mariscos,103.0,20.7,0.0,1.6,61,1
+E46,Pescado congrio,Pescados y mariscos,73.0,15.7,,0.7,61,1
+E47,Pescado corvina,Pescados y mariscos,124.0,19.5,0.0,4.5,61,1
+E48,"Pescado fuasaco, con espinas",Pescados y mariscos,72.0,16.3,0.0,0.3,61,1
+E49,"Pescado jurel, en conserva",Pescados y mariscos,127.0,23.2,0.0,3.8,61,1
+E50,"Pescado jurel, fresco",Pescados y mariscos,121.0,22.2,0.3,2.7,61,1
+E51,Pescado lenguado,Pescados y mariscos,91.0,18.8,,1.2,61,1
+E52,Pescado lisa,Pescados y mariscos,119.0,20.8,,3.3,61,1
+E53,"Pescado lorna, fresco",Pescados y mariscos,96.0,18.5,0.0,1.9,61,1
+E54,"Pescado lorna, pulpa seca salada",Pescados y mariscos,150.0,30.9,0.0,2.0,61,1
+E55,Pescado machete,Pescados y mariscos,136.0,20.5,,5.4,61,1
+E56,"Pescado maparate, con espinas",Pescados y mariscos,73.0,15.1,0.0,0.9,61,1
+E57,"Pescado merluza, fresco",Pescados y mariscos,72.0,15.8,,0.5,62,1
+E58,"Pescado merluza, seco",Pescados y mariscos,363.0,73.8,,5.3,62,1
+E59,"Pescado mero, fresco",Pescados y mariscos,85.0,18.6,0.0,0.6,62,1
+E60,"Pescado paiche, seco",Pescados y mariscos,247.0,38.2,0.0,9.3,62,1
+E61,Pescado pampanito,Pescados y mariscos,106.0,19.2,0.0,2.7,62,1
+E62,"Pescado paña, salado deshidratado",Pescados y mariscos,288.0,54.3,0.0,6.2,62,1
+E63,Pescado pejerrey,Pescados y mariscos,105.0,19.6,,2.4,62,1
+E64,Pescado pejesapo,Pescados y mariscos,101.0,22.1,,0.7,62,1
+E65,"Pescado pejesapo, pulpa asada",Pescados y mariscos,87.0,19.5,0.0,0.4,62,1
+E66,"Pescado pejesapo, pulpa sancochada",Pescados y mariscos,83.0,18.7,0.0,0.3,62,1
+E67,"Pescado perico, fresco, pulpa sin piel",Pescados y mariscos,91.0,20.2,0.0,0.5,62,1
+E68,Pescado pintadilla,Pescados y mariscos,85.0,18.8,0.0,0.5,62,1
+E69,"Pescado ractacara, con espinas",Pescados y mariscos,87.0,15.4,0.0,2.3,62,1
+E70,"Pescado raya, pulpa asada",Pescados y mariscos,136.0,31.1,0.0,0.4,62,1
+E71,Pescado róbalo,Pescados y mariscos,95.0,21.3,,0.5,63,1
+E72,"Pescado sardina, en aceite vegetal, conserva",Pescados y mariscos,242.0,20.6,0.0,17.7,63,1
+E73,"Pescado sardina, en salsa de tomate, conserva",Pescados y mariscos,85.0,14.9,2.8,1.6,63,1
+E74,"Pescado sardina, en grated, conserva",Pescados y mariscos,171.0,22.4,,9.0,63,1
+E75,"Pescado sardina, filete, conserva",Pescados y mariscos,202.0,25.8,,11.0,63,1
+E76,"Pescado sardina, fresco",Pescados y mariscos,146.0,20.2,0.0,6.6,63,1
+E77,"Pescado Tilapia, fresco",Pescados y mariscos,100.0,18.4,0.7,2.1,63,1
+E78,"Pescado toyo, fresco",Pescados y mariscos,89.0,19.5,,0.6,63,1
+E79,"Pescado toyo, seco salado",Pescados y mariscos,186.0,38.6,0.0,2.3,63,1
+E80,Pescado tramboyo,Pescados y mariscos,85.0,19.2,0.0,0.3,63,1
+E81,Pescado trucha rosada,Pescados y mariscos,110.0,20.9,,2.3,63,1
+E82,"Pescado trucha, en conserva",Pescados y mariscos,167.0,21.5,0.0,9.0,63,1
+E83,"Pescado trucha, fresca",Pescados y mariscos,111.0,19.5,,3.1,63,1
+E84,"Pescado yahuarachi, con espinas",Pescados y mariscos,86.0,15.5,0.0,2.2,63,1
+E85,"Pescado yuliya, con espinas",Pescados y mariscos,85.0,16.9,0.0,1.4,64,1
+E86,"Pescado zúngaro, salado deshidratado",Pescados y mariscos,286.0,47.3,0.0,9.3,64,1
+E87,Pique,Pescados y mariscos,78.0,15.9,0.0,1.1,64,1
+E88,Pota,Pescados y mariscos,91.0,16.0,3.1,1.1,64,1
+E89,"Pota, concentrado proteico de",Pescados y mariscos,396.0,91.8,0.5,0.3,64,1
+E90,Pulpo,Pescados y mariscos,80.0,13.6,2.2,1.4,64,1
+E91,"Choro, pulpa cocida, envasado",Pescados y mariscos,101.0,17.2,4.6,1.5,64,1
+E92,"Mixtura de mariscos: langostino, mejillones, caracol, concha de abanico, calamar, pota, envasado",Pescados y mariscos,80.0,15.3,2.8,0.9,64,1
+E93,"Pescado ayanque o cachema, pulpa con piel, sancochado sin sal",Pescados y mariscos,159.0,20.8,0.0,7.7,64,1
+E94,"Pescado Boquichico, fresco",Pescados y mariscos,95.0,18.3,0.1,1.8,64,1
+E95,"Pescado Cojinova, pulpa con piel, sancochado sin sal",Pescados y mariscos,120.0,26.8,0.0,0.6,64,1
+E96,"Pescado Doncella, fresco",Pescados y mariscos,84.0,18.8,0.0,0.4,64,1
+E97,"Pescado jurel, pulpa con piel, frita en aceite vegetal, sin sal",Pescados y mariscos,159.0,26.8,4.2,3.9,64,1
+E98,"Pescado Jurel, pulpa con piel, sancochado sin sal",Pescados y mariscos,151.0,26.5,0.4,4.0,64,1
+E99,"Pescado Paco, fresco",Pescados y mariscos,83.0,18.6,0.0,0.4,65,1
+E100,"Pescado Palometa, fresco",Pescados y mariscos,124.0,18.0,0.0,5.2,65,1
+E101,"Pescado Reyneta, fresco",Pescados y mariscos,94.0,20.3,0.0,0.9,65,1
+E102,"Pez espada, fresco",Pescados y mariscos,211.0,19.8,0.0,14.0,65,1
+E103,"Pescado trucha rosada, pulpa con piel, sancochado sin sal",Pescados y mariscos,168.0,22.3,0.1,8.0,65,1
+F1,"Ballena, carne pulpa de",Carnes y derivados,90.0,18.6,0.0,1.2,66,1
+F2,"Carnero, cabeza sancochada de",Carnes y derivados,111.0,14.2,0.0,5.6,66,1
+F3,"Carnero, corazón de",Carnes y derivados,115.0,15.9,1.4,4.6,66,1
+F4,"Carnero, hígado de",Carnes y derivados,131.0,19.9,2.6,4.0,66,1
+F5,"Carnero, panza de (mondongo)",Carnes y derivados,72.0,15.7,0.0,0.6,66,1
+F6,"Carnero, patas sancochadas de",Carnes y derivados,108.0,20.9,0.0,2.1,66,1
+F7,"Carnero, pulmón de (bofe)",Carnes y derivados,77.0,13.4,0.0,2.2,66,1
+F8,"Carnero, riñón",Carnes y derivados,109.0,18.0,0.8,3.2,66,1
+F9,"Carnero, sesos de",Carnes y derivados,113.0,10.0,0.0,7.8,66,1
+F10,"Carnero, pulpa gorda",Carnes y derivados,267.0,16.9,0.0,21.6,66,1
+F11,"Carnero, pulpa muy magra",Carnes y derivados,136.0,19.0,0.0,6.1,66,1
+F12,"Carnero, pulpa semigorda",Carnes y derivados,253.0,18.2,0.0,19.4,66,1
+F13,"Cerdo, carne sin hueso",Carnes y derivados,198.0,14.4,0.1,15.1,66,1
+F14,"Cerdo, hígado de",Carnes y derivados,128.0,18.5,1.7,4.7,66,1
+F15,"Cerdo, patas semigordas",Carnes y derivados,284.0,20.0,0.0,22.0,67,1
+F16,"Cerdo, pulmón de (bofe)",Carnes y derivados,79.0,13.5,0.0,2.4,67,1
+F17,"Cerdo, riñón de",Carnes y derivados,139.0,13.9,0.0,8.8,67,1
+F18,"Chivo, carne pulpa de",Carnes y derivados,115.0,19.4,0.0,3.6,67,1
+F19,"Conejo, carne pulpa de",Carnes y derivados,136.0,20.1,0.0,5.6,67,1
+F20,"Gallina, pechuga de, sin piel",Carnes y derivados,108.0,19.2,0.0,2.9,67,1
+F21,"Gallina, pierna de, sin piel",Carnes y derivados,120.0,20.6,0.0,3.6,67,1
+F22,"Majaz, carne pulpa de",Carnes y derivados,108.0,21.4,1.4,1.2,67,1
+F23,"Motelo, carne pulpa de",Carnes y derivados,113.0,21.4,1.4,1.8,67,1
+F24,"Pato, carne de",Carnes y derivados,326.0,16.0,0.0,28.6,67,1
+F25,"Pavo, carne de",Carnes y derivados,160.0,20.4,0.0,8.0,67,1
+F26,"Pollo, carne pulpa",Carnes y derivados,119.0,21.4,0.0,3.1,67,1
+F27,"Pollo, corazón de",Carnes y derivados,157.0,15.6,1.6,9.3,67,1
+F28,"Pollo, hígado de",Carnes y derivados,125.0,18.0,3.4,3.9,67,1
+F29,"Pollo, sangre de, sancochada sin sal",Carnes y derivados,89.0,19.8,0.5,0.3,68,1
+F30,"Pollo, sangre cruda de",Carnes y derivados,65.0,15.0,,0.1,68,1
+F31,"Rana, carne de",Carnes y derivados,73.0,16.4,0.0,0.3,68,1
+F32,"Tortuga charapa, carne de",Carnes y derivados,79.0,16.4,0.1,0.9,68,1
+F33,"Res, bazo de",Carnes y derivados,92.0,18.9,0.0,1.2,68,1
+F34,"Res, cabeza sancochada de",Carnes y derivados,111.0,18.6,0.2,3.4,68,1
+F35,"Res, carne pulpa de",Carnes y derivados,105.0,21.3,0.0,1.6,68,1
+F36,"Res, corazón de",Carnes y derivados,103.0,16.6,0.1,3.5,68,1
+F37,"Res, criadillas de",Carnes y derivados,60.0,9.8,0.4,1.8,68,1
+F38,"Res, hígado de",Carnes y derivados,140.0,20.0,3.3,4.6,68,1
+F39,"Res, lengua de",Carnes y derivados,173.0,16.5,0.3,11.2,68,1
+F40,"Res, panza de (mondongo)",Carnes y derivados,104.0,16.9,0.0,3.5,68,1
+F41,"Res, pata sancochada de",Carnes y derivados,152.0,23.7,0.0,5.6,68,1
+F42,"Res, pulmón de (bofe)",Carnes y derivados,83.0,17.2,0.0,1.1,68,1
+F43,"Res, riñón de",Carnes y derivados,92.0,15.1,0.3,2.9,69,1
+F44,"Res, sesos de",Carnes y derivados,135.0,11.3,0.0,9.6,69,1
+F45,"Res, ubre de",Carnes y derivados,233.0,14.1,0.0,19.2,69,1
+F46,"Carnero, carne seca sin hueso (chalona)",Carnes y derivados,320.0,50.3,,11.7,69,1
+F47,"Chicharrón de cerdo, cocido",Carnes y derivados,602.0,11.3,,61.4,69,1
+F48,Chicharrón de prensa,Carnes y derivados,438.0,23.9,,37.2,69,1
+F49,Chorizo,Carnes y derivados,287.0,21.0,0.0,21.9,69,1
+F50,Jamón del país,Carnes y derivados,344.0,24.7,0.0,26.4,69,1
+F51,Jamonada,Carnes y derivados,344.0,15.7,2.8,29.5,69,1
+F52,Mortadela,Carnes y derivados,256.0,9.8,9.4,19.7,69,1
+F53,Paté,Carnes y derivados,500.0,10.9,1.1,49.8,69,1
+F54,Queso de chancho,Carnes y derivados,242.0,20.1,,17.3,69,1
+F55,Relleno,Carnes y derivados,119.0,14.4,3.2,5.0,69,1
+F56,Salchicha blanca chica,Carnes y derivados,449.0,12.0,2.0,43.2,69,1
+F57,Salchicha blanca grande,Carnes y derivados,363.0,13.6,3.5,32.3,70,1
+F58,Hot Dog,Carnes y derivados,364.0,11.0,2.1,34.3,70,1
+F59,"Salchicha de ""Huacho""",Carnes y derivados,461.0,12.9,2.4,44.0,70,1
+F60,Tocino,Carnes y derivados,493.0,13.5,0.8,47.9,70,1
+F61,"Alpaca, carne pulpa de",Carnes y derivados,109.0,24.1,0.3,0.5,70,1
+F62,"Carnero, criadillas fritas",Carnes y derivados,97.0,15.8,1.6,3.0,70,1
+F63,"Carnero, panza cocida (mondongo)",Carnes y derivados,92.0,12.3,3.7,3.1,70,1
+F64,"Carnero, pierna cocida",Carnes y derivados,260.0,24.8,0.5,17.6,70,1
+F65,"Carnero, sangre cocida",Carnes y derivados,122.0,20.4,0.0,4.5,70,1
+F66,"Cerdo, carne magra, cruda",Carnes y derivados,143.0,21.4,0.0,5.7,70,1
+F67,"Cerdo, corazón de",Carnes y derivados,131.0,15.9,2.9,6.2,70,1
+F68,"Cerdo, costilla con piel y grasa, crudo",Carnes y derivados,298.0,17.6,0.0,24.7,70,1
+F69,"Cerdo, cuero o pellejo crocante",Carnes y derivados,527.0,58.5,4.6,30.5,70,1
+F70,"Cerdo, cuero",Carnes y derivados,505.0,48.4,0.0,34.6,70,1
+F71,"Cerdo, lengua cocida de",Carnes y derivados,325.0,6.1,13.0,27.5,71,1
+F72,"Cordero, pierna cruda",Carnes y derivados,128.0,20.6,0.0,4.5,71,1
+F73,"Codorniz, carne cocida de",Carnes y derivados,199.0,21.1,9.6,8.4,71,1
+F74,"Cuy, carne de",Carnes y derivados,96.0,19.0,0.1,1.6,71,1
+F75,"Llama, carne fresca de",Carnes y derivados,130.0,22.5,2.7,3.3,71,1
+F76,"Llama, carne seca de (charqui)",Carnes y derivados,279.0,57.7,1.1,3.6,71,1
+F77,"Pate de hígado de pollo, envasado",Carnes y derivados,201.0,13.5,6.6,13.1,71,1
+F78,"Pollo, alas con piel, crudas",Carnes y derivados,222.0,18.3,0.0,16.0,71,1
+F79,"Pollo, molleja, cruda",Carnes y derivados,94.0,17.7,0.0,2.1,71,1
+F80,"Pollo, molleja de, sancochada sin sal",Carnes y derivados,144.0,29.1,0.1,2.2,71,1
+F81,"Pollo, pata de, con piel, cruda",Carnes y derivados,205.0,19.3,0.0,13.6,71,1
+F82,"Pollo, pechuga de, sin piel, sancochada sin sal",Carnes y derivados,150.0,30.4,0.0,2.2,71,1
+F83,"Pollo, pechuga de, sin piel, frita en aceite vegetal, sin sal",Carnes y derivados,201.0,34.9,0.1,5.7,71,1
+F84,"Pollo, pierna de, con piel, sancochada sin sal",Carnes y derivados,175.0,23.5,0.0,8.3,71,1
+F85,"Pollo, pierna de, con piel, frita en aceite vegetal, sin sal",Carnes y derivados,185.0,24.9,0.0,8.8,72,1
+F86,"Pollo, vísceras o menudencia cruda",Carnes y derivados,168.0,17.9,2.1,9.2,72,1
+F87,"Res, bazo de, sancochado sin sal",Carnes y derivados,107.0,20.8,0.0,2.0,72,1
+F88,"Res, carne frita",Carnes y derivados,182.0,15.4,6.1,10.7,72,1
+F89,"Res, carne molida de, cruda",Carnes y derivados,164.0,21.0,0.0,8.3,72,1
+F90,"Res, carne molida de, frita en aceite vegetal, sin sal",Carnes y derivados,277.0,27.3,0.1,17.7,72,1
+F91,"Res, charque crudo",Carnes y derivados,292.0,62.4,1.4,4.1,72,1
+F92,"Res, cuadril, churrasco",Carnes y derivados,133.0,22.0,0.0,5.0,72,1
+F93,"Res (ternera), costilla cruda",Carnes y derivados,95.0,20.0,0.0,1.7,72,1
+F94,"Res, hígado de, frito en aceite vegetal, sin sal",Carnes y derivados,161.0,21.5,2.7,6.5,72,1
+F95,"Res, lengua cocida",Carnes y derivados,269.0,16.6,9.5,18.2,72,1
+F96,"Res, panza de (mondongo), sancochado sin sal",Carnes y derivados,67.0,10.6,0.0,2.4,72,1
+F97,"Res, pata de, con piel y grasa, cruda",Carnes y derivados,141.0,24.9,0.1,3.9,72,1
+F98,"Res, sangre cocida",Carnes y derivados,137.0,19.5,0.0,6.6,72,1
+F99,"Res, sangre cruda",Carnes y derivados,135.0,19.8,0.0,6.2,73,1
+F100,"Sajino, carne pulpa de",Carnes y derivados,106.0,21.4,1.3,1.1,73,1
+F101,"Venado, carne pulpa de",Carnes y derivados,110.0,22.9,1.4,0.8,73,1
+F102,"Venado, carne seca de",Carnes y derivados,160.0,32.4,2.4,1.4,73,1
+F103,Ziqui - zapa (hormiga),Carnes y derivados,487.0,36.3,18.4,28.9,73,1
+F104,"Cabanossi, embutido cocido y ahumado",Carnes y derivados,345.0,28.9,2.8,24.2,73,1
+F105,"Carnero, pulpa de, sin piel, sancochada sin sal",Carnes y derivados,229.0,31.6,0.1,10.3,73,1
+F106,Cecina,Carnes y derivados,171.0,30.1,0.0,4.8,73,1
+F107,"Cerdo, chuleta de, con piel, frita en aceite vegetal, sin sal",Carnes y derivados,299.0,26.6,0.1,20.5,73,1
+F108,"Cerdo, pulpa de, sin piel, sancochada sin sal",Carnes y derivados,202.0,32.3,0.0,7.1,73,1
+F109,"Cerdo, sangre de, cocida, envasada",Carnes y derivados,115.0,25.8,0.1,0.5,73,1
+F110,"Chorizo, embutido de carne de cerdo, frito en aceite vegetal",Carnes y derivados,338.0,13.6,7.3,27.8,73,1
+F111,"Cuy, pecho de, pulpa con piel, cruda",Carnes y derivados,269.0,16.0,8.1,18.7,73,1
+F112,"Cuy, pierna de, pulpa con piel, cruda",Carnes y derivados,219.0,16.6,0.8,16.0,73,1
+F113,"Gallina, pierna y encuentro de, pulpa con piel, sancochada sin sal",Carnes y derivados,209.0,27.3,0.1,10.2,74,1
+F114,"Hot dog, embutido de carne de pollo, cerdo y pavo, frito en aceite vegetal",Carnes y derivados,202.0,10.3,7.2,14.3,74,1
+F115,Jamonada especial,Carnes y derivados,155.0,12.1,4.9,9.3,74,1
+F116,"Majaz, pulpa ahumada de, sancochada sin sal",Carnes y derivados,219.0,41.4,0.0,4.7,74,1
+F117,"Paté de hígado de pollo, pavo y carne de cerdo",Carnes y derivados,195.0,13.5,0.8,15.3,74,1
+F118,"Pavo, pechuga de, con piel",Carnes y derivados,94.0,17.7,1.6,1.3,74,1
+F119,"Pavo, pierna de, con piel",Carnes y derivados,105.0,16.4,2.8,2.6,74,1
+F120,"Pollo, ala de, con piel, sancochada sin sal (brazuelo, centro y punta)",Carnes y derivados,262.0,20.1,1.2,19.1,74,1
+F121,"Pollo, corazón de, sancochado sin sal",Carnes y derivados,154.0,25.7,0.0,4.9,74,1
+F122,"Pollo, encuentro de, con piel, frito en aceite vegetal, sin sal",Carnes y derivados,202.0,26.0,0.4,9.9,74,1
+F123,"Pollo, encuentro de, con piel, sancochado sin sal",Carnes y derivados,198.0,23.4,0.1,10.8,74,1
+F124,"Pollo, hamburguesa de, cruda, envasada",Carnes y derivados,208.0,13.6,10.0,12.2,74,1
+F125,"Pollo, hígado de, sancochado sin sal",Carnes y derivados,157.0,23.9,2.9,4.9,74,1
+F126,"Pollo, nuggets de pechuga de, crudo, envasado",Carnes y derivados,185.0,11.2,9.8,10.8,74,1
+F127,"Pollo, pecho y ala de, con piel a la brasa",Carnes y derivados,170.0,25.8,2.3,6.4,75,1
+F128,"Pollo, pierna y encuentro de, con piel a la brasa",Carnes y derivados,213.0,20.9,3.7,12.7,75,1
+F129,"Res, bofe de, con verduras, cocido, envasado",Carnes y derivados,107.0,18.8,0.4,2.8,75,1
+F130,"Res, hamburguesa de carne de, cruda, envasada",Carnes y derivados,219.0,12.1,6.4,15.7,75,1
+F131,"Res, osobuco de",Carnes y derivados,121.0,22.5,0.1,2.7,75,1
+F132,"Sajino ahumado, pulpa de, sancochada sin sal",Carnes y derivados,173.0,32.0,0.0,4.0,75,1
+F133,"Salchicha de Huacho, frita en aceite vegetal",Carnes y derivados,498.0,15.5,0.9,47.5,75,1
+F134,"Tocino, sancochado * Imputado Tabla INCAP 2012; ** Tabla Boliviana 2005; ***Tabla Uruguaya",Carnes y derivados,350.0,25.0,0.0,27.0,75,1
+G1,"Crema de leche, espesa",Leches y derivados,345.0,2.1,2.8,37.0,76,1
+G2,"Crema de leche, rala",Leches y derivados,195.0,2.7,3.7,19.3,76,1
+G3,Leche condensada endulzada,Leches y derivados,322.0,7.9,53.7,9.2,76,1
+G4,Leche en polvo descremada,Leches y derivados,362.0,36.2,52.0,0.8,76,1
+G5,Leche en polvo entera,Leches y derivados,484.0,27.0,36.1,26.1,76,1
+G6,Leche evaporada descremada,Leches y derivados,79.0,7.1,10.5,0.9,76,1
+G7,Leche evaporada entera,Leches y derivados,133.0,6.3,10.9,7.7,76,1
+G8,Leche fresca c/menos de 1% grasa,Leches y derivados,43.0,3.5,4.7,1.0,76,1
+G9,Leche fresca entera (Plusa),Leches y derivados,64.0,3.2,5.1,3.2,76,1
+G10,Leche fresca de cabra,Leches y derivados,66.0,3.2,5.0,3.8,76,1
+G11,Leche fresca de vaca,Leches y derivados,63.0,3.1,4.9,3.5,76,1
+G12,Leche materna,Leches y derivados,70.0,1.0,6.9,4.4,76,1
+G13,Queso fresco de cabra,Leches y derivados,173.0,16.3,3.4,10.3,76,1
+G14,Queso fresco de vaca,Leches y derivados,265.0,17.2,3.6,20.2,76,1
+G15,Queso mantecoso,Leches y derivados,322.0,19.5,1.5,26.5,77,1
+G16,Queso parmesano duro,Leches y derivados,440.0,39.1,1.8,30.3,77,1
+G17,Yogurt de leche entera,Leches y derivados,61.0,3.5,4.7,3.3,77,1
+G18,Yogurt frutado de leche semidescremada,Leches y derivados,97.0,4.1,18.2,2.8,77,1
+G19,Yogurt frutado de leche descremada,Leches y derivados,95.0,4.4,19.0,0.2,77,1
+G20,Yogurt natural de leche descremada,Leches y derivados,56.0,5.7,7.7,0.2,77,1
+G21,"Leche fresca de vaca, descremada",Leches y derivados,30.0,2.5,5.0,0.0,77,1
+G22,"Leche parcialmente descremada sabor ""chocolate"" UHT",Leches y derivados,82.0,3.0,11.3,2.8,77,1
+G23,Queso andino,Leches y derivados,375.0,22.6,0.6,31.4,77,1
+G24,Queso paria,Leches y derivados,298.0,19.2,0.0,24.5,77,1
+G25,Yogurt bebible descremado durazno con calcio,Leches y derivados,50.0,4.1,8.1,0.1,77,1
+G26,Yogurt bebible de fresa,Leches y derivados,78.0,2.7,14.5,1.2,77,1
+G27,"Leche concentrada endulzada, enriquecida con DHA, zinc y vitaminas",Leches y derivados,124.0,5.5,12.5,6.0,77,1
+G28,"Leche concentrada, sin lactosa",Leches y derivados,89.0,7.2,6.8,3.7,77,1
+G29,Queso cabaña (cottage),Leches y derivados,106.0,12.5,2.8,4.8,78,1
+G30,Queso edam,Leches y derivados,330.0,24.4,1.0,25.3,78,1
+G31,"Queso fresco, parcialmente descremado, reducido en grasa",Leches y derivados,153.0,17.6,2.6,7.7,78,1
+G32,Queso Mozarella,Leches y derivados,301.0,24.2,2.1,21.6,78,1
+G33,Queso ricotta,Leches y derivados,115.0,13.5,5.3,4.2,78,1
+G34,"Yogurt bebible descremado, endulzado con stevia, linaza en almibar y frutos secos",Leches y derivados,55.0,4.0,7.9,0.8,78,1
+G35,Yogurt bebible parcialmente descremado con mora,Leches y derivados,65.0,3.3,9.1,1.7,78,1
+G36,Yogurt bebible parcialmente descremado con sauco,Leches y derivados,72.0,2.6,9.5,2.7,78,1
+G37,Yogurt griego descremado con fresas,Leches y derivados,74.0,4.2,14.0,0.3,78,1
+G38,Yogurt griego natural sin azúcar ***Imputado Tabla Uruguaya,Leches y derivados,79.0,4.0,7.2,3.9,78,1
+H1,Cerveza,Bebidas (alcohólicas y analcohólicas),36.0,0.3,5.1,0.0,79,1
+H2,Chicha de aguaje,Bebidas (alcohólicas y analcohólicas),54.0,0.4,11.2,0.8,79,1
+H3,Chicha de cebada,Bebidas (alcohólicas y analcohólicas),24.0,0.1,5.5,0.2,79,1
+H4,Chicha de jora,Bebidas (alcohólicas y analcohólicas),28.0,0.4,5.8,0.3,79,1
+H5,Chicha de maíz morado con azúcar,Bebidas (alcohólicas y analcohólicas),20.0,0.0,4.9,0.0,79,1
+H6,Chicha de maní,Bebidas (alcohólicas y analcohólicas),34.0,0.5,6.3,0.8,79,1
+H7,Chicha de pijuayo,Bebidas (alcohólicas y analcohólicas),47.0,0.8,10.6,0.1,79,1
+H8,Chicha de soya,Bebidas (alcohólicas y analcohólicas),41.0,0.6,9.1,0.2,79,1
+H9,Chicha de yuca (masato),Bebidas (alcohólicas y analcohólicas),37.0,0.2,8.9,0.1,79,1
+H10,Coca Cola,Bebidas (alcohólicas y analcohólicas),39.0,0.0,10.5,0.0,79,1
+H11,Inca Kola,Bebidas (alcohólicas y analcohólicas),41.0,0.0,11.0,0.0,79,1
+H12,Bebida de soya,Bebidas (alcohólicas y analcohólicas),38.0,3.0,2.5,1.4,79,1
+H13,Té sin azúcar,Bebidas (alcohólicas y analcohólicas),1.0,0.1,0.2,0.0,79,1
+H14,Vino blanco (grado alcohólico: 12.0),Bebidas (alcohólicas y analcohólicas),81.0,,,,79,1
+H15,Vino tinto (grado alcohólico: 10.2),Bebidas (alcohólicas y analcohólicas),69.0,,,,80,1
+H16,Café sin azúcar,Bebidas (alcohólicas y analcohólicas),2.0,0.1,0.6,0.0,80,1
+H17,"Ajonjolí, bebida de, natural, sin azúcar",Bebidas (alcohólicas y analcohólicas),46.0,1.6,0.3,4.2,80,1
+H18,"Almendra, bebida de, natural, sin azúcar",Bebidas (alcohólicas y analcohólicas),73.0,3.0,0.7,6.4,80,1
+H19,"Arándano y uva, bebida de, envasada",Bebidas (alcohólicas y analcohólicas),17.0,0.0,4.3,0.0,80,1
+H20,"Avellana, bebida de, natural, sin azúcar",Bebidas (alcohólicas y analcohólicas),58.0,1.4,0.3,5.7,80,1
+H21,"Carambola, refresco de, con azúcar",Bebidas (alcohólicas y analcohólicas),30.0,0.0,7.3,0.0,80,1
+H22,"Cebada, agua de , natural, sin azúcar",Bebidas (alcohólicas y analcohólicas),3.0,0.1,0.3,0.1,80,1
+H23,"Cebada, refresco de, con azúcar",Bebidas (alcohólicas y analcohólicas),22.0,0.1,5.4,0.0,80,1
+H24,"Emoliente, con azúcar",Bebidas (alcohólicas y analcohólicas),15.0,0.1,3.0,0.3,80,1
+H25,"Infusión de hierbas, con azúcar",Bebidas (alcohólicas y analcohólicas),28.0,0.0,6.7,0.2,80,1
+H26,"Infusión de hierba luisa, con azúcar",Bebidas (alcohólicas y analcohólicas),14.0,0.0,3.5,0.0,80,1
+H27,"Maíz morado, chicha de, natural, sin azúcar, sin limón",Bebidas (alcohólicas y analcohólicas),2.0,0.1,0.2,0.2,80,1
+H28,"Malta, bebida de, sin alcohol, envasada",Bebidas (alcohólicas y analcohólicas),32.0,0.3,7.6,0.0,80,1
+H29,"Manzana, refresco de, con azúcar",Bebidas (alcohólicas y analcohólicas),34.0,0.1,8.2,0.1,81,1
+H30,"Maracuyá, refresco de, con azúcar",Bebidas (alcohólicas y analcohólicas),34.0,0.1,7.9,0.2,81,1
+H31,"Naranja, mandarina y limón, bebida sabor a, envasada",Bebidas (alcohólicas y analcohólicas),12.0,0.0,3.1,0.0,81,1
+H32,"Piña, néctar de, con edulcorante, envasada",Bebidas (alcohólicas y analcohólicas),15.0,0.1,3.7,0.0,81,1
+J1,Huevo de charapa,Huevos y derivados,222.0,16.3,1.8,16.0,82,1
+J2,"Huevo de gallina, clara de",Huevos y derivados,51.0,10.9,0.7,0.2,82,1
+J3,"Huevo de gallina entero, sancochado en agua",Huevos y derivados,148.0,12.8,0.8,9.9,82,1
+J4,"Huevo de gallina entero, crudo",Huevos y derivados,166.0,12.7,2.9,11.1,82,1
+J5,"Huevo de gallina, yema de",Huevos y derivados,354.0,15.6,1.9,30.9,82,1
+J6,Huevo de tortuga motelo,Huevos y derivados,143.0,16.4,1.6,7.3,82,1
+J7,Huevo de pata,Huevos y derivados,166.0,13.1,2.3,11.1,82,1
+J8,"Huevo de pata, yema de",Huevos y derivados,426.0,15.1,2.8,38.8,82,1
+J9,Huevo de tortuga taricaya,Huevos y derivados,178.0,15.1,2.9,11.3,82,1
+J10,"Huevo de gallina, clara sancochada en agua",Huevos y derivados,59.0,11.9,1.0,0.3,82,1
+J11,"Huevo de gallina, yema sancochada en agua",Huevos y derivados,364.0,16.3,1.0,32.1,82,1
+J12,"Huevo de codorniz, entero crudo",Huevos y derivados,162.0,12.6,6.0,9.4,82,1
+J13,"Huevo de codorniz, entero sancochado en agua",Huevos y derivados,182.0,12.7,3.9,12.4,82,1
+J14,"Huevo de codorniz, clara sancochada en agua",Huevos y derivados,55.0,10.6,2.2,0.1,83,1
+J15,"Huevo de codorniz, yema sancochada en agua",Huevos y derivados,326.0,13.5,8.4,26.2,83,1
+J16,"Huevo de gallina, entero, frito en aceite vegetal, sin sal",Huevos y derivados,176.0,13.8,2.3,12.5,83,1
+K1,Azúcar granulada o refinada,Productos azucarados,384.0,0.0,99.2,0.0,84,1
+K2,Azúcar rubia,Productos azucarados,380.0,0.0,97.5,0.0,84,1
+K3,Chancaca,Productos azucarados,324.0,0.0,83.9,0.0,84,1
+K4,Miel de abeja,Productos azucarados,330.0,0.0,85.4,0.0,84,1
+K5,Miel de caña,Productos azucarados,282.0,0.3,72.0,0.2,84,1
+K6,Mermelada de durazno,Productos azucarados,196.0,0.6,50.7,0.1,84,1
+K7,Mermelada frutilla,Productos azucarados,229.0,0.4,59.4,0.2,84,1
+K8,Mermelada de sauco,Productos azucarados,268.0,0.4,66.6,0.1,84,1
+L1,Achiote seco,Miscelaneos,388.0,11.3,74.9,5.3,85,1
+L2,Algas,Miscelaneos,249.0,67.8,15.3,6.5,85,1
+L3,"Azafrán de raíz, cúrcuma o palillo fresco, sin cáscara",Miscelaneos,71.0,1.3,16.7,0.4,85,1
+L4,Café grano sin tostar,Miscelaneos,203.0,11.7,68.2,10.8,85,1
+L5,Cochayuyo fresco,Miscelaneos,20.0,1.7,2.5,0.4,85,1
+L6,Cocoa,Miscelaneos,404.0,19.0,47.8,17.1,85,1
+L7,Cominos,Miscelaneos,375.0,17.8,33.7,22.3,85,1
+L8,Extracto de algarrobo en polvo,Miscelaneos,340.0,12.0,65.8,3.2,85,1
+L9,Champiñones u hongos (Callampa),Miscelaneos,22.0,3.0,1.7,0.4,85,1
+L10,Laurel,Miscelaneos,188.0,4.2,47.1,1.2,85,1
+L11,Pimienta negra,Miscelaneos,255.0,11.0,44.5,3.3,85,1
+L12,Té hojas secas,Miscelaneos,308.0,8.0,71.4,4.0,85,1
+L13,Yuyo fresco,Miscelaneos,41.0,2.1,8.0,0.1,85,1
+L14,"Ají dulce seco, molido (paprika)",Miscelaneos,362.0,14.5,49.5,17.9,85,1
+L15,"Algarrobina, líquida",Miscelaneos,368.0,5.2,85.5,0.2,86,1
+L16,"Anís, semilla",Miscelaneos,337.0,17.6,35.4,15.9,86,1
+L17,Caldo de res,Miscelaneos,40.0,1.2,3.3,2.4,86,1
+L18,"Caldo de pollo, o gallina",Miscelaneos,89.0,0.2,0.0,9.8,86,1
+L19,"Clavo de olor, molido",Miscelaneos,323.0,6.0,27.0,20.1,86,1
+L20,"Canela, molida",Miscelaneos,261.0,3.9,79.9,3.2,86,1
+L21,Condimentos o especies molidas no especificadas,Miscelaneos,263.0,6.1,50.5,8.7,86,1
+L22,Cushuro o nostoc deshidratada (alga),Miscelaneos,242.0,29.0,46.9,0.5,86,1
+L23,Levadura fresca para pan,Miscelaneos,113.0,13.4,14.2,0.3,86,1
+L24,Levadura seca,Miscelaneos,359.0,41.6,45.5,1.2,86,1
+L25,"Nuez moscada, molida",Miscelaneos,440.0,5.8,28.5,36.3,86,1
+L26,Pimienta blanca,Miscelaneos,296.0,10.4,68.6,2.1,86,1
+L27,"Salsa envasada, inglesa",Miscelaneos,67.0,0.0,19.5,0.0,86,1
+L28,Setas,Miscelaneos,19.0,2.3,2.1,0.1,86,1
+L29,"Vainilla, extracto",Miscelaneos,288.0,0.1,12.7,0.1,87,1
+L30,"Alimento granulado con malta, leche, cacao y azúcar, en polvo, para bebida",Miscelaneos,366.0,9.8,65.5,7.3,87,1
+L31,"Azafrán de raíz, cúrcuma o palillo en polvo",Miscelaneos,324.0,7.3,68.0,5.1,87,1
+L32,"Cachanga, frita en aceite",Miscelaneos,422.0,8.4,52.4,19.8,87,1
+L33,"Caldo de ave, tabletas",Miscelaneos,314.0,13.2,6.3,25.2,87,1
+L34,"Caldo de carne, tabletas",Miscelaneos,300.0,5.8,13.7,24.7,87,1
+L35,"Camote, hojuela frita en aceite vegetal, endulzado, envasado",Miscelaneos,483.0,4.6,57.5,26.0,87,1
+L36,"""Chicharrón"" (piel de cerdo, frito en aceite vegetal con sal), envasado",Miscelaneos,554.0,62.8,0.0,33.7,87,1
+L37,"Chocolate con leche y maní, barra, envasado",Miscelaneos,534.0,9.5,48.6,33.5,87,1
+L38,Chocolate simple con azúcar (para taza),Miscelaneos,248.0,3.8,75.1,16.8,87,1
+L39,"Churro relleno con crema pastelera, frito en aceite",Miscelaneos,330.0,4.8,45.3,14.3,87,1
+L40,"Churro relleno con majarblanco, frito en aceite",Miscelaneos,378.0,7.9,56.5,13.4,87,1
+L41,"Haba, frita en aceite vegetal con sal, envasada",Miscelaneos,413.0,25.1,37.5,18.1,87,1
+L42,"Mayonesa con sal, envasada",Miscelaneos,390.0,0.9,23.9,33.4,87,1
+L43,"Papa, al hilo frita en aceite vegetal con sal, envasada",Miscelaneos,512.0,4.9,51.1,32.0,88,1
+L44,"Papa, hojuela frita en aceite vegetal con sal, envasada",Miscelaneos,524.0,6.1,46.1,35.1,88,1
+L45,"Pizza americana, (listo para consumo)",Miscelaneos,260.0,9.7,31.8,10.4,88,1
+L46,"Plátano, hojuela frita en aceite vegetal con sal (chifles), envasado",Miscelaneos,500.0,2.1,55.0,30.1,88,1
+L47,"Ravioles relleno con carne, crudo, envasado",Miscelaneos,186.0,9.6,33.0,1.8,88,1
+L48,Salsa de soya,Miscelaneos,60.0,10.5,4.8,0.1,88,1
+L49,"Sopa con fideo precocido y sazonador en polvo sabor a pollo, envasado",Miscelaneos,420.0,11.1,57.9,16.0,88,1
+L50,Vinagre,Miscelaneos,21.0,0.0,6.0,0.0,88,1
+L51,"""Yuquita"" de harina, frita en aceite con sal",Miscelaneos,343.0,8.3,60.9,7.3,88,1
+Q1,Al 110 maternizada,Alimentos infantiles,502.0,14.0,55.3,25.0,89,1
+Q2,Cerelac manzana,Alimentos infantiles,414.0,11.0,75.6,7.4,89,1
+Q3,Cerelac trigo,Alimentos infantiles,425.0,11.5,77.2,7.8,89,1
+Q4,Eledón maternizada,Alimentos infantiles,417.0,27.9,49.8,12.0,89,1
+Q5,Nan maternizada,Alimentos infantiles,509.0,11.4,57.7,26.0,89,1
+Q6,Nestúm cereal mixto,Alimentos infantiles,380.0,9.4,82.9,1.2,89,1
+Q7,Nestúm tres cereales,Alimentos infantiles,376.0,10.7,77.8,2.4,89,1
+Q8,Pelargón maternizada,Alimentos infantiles,458.0,16.5,59.6,17.1,89,1
+Q9,"Alimento instantáneo en polvo, a base de harina de arroz, para niños a partir de 6 meses de edad",Alimentos infantiles,370.0,7.4,83.8,0.6,89,1
+Q10,"Alimento complementario en polvo, a base de leche descremada, maltodextrina, vitaminas y minerales",Alimentos infantiles,398.0,14.5,37.4,21.2,89,1
+Q11,"Alimento lácteo en polvo con leche descremada, prebióticos, probióticos, vitaminas y minerales, para mayores de 2 años de edad",Alimentos infantiles,392.0,17.4,29.4,22.8,89,1
+Q12,"Fórmula infantil, en polvo con DHA, prebióticos, vitaminas y minerales, sin sacarosa y fructosa, niños en crecimiento",Alimentos infantiles,389.0,11.4,52.5,14.8,89,1
+Q13,"Fórmula láctea infantil, líquida con hierro y prebióticos; a partir de los 6 meses de edad",Alimentos infantiles,112.0,4.0,12.2,5.3,90,1
+Q14,"Fórmula láctea infantil, en polvo con hierro y probióticos, lactantes a partir de",Alimentos infantiles,399.0,14.3,38.2,21.0,90,1
+Q15,"Fórmula láctea para lactantes, a base de leche; en polvo, de 0 a 6 meses de edad",Alimentos infantiles,418.0,10.1,30.8,28.3,90,1
+Q16,"Fórmula láctea para lactantes, a base de leche; en polvo, lactantes a partir de 6 meses de edad",Alimentos infantiles,399.0,14.8,32.2,23.5,90,1
+Q17,"Fórmula láctea para lactantes, en polvo con DHA, ARA, hierro,vitaminas y minerales; de 0 a 12 meses de edad",Alimentos infantiles,408.0,11.3,30.0,26.9,90,1
+Q18,"Mezcla de cereales instantánea en polvo (harinas de trigo, arroz, maíz, cebada y avena) con leche descremada",Alimentos infantiles,374.0,15.9,59.5,8.0,90,1
+SB1,"Hojuela de cereal, con canela, bebida de",Alimentos preparados · Bebidas para desayuno,26,1.2,3.9,0.6,181,1
+SB2,"Hojuela de cereal, con cocoa, clavo de olor y canela, bebida de",Alimentos preparados · Bebidas para desayuno,22,1.4,3.1,0.4,181,1
+SB3,"Hojuela de cereal, con membrillo, bebida de",Alimentos preparados · Bebidas para desayuno,26,1.3,4.4,0.4,181,1
+SB4,"Hojuela de cereal, con avena precocida, bebida de",Alimentos preparados · Bebidas para desayuno,17,1.3,2.2,0.4,181,1
+SB5,"Hojuela de cereal, con leche evaporada entera UHT, bebida de",Alimentos preparados · Bebidas para desayuno,35,1.3,4.2,1.4,182,1
+SB6,"Hojuela de cereal, con leche evaporada entera UHT, avena, clavo de olor, canela y vainilla, bebida de",Alimentos preparados · Bebidas para desayuno,55,2.1,7.1,2.0,182,1
+SB7,"Hojuela de quinua con cereales, leche evaporada entera, canela y clavo de olor, bebida de",Alimentos preparados · Bebidas para desayuno,43,1.6,5.6,1.6,182,1
+SB8,"Hojuela de quinua con cereales, leche evaporada entera UHT, azúcar rubia,clavo de olor y canela, bebida de",Alimentos preparados · Bebidas para desayuno,63,2.0,8.9,2.2,182,1
+SB9,"Hojuela de cereales con soya precocidos con leche evaporada, bebida de",Alimentos preparados · Bebidas para desayuno,38,1.5,4.0,1.7,182,1
+SE1,Aguadito de pollo,Alimentos preparados · Entradas,42,2.4,5.6,0.9,106,5
+SE2,Aguadito de pescado,Alimentos preparados · Entradas,32,1.4,5.3,0.4,106,2
+SE3,Alita broaster con ensalada de lechuga,Alimentos preparados · Entradas,143,8.2,11.0,6.7,106,1
+SE4,Ancoquis en salsa roja,Alimentos preparados · Entradas,127,5.2,15.9,4.4,106,1
+SE5,Atún vegano,Alimentos preparados · Entradas,152,11.9,21.2,3.1,106,1
+SE6,Caldo,Alimentos preparados · Entradas,38,2.2,6.3,0.2,106,1
+SE7,Caldo de carne,Alimentos preparados · Entradas,30,1.8,4.8,0.1,106,3
+SE8,Caldo de cordero,Alimentos preparados · Entradas,47,2.6,5.5,1.5,107,3
+SE9,Caldo de gallina,Alimentos preparados · Entradas,47,3.1,7.3,0.5,107,5
+SE10,Caldo de mote,Alimentos preparados · Entradas,79,3.1,15.1,0.6,107,4
+SE11,Caldo de pescado,Alimentos preparados · Entradas,32,1.0,6.8,0.1,107,1
+SE12,Caldo de pollo,Alimentos preparados · Entradas,40,2.2,5.6,0.8,108,5
+SE13,Caldo de res,Alimentos preparados · Entradas,50,1.9,10.4,0.1,108,1
+SE14,Carpaccio de pescado,Alimentos preparados · Entradas,88,14.0,2.4,1.9,108,1
+SE15,Causa,Alimentos preparados · Entradas,95,4.7,13.6,2.5,108,1
+SE16,Causa de palta,Alimentos preparados · Entradas,140,1.4,4.5,11.9,108,1
+SE17,Causa de pescado,Alimentos preparados · Entradas,118,3.3,16.4,3.9,108,4
+SE18,Causa de pollo,Alimentos preparados · Entradas,130,3.6,14.2,6.2,108,5
+SE19,Causa de pulpa de cangrejo,Alimentos preparados · Entradas,215,6.7,8.0,17.6,109,1
+SE20,Causa criolla,Alimentos preparados · Entradas,174,2.4,17.6,10.7,109,1
+SE21,Causa rellena,Alimentos preparados · Entradas,108,3.3,14.0,4.3,109,3
+SE22,Cazuela,Alimentos preparados · Entradas,33,1.9,4.1,0.8,109,1
+SE23,Cazuela de pollo,Alimentos preparados · Entradas,39,2.2,5.4,0.6,109,1
+SE24,Cazuela de res,Alimentos preparados · Entradas,34,1.5,6.3,0.2,109,4
+SE25,Cebiche de pescado,Alimentos preparados · Entradas,90,7.6,11.0,1.5,110,5
+SE26,Cebiche de pescado con chicharrón de pota,Alimentos preparados · Entradas,147,6.9,23.7,2.7,110,1
+SE27,Cebiche de pescado con pota,Alimentos preparados · Entradas,69,4.4,14.1,0.2,110,1
+SE28,Cebiche de pota,Alimentos preparados · Entradas,53,5.1,6.9,0.4,110,1
+SE29,Cebiche mixto,Alimentos preparados · Entradas,96,8.5,11.2,1.8,110,5
+SE30,Cebiche y chilcano de pescado,Alimentos preparados · Entradas,77,6.3,5.5,2.9,111,1
+SE31,Chaque,Alimentos preparados · Entradas,66,5.5,9.5,0.6,111,1
+SE32,Chilcano de pescado,Alimentos preparados · Entradas,19,0.8,1.5,1.1,111,4
+SE33,Chicharrón con sarsa criolla y leche de tigre,Alimentos preparados · Entradas,66,5.7,8.7,0.7,111,1
+SE34,Chicharrón de pollo,Alimentos preparados · Entradas,100,2.7,20.2,1.6,111,1
+SE35,Chicharron de pota,Alimentos preparados · Entradas,316,7.5,24.6,20.7,111,2
+SE36,Choritos a la chalaca,Alimentos preparados · Entradas,65,6.2,7.8,1.2,111,1
+SE37,Choclo a la huancaína,Alimentos preparados · Entradas,111,5.4,11.1,5.4,111,1
+SE38,Choclo con queso,Alimentos preparados · Entradas,151,8.9,8.1,9.4,111,3
+SE39,Chupe de camarón,Alimentos preparados · Entradas,67,3.4,9.8,1.4,112,3
+SE40,Chupe de cangrejo,Alimentos preparados · Entradas,37,2.2,5.3,0.6,112,3
+SE41,Chupe de chochoca,Alimentos preparados · Entradas,53,1.6,8.0,1.6,112,1
+SE42,Chupe de choro,Alimentos preparados · Entradas,52,2.5,6.6,1.2,112,3
+SE43,Chupe de habas,Alimentos preparados · Entradas,39,1.6,7.0,0.5,112,2
+SE44,Chupe de mariscos,Alimentos preparados · Entradas,47,2.7,6.6,0.9,112,3
+SE45,Chupe de pescado,Alimentos preparados · Entradas,48,2.4,7.0,1.3,113,5
+SE46,Chupe de pollo,Alimentos preparados · Entradas,36,2.8,4.0,0.9,113,1
+SE47,Chupe de trigo,Alimentos preparados · Entradas,16,0.6,2.6,0.3,113,1
+SE48,Chupe mixto,Alimentos preparados · Entradas,15,1.4,1.4,0.4,113,1
+SE49,Consomé de pollo,Alimentos preparados · Entradas,30,2.6,2.1,1.1,113,1
+SE50,Crema de arveja,Alimentos preparados · Entradas,40,2.4,5.8,0.8,113,4
+SE51,Crema de ocopa,Alimentos preparados · Entradas,109,3.1,15.2,3.6,114,1
+SE52,Crema de pimiento,Alimentos preparados · Entradas,114,4.1,15.0,4.0,114,2
+SE53,Crema de rocoto,Alimentos preparados · Entradas,126,3.5,16.3,4.8,114,4
+SE54,Crema de verdura,Alimentos preparados · Entradas,24,0.9,2.2,1.1,114,3
+SE55,Crema de zapallo,Alimentos preparados · Entradas,24,0.6,3.2,1.1,114,2
+SE56,Croquetas,Alimentos preparados · Entradas,175,4.2,15.3,11.6,114,1
+SE57,Ensalada,Alimentos preparados · Entradas,78,1.4,3.5,6.5,115,5
+SE58,Ensalada cesar,Alimentos preparados · Entradas,76,4.7,3.6,4.8,115,1
+SE59,Ensalada de atún,Alimentos preparados · Entradas,82,3.9,12.5,1.3,115,1
+SE60,Ensalada de cocona,Alimentos preparados · Entradas,45,1.2,9.0,0.4,115,1
+SE61,Ensalada de fideos,Alimentos preparados · Entradas,273,5.9,36.4,11.4,115,1
+SE62,Ensalada de lechuga,Alimentos preparados · Entradas,62,0.6,1.5,5.7,115,1
+SE63,Ensalada de verduras,Alimentos preparados · Entradas,82,1.4,4.3,6.8,115,5
+SE64,Ensalada rusa,Alimentos preparados · Entradas,60,1.5,6.8,2.7,116,2
+SE65,Flauta rellena,Alimentos preparados · Entradas,123,13.3,10.3,3.2,116,1
+SE66,Huevo a la rusa,Alimentos preparados · Entradas,94,3.6,7.6,4.6,116,3
+SE67,Huevitos en salsa golf,Alimentos preparados · Entradas,130,1.7,9.1,9.1,116,2
+SE68,Hummus,Alimentos preparados · Entradas,212,7.0,38.0,3.9,116,1
+SE69,Menestrón con pollo,Alimentos preparados · Entradas,85,4.2,13.8,1.2,116,2
+SE70,Menestrón con res,Alimentos preparados · Entradas,45,2.3,7.8,0.4,116,5
+SE71,Ocopa a la arequipeña,Alimentos preparados · Entradas,125,3.8,17.2,4.6,117,5
+SE72,Palta rellena,Alimentos preparados · Entradas,138,3.3,7.2,9.5,117,3
+SE73,Pan al ajo,Alimentos preparados · Entradas,226,3.4,23.1,14.1,117,3
+SE74,Papa a la huancaína,Alimentos preparados · Entradas,118,3.5,18.1,3.9,118,5
+SE75,Papas a la rioja,Alimentos preparados · Entradas,60,2.5,8.9,1.7,118,1
+SE76,Papa con huevo,Alimentos preparados · Entradas,116,6.3,6.9,7.1,118,1
+SE77,Papas fritas,Alimentos preparados · Entradas,359,1.4,13.3,33.4,118,1
+SE78,Papa rellena,Alimentos preparados · Entradas,162,4.2,14.1,9.7,118,4
+SE79,Papa rellena con ensalada,Alimentos preparados · Entradas,135,3.3,17.6,6.0,118,1
+SE80,Papa rellena con sarsa criolla,Alimentos preparados · Entradas,160,3.9,12.3,9.6,118,1
+SE81,Parihuela,Alimentos preparados · Entradas,67,4.8,5.8,3.2,119,3
+SE82,Pastel de papa,Alimentos preparados · Entradas,138,6.2,13.1,6.1,119,1
+SE83,Patasca,Alimentos preparados · Entradas,74,3.8,8.8,2.6,119,4
+SE84,Pejerrey arrebosado,Alimentos preparados · Entradas,172,6.9,14.3,9.3,119,1
+SE85,Rocoto relleno,Alimentos preparados · Entradas,136,6.6,10.1,7.5,119,1
+SE86,Salpicón de atún,Alimentos preparados · Entradas,253,7.9,29.9,11.0,119,1
+SE87,Salpicón de pollo,Alimentos preparados · Entradas,93,4.8,10.7,3.5,119,4
+SE88,Salpicón de verduras,Alimentos preparados · Entradas,169,3.3,14.7,10.9,120,1
+SE89,Sancochado con pollo,Alimentos preparados · Entradas,52,3.4,7.7,0.7,120,2
+SE90,Sancochado con res,Alimentos preparados · Entradas,36,1.7,6.2,0.2,120,5
+SE91,Shambar,Alimentos preparados · Entradas,56,4.2,5.6,1.4,120,3
+SE92,Solterito,Alimentos preparados · Entradas,85,5.0,10.3,2.6,120,1
+SE93,Sopa a la minuta,Alimentos preparados · Entradas,49,3.2,7.3,0.6,120,5
+SE94,Sopa a la minuta de pollo,Alimentos preparados · Entradas,60,2.9,8.4,1.3,121,1
+SE95,Sopa campesina,Alimentos preparados · Entradas,45,2.2,5.9,0.4,121,1
+SE96,Sopa chilena,Alimentos preparados · Entradas,21,2.1,2.3,0.3,121,1
+SE97,Sopa criolla con pollo,Alimentos preparados · Entradas,19,1.0,2.6,0.5,121,1
+SE98,Sopa criolla con res,Alimentos preparados · Entradas,41,3.1,5.6,0.6,121,1
+SE99,Sopa de arroz,Alimentos preparados · Entradas,26,1.4,3.7,0.5,121,1
+SE100,Sopa de arroz con res,Alimentos preparados · Entradas,30,1.3,5.8,0.1,121,3
+SE101,Sopa de arverja,Alimentos preparados · Entradas,94,2.9,19.4,0.4,121,1
+SE102,Sopa de cangrejo,Alimentos preparados · Entradas,35,1.4,7.2,0.1,122,1
+SE103,Sopa de casa,Alimentos preparados · Entradas,44,2.0,7.6,0.4,122,5
+SE104,Sopa de casa con res,Alimentos preparados · Entradas,39,1.9,7.1,0.2,122,4
+SE105,Sopa de choro,Alimentos preparados · Entradas,38,1.6,6.8,0.2,122,4
+SE106,Sopa de fideos,Alimentos preparados · Entradas,34,1.9,5.0,0.7,123,2
+SE107,Sopa de fideos con res,Alimentos preparados · Entradas,46,2.3,8.4,0.2,123,3
+SE108,Sopa de frejoles,Alimentos preparados · Entradas,58,3.4,8.3,0.5,123,1
+SE109,Sopa de gallina,Alimentos preparados · Entradas,33,2.1,5.4,0.2,123,2
+SE110,Sopa de habas,Alimentos preparados · Entradas,54,2.2,10.1,0.7,123,1
+SE111,Sopa de hueso de res,Alimentos preparados · Entradas,20,0.4,3.9,0.2,123,1
+SE112,Sopa de leche,Alimentos preparados · Entradas,41,1.5,5.3,0.8,123,1
+SE113,Sopa de menudencia,Alimentos preparados · Entradas,45,2.5,6.1,0.7,123,4
+SE114,Sopa de morón con pollo,Alimentos preparados · Entradas,48,2.3,7.4,0.9,124,4
+SE115,Sopa de morón con res,Alimentos preparados · Entradas,25,1.3,4.3,0.3,124,5
+SE116,Sopa de mote,Alimentos preparados · Entradas,56,2.2,10.6,0.6,124,3
+SE117,Sopa de mote con res,Alimentos preparados · Entradas,38,1.5,7.1,0.4,124,1
+SE118,Sopa de papa,Alimentos preparados · Entradas,77,3.1,7.3,3.2,125,2
+SE119,Sopa de pescado,Alimentos preparados · Entradas,44,1.6,8.2,0.3,125,2
+SE120,Sopa de pollo,Alimentos preparados · Entradas,42,2.3,6.1,0.7,125,5
+SE121,Sopa de res,Alimentos preparados · Entradas,42,2.1,7.8,0.2,125,5
+SE122,Sopa de sémola,Alimentos preparados · Entradas,39,2.2,5.1,0.8,126,4
+SE123,Sopa de sémola con pollo,Alimentos preparados · Entradas,37,2.1,4.9,0.7,126,3
+SE124,Sopa de sémola con res,Alimentos preparados · Entradas,36,1.6,6.7,0.2,126,2
+SE125,Sopa de trigo,Alimentos preparados · Entradas,23,1.2,3.3,0.2,126,4
+SE126,Sopa de trigo con pollo,Alimentos preparados · Entradas,32,1.9,4.6,0.6,126,2
+SE127,Sopa de trigo con res,Alimentos preparados · Entradas,32,1.6,5.7,0.2,127,3
+SE128,Sopa de verduras,Alimentos preparados · Entradas,34,2.5,5.4,0.2,127,1
+SE129,Sopa de verduras con pollo,Alimentos preparados · Entradas,41,2.4,6.4,0.5,127,4
+SE130,Sopa de verduras con res,Alimentos preparados · Entradas,39,1.5,7.7,0.1,127,3
+SE131,Sopa wantán,Alimentos preparados · Entradas,92,4.6,11.0,3.2,127,5
+SE132,Sustancia,Alimentos preparados · Entradas,60,3.3,8.8,1.1,128,1
+SE133,Sustancia de pollo,Alimentos preparados · Entradas,47,2.9,7.3,0.6,128,2
+SE134,Sustancia de res,Alimentos preparados · Entradas,45,1.9,7.7,0.6,128,4
+SE135,Tamal de pollo,Alimentos preparados · Entradas,201,5.0,20.0,11.5,128,3
+SE136,Tamal verde,Alimentos preparados · Entradas,156,3.7,20.7,6.9,128,1
+SE137,Tequeños,Alimentos preparados · Entradas,534,7.8,30.7,42.7,129,2
+SE138,Tequeños con crema a la huancaína,Alimentos preparados · Entradas,277,8.4,28.6,14.4,129,2
+SE139,Tequeños con guacamole,Alimentos preparados · Entradas,402,8.0,36.9,25.4,129,4
+SE140,Tequeños de queso,Alimentos preparados · Entradas,351,6.7,35.1,22.0,129,1
+SE141,Tiradito de pejerrey,Alimentos preparados · Entradas,94,6.7,14.0,1.1,129,3
+SE142,Wantán frito,Alimentos preparados · Entradas,360,8.6,32.2,22.1,129,2
+SE143,Yucas rellenas,Alimentos preparados · Entradas,147,4.0,14.8,8.2,130,1
+SE144,Ensalada de palta,Alimentos preparados · Entradas,36,1.0,1.2,3.0,130,1
+SP1,Arroz con leche,Alimentos preparados · Postres,156,2.3,33.5,1.3,182,5
+SP2,Arroz zambito,Alimentos preparados · Postres,214,3.4,46.8,1.4,182,2
+SP3,Budín de pan,Alimentos preparados · Postres,200,4.0,34.9,4.6,182,3
+SP4,Compota de frutas,Alimentos preparados · Postres,82,0.4,18.1,0.1,183,2
+SP5,Crema volteada,Alimentos preparados · Postres,198,8.7,21.4,8.7,183,1
+SP6,Durazno al almibar,Alimentos preparados · Postres,208,0.2,53.1,0.1,183,1
+SP7,Dulce de cañihua,Alimentos preparados · Postres,45,1.5,6.1,1.6,183,1
+SP8,Ensalada de frutas,Alimentos preparados · Postres,66,0.7,14.5,0.5,183,1
+SP9,Flan,Alimentos preparados · Postres,76,1.8,12.6,2.0,183,2
+SP10,Gelatina,Alimentos preparados · Postres,68,1.8,15.2,0.0,183,5
+SP11,Leche asada,Alimentos preparados · Postres,152,7.3,14.0,7.0,184,1
+SP12,Mazamorra de frutas,Alimentos preparados · Postres,52,0.4,11.7,0.1,184,5
+SP13,Mazamorra de sémola,Alimentos preparados · Postres,118,1.7,27.4,0.5,184,1
+SP14,Mazamorra de maizena,Alimentos preparados · Postres,76,1.0,15.8,1.2,184,1
+SP15,Mazamorra morada,Alimentos preparados · Postres,62,0.6,13.4,0.2,184,5
+SP16,Panqueque relleno,Alimentos preparados · Postres,180,3.9,34.2,3.2,185,1
+SP17,Tiramisú *Información proveniente de análiis químico,Alimentos preparados · Postres,297,8.7,12.0,23.6,185,1
+SR1,Chicha blanca,Alimentos preparados · Refrescos,41,0.3,9.7,0.2,176,1
+SR2,Emoliente,Alimentos preparados · Refrescos,33,0.2,7.8,0.2,176,5
+SR3,Infusión de hierbas,Alimentos preparados · Refrescos,25,0.0,6.3,0.0,177,5
+SR4,Limonada,Alimentos preparados · Refrescos,28,0.0,7.2,0.0,177,5
+SR5,Refresco de carambola,Alimentos preparados · Refrescos,24,0.1,5.9,0.0,177,5
+SR6,Refresco de cebada,Alimentos preparados · Refrescos,39,0.3,9.5,0.1,178,5
+SR7,Refresco de cebada con linaza,Alimentos preparados · Refrescos,35,0.3,7.8,0.3,178,2
+SR8,Refresco de durazno,Alimentos preparados · Refrescos,20,0.0,4.8,0.0,178,3
+SR9,Refresco de linaza,Alimentos preparados · Refrescos,29,0.5,5.3,0.7,178,1
+SR10,Refresco de mango,Alimentos preparados · Refrescos,27,0.0,6.9,0.0,178,5
+SR11,Refresco de manzana,Alimentos preparados · Refrescos,27,0.0,7.0,0.0,179,5
+SR12,Refresco de maracuyá,Alimentos preparados · Refrescos,29,0.1,7.4,0.0,179,5
+SR13,Refresco de membrillo,Alimentos preparados · Refrescos,28,0.0,7.0,0.0,180,3
+SR14,Refresco de naranja,Alimentos preparados · Refrescos,23,0.1,5.7,0.0,180,5
+SR15,Refresco de papaya,Alimentos preparados · Refrescos,27,0.0,6.8,0.0,180,1
+SR16,Refresco de piña,Alimentos preparados · Refrescos,23,0.0,5.7,0.0,180,5
+SR17,Refresco de soya,Alimentos preparados · Refrescos,53,2.4,8.6,1.3,181,1
+SR18,Chicha de jora,Alimentos preparados · Refrescos,34,0.3,7.4,0.2,181,2
+SR19,Chicha morada,Alimentos preparados · Refrescos,44,0.5,10.3,0.2,181,5
+SR20,Naranjada,Alimentos preparados · Refrescos,19,0.0,4.7,0.0,181,1
+SS1,Adobo de cerdo con arroz,Alimentos preparados · Segundos,174,6.3,31.7,1.9,130,1
+SS2,Adobo de cerdo con menestra y arroz,Alimentos preparados · Segundos,165,9.7,23.8,3.4,130,1
+SS3,Adobo de cerdo con puré y arroz,Alimentos preparados · Segundos,146,4.8,19.9,5.0,130,1
+SS4,Adobo de pollo con arroz,Alimentos preparados · Segundos,138,7.3,22.4,1.8,130,2
+SS5,Adobo de pollo con ensalada y arroz,Alimentos preparados · Segundos,145,4.9,25.5,2.2,130,1
+SS6,Adobo de res con arroz y puré,Alimentos preparados · Segundos,126,5.6,21.4,1.8,130,1
+SS7,Adobo de res con menestra y arroz,Alimentos preparados · Segundos,155,7.7,27.8,1.7,130,1
+SS8,Aeropuerto de pollo,Alimentos preparados · Segundos,212,6.5,39.1,2.5,130,1
+SS9,Aeropuerto tacon pa,Alimentos preparados · Segundos,177,7.6,28.2,3.4,130,1
+SS10,Ají de pollo con arroz,Alimentos preparados · Segundos,151,5.5,23.3,3.1,130,5
+SS11,Albóndigas en salsa con arroz,Alimentos preparados · Segundos,133,6.3,18.0,3.6,131,1
+SS12,Alita broaster con papas fritas y arroz,Alimentos preparados · Segundos,272,5.7,19.7,18.7,131,1
+SS13,Anticucho con papa y arroz,Alimentos preparados · Segundos,112,9.6,10.6,3.2,131,2
+SS14,Arroz a la jardinera con pollo,Alimentos preparados · Segundos,134,7.1,21.3,1.7,131,3
+SS15,Arroz a la jardinera con pollo frito,Alimentos preparados · Segundos,165,4.3,27.4,3.9,131,2
+SS16,Arroz arabe con pollo,Alimentos preparados · Segundos,135,5.8,23.6,1.2,131,2
+SS17,"Arroz blanco con filete de pollo, papas sancochadas y ensalada",Alimentos preparados · Segundos,146,6.5,23.8,2.5,132,1
+SS18,Arroz chaufa con pollo chijaukay,Alimentos preparados · Segundos,188,7.3,22.3,7.3,132,3
+SS19,Arroz chaufa con pollo al tamarindo,Alimentos preparados · Segundos,129,6.3,21.7,1.4,132,1
+SS20,Arroz chaufa con pollo taypa especial,Alimentos preparados · Segundos,124,8.9,10.0,4.4,132,1
+SS21,Arroz chaufa de cerdo,Alimentos preparados · Segundos,194,6.8,29.4,4.9,132,1
+SS22,Arroz chaufa de mariscos,Alimentos preparados · Segundos,141,6.6,22.0,2.4,132,3
+SS23,Arroz chaufa de pollo,Alimentos preparados · Segundos,174,6.3,29.2,2.8,132,5
+SS24,Arroz chaufa de res,Alimentos preparados · Segundos,217,7.0,22.8,10.4,133,2
+SS25,Arroz chaufa especial,Alimentos preparados · Segundos,205,10.5,22.7,7.5,133,1
+SS26,Arroz con carne,Alimentos preparados · Segundos,119,4.9,23.6,0.5,133,1
+SS27,Arroz con cerdo y sarsa criolla,Alimentos preparados · Segundos,140,4.1,23.4,2.9,133,1
+SS28,Arroz con frejol y seco de res,Alimentos preparados · Segundos,137,7.0,21.4,2.1,133,5
+SS29,Arroz con frejoles y seco de pollo,Alimentos preparados · Segundos,130,7.1,20.8,1.7,133,5
+SS30,Arroz con lentejas y churrasco,Alimentos preparados · Segundos,157,9.4,23.1,2.9,134,1
+SS31,Arroz con mariscos,Alimentos preparados · Segundos,145,5.8,23.5,2.7,134,5
+SS32,Arroz con pato,Alimentos preparados · Segundos,174,5.6,20.9,7.1,134,1
+SS33,Arroz con pollo,Alimentos preparados · Segundos,142,6.9,22.0,2.3,134,5
+SS34,Arroz tapado,Alimentos preparados · Segundos,157,7.3,21.2,4.4,135,1
+SS35,Arvejita verde partida con estofado de pollo y arroz,Alimentos preparados · Segundos,142,8.8,20.2,2.8,135,1
+SS36,Arvejita verde partida con guiso de pollo y arroz,Alimentos preparados · Segundos,143,7.8,23.8,1.2,135,1
+SS37,Arvejita verde partida con hígado frito y arroz,Alimentos preparados · Segundos,150,4.6,29.8,1.1,135,1
+SS38,Arvejita verde partida con pollo al horno y arroz,Alimentos preparados · Segundos,124,7.3,14.8,3.4,135,1
+SS39,Arvejita verde partida con pescado frito y arroz,Alimentos preparados · Segundos,219,6.8,25.9,9.2,135,2
+SS40,Asado de cerdo con arvejita verde y arroz,Alimentos preparados · Segundos,140,8.3,22.0,1.9,135,2
+SS41,Asado de cerdo con menestra y arroz,Alimentos preparados · Segundos,153,8.0,24.9,2.2,135,1
+SS42,Asado de pollo con arroz,Alimentos preparados · Segundos,152,8.7,20.4,3.2,135,2
+SS43,Asado de pollo con menestra y arroz,Alimentos preparados · Segundos,135,8.5,21.1,1.7,135,2
+SS44,Asado de pollo con puré y arroz,Alimentos preparados · Segundos,148,6.4,23.6,2.7,136,1
+SS45,Asado de res con arroz,Alimentos preparados · Segundos,132,5.2,25.6,0.6,136,2
+SS46,Asado de res con menestra y arroz,Alimentos preparados · Segundos,112,6.5,18.6,1.4,136,3
+SS47,Asado de res con puré y arroz,Alimentos preparados · Segundos,118,5.4,19.6,1.6,136,2
+SS48,Bisteck de res a lo pobre con arroz,Alimentos preparados · Segundos,168,6.2,21.9,5.9,136,3
+SS49,Bisteck de res con arroz,Alimentos preparados · Segundos,151,7.1,19.5,4.7,136,2
+SS50,Bisteck de res con papas fritas y arroz,Alimentos preparados · Segundos,96,3.4,13.5,3.1,137,1
+SS51,Cabrito a la norteña con arroz,Alimentos preparados · Segundos,110,5.5,18.4,1.2,137,2
+SS52,Cabrito con frejoles y arroz,Alimentos preparados · Segundos,146,7.2,20.1,3.6,137,4
+SS53,Carapulcra con arroz,Alimentos preparados · Segundos,151,6.1,18.5,4.0,137,1
+SS54,Carapulcra de cerdo con arroz,Alimentos preparados · Segundos,164,7.1,27.7,2.6,137,3
+SS55,Carne de res con ensalada y arroz,Alimentos preparados · Segundos,215,6.9,22.4,10.5,137,1
+SS56,Cau cau con arroz,Alimentos preparados · Segundos,112,4.6,19.0,1.8,137,5
+SS57,Causa con pollo al horno y arroz,Alimentos preparados · Segundos,130,3.3,22.9,2.3,138,1
+SS58,Cebiche con chicharrón,Alimentos preparados · Segundos,172,10.1,12.0,9.0,138,2
+SS59,Cebiche de pescado,Alimentos preparados · Segundos,124,8.4,15.9,2.8,138,4
+SS60,Cebiche de pollo con arroz,Alimentos preparados · Segundos,138,7.6,21.1,2.3,138,1
+SS61,Cerdo al horno con arroz,Alimentos preparados · Segundos,161,7.7,23.2,3.5,138,1
+SS62,Chanfainita con arroz,Alimentos preparados · Segundos,151,4.3,28.2,1.8,138,1
+SS63,Chanfainita con tallarín,Alimentos preparados · Segundos,153,5.8,29.7,0.7,138,1
+SS64,Chicharrón de pescado,Alimentos preparados · Segundos,186,6.8,15.8,10.1,139,2
+SS65,Chicharrón de pescado con arroz,Alimentos preparados · Segundos,208,5.5,26.2,8.7,139,2
+SS66,Chicharrón de pescado con ensalada y arroz,Alimentos preparados · Segundos,241,6.8,29.2,10.5,139,1
+SS67,Chicharrón de pescado con frejoles y arroz,Alimentos preparados · Segundos,135,5.4,22.0,1.7,139,2
+SS68,Chicharron de pescado con yuca frita y arroz,Alimentos preparados · Segundos,231,7.4,22.4,12.2,139,4
+SS69,Chicharrón de pescado con yucas doradas,Alimentos preparados · Segundos,195,9.9,23.4,6.9,139,1
+SS70,Chicharrón de pollo con ensalada y arroz,Alimentos preparados · Segundos,190,6.7,24.2,6.8,139,2
+SS71,Chicharrón mixto,Alimentos preparados · Segundos,222,9.3,13.6,14.1,140,1
+SS72,Chicharrón mixto con sarsa criolla y arroz,Alimentos preparados · Segundos,168,6.3,25.8,3.8,140,1
+SS73,Chicharrón mixto con yuca frita,Alimentos preparados · Segundos,168,10.5,12.6,8.8,140,1
+SS74,Chicken quesadilla,Alimentos preparados · Segundos,193,12.2,14.3,9.9,140,1
+SS75,Chuleta a la parrilla con arroz,Alimentos preparados · Segundos,111,6.3,17.2,1.8,140,1
+SS76,Chuleta de cerdo con papas fritas y arroz,Alimentos preparados · Segundos,178,6.7,18.7,8.0,140,1
+SS77,Churrasco con arroz,Alimentos preparados · Segundos,100,3.8,18.5,0.7,140,1
+SS78,Churrasco con frejoles y arroz,Alimentos preparados · Segundos,171,10.9,17.8,6.4,140,1
+SS79,"Churrasco con papas fritas, ensalada y arroz",Alimentos preparados · Segundos,156,4.6,23.4,4.3,140,1
+SS80,Combinado de pollo,Alimentos preparados · Segundos,163,5.6,31.2,1.4,140,4
+SS81,Combinado de res,Alimentos preparados · Segundos,151,4.5,24.8,3.8,140,1
+SS82,Combinado de tallarín rojo con frejoles y arroz,Alimentos preparados · Segundos,193,10.4,29.4,3.6,141,1
+SS83,Cordero a la norteña con frejoles y arroz,Alimentos preparados · Segundos,165,8.8,21.1,4.8,141,3
+SS84,Costillas barbiquiu con arroz y camote,Alimentos preparados · Segundos,190,6.5,20.2,8.2,141,1
+SS85,Costillas con papa y arroz,Alimentos preparados · Segundos,166,8.3,19.8,5.7,141,1
+SS86,Costillas a la norteña con frejoles y arroz,Alimentos preparados · Segundos,152,8.0,20.1,3.3,141,1
+SS87,Encebollado de hígado con frejoles y arroz,Alimentos preparados · Segundos,161,8.8,17.9,6.2,141,1
+SS88,Ensalada rusa con pollo broaster y arroz,Alimentos preparados · Segundos,157,8.8,19.2,4.9,141,1
+SS89,Ensalada rusa con pollo a la brasa y arroz,Alimentos preparados · Segundos,146,8.8,18.2,3.4,141,1
+SS90,Ensalada rusa con pollo al horno y arroz,Alimentos preparados · Segundos,131,8.4,17.9,2.3,141,2
+SS91,Ensalada rusa con pollo frito y arroz,Alimentos preparados · Segundos,156,7.2,18.7,5.5,141,2
+SS92,Escabeche de pescado con arroz,Alimentos preparados · Segundos,189,6.6,22.6,7.7,142,3
+SS93,Escabeche de pollo con arroz,Alimentos preparados · Segundos,139,7.0,21.4,2.4,142,5
+SS94,Estofado de pavita con arroz y ensalada,Alimentos preparados · Segundos,138,5.7,21.4,2.7,142,2
+SS95,Estofado de pollo con arroz,Alimentos preparados · Segundos,125,6.5,20.1,1.5,142,4
+SS96,Estofado de pollo con arroz y ensalada,Alimentos preparados · Segundos,118,5.7,19.2,1.8,143,2
+SS97,Estofado de pollo con menestra y arroz,Alimentos preparados · Segundos,146,7.6,24.1,1.7,143,3
+SS98,Estofado de res con arroz,Alimentos preparados · Segundos,140,7.5,23.8,1.1,143,2
+SS99,Estofado de res con menestra y arroz,Alimentos preparados · Segundos,126,6.6,22.5,1.1,143,2
+SS100,Estofado de lengua con arroz,Alimentos preparados · Segundos,133,4.9,15.9,5.1,143,1
+SS101,Espesado de res con arroz,Alimentos preparados · Segundos,212,6.8,41.0,2.0,143,1
+SS102,Fetuccini a lo alfredo,Alimentos preparados · Segundos,339,9.9,30.4,19.9,143,1
+SS103,Filete de pescado con arroz,Alimentos preparados · Segundos,207,5.8,19.7,11.5,143,1
+SS104,Filete de pescado con menestra y arroz,Alimentos preparados · Segundos,209,8.5,28.5,6.3,143,3
+SS105,"Filete de pescado con papas fritas, sarsa criolla y arroz",Alimentos preparados · Segundos,138,5.5,25.6,1.3,144,1
+SS106,Filete de pescado en salsa de mariscos,Alimentos preparados · Segundos,136,6.4,24.5,0.8,144,1
+SS107,Filete de pollo con papas fritas y arroz,Alimentos preparados · Segundos,139,8.1,16.6,3.8,144,2
+SS108,"Filete de pollo con papas fritas, ensalada y arroz",Alimentos preparados · Segundos,169,5.5,13.2,10.2,144,2
+SS109,Filete de pollo a la parrilla con ensalada y arroz,Alimentos preparados · Segundos,162,8.1,25.9,2.4,144,1
+SS110,Frejoles con asado de carne y arroz,Alimentos preparados · Segundos,119,6.1,18.4,2.3,144,1
+SS111,Frejoles con bisteck y arroz,Alimentos preparados · Segundos,140,8.6,23.2,1.5,144,2
+SS112,Frejoles con cabrito a la norteña y arroz,Alimentos preparados · Segundos,161,9.1,16.5,5.6,144,1
+SS113,Frejoles con pescado y arroz,Alimentos preparados · Segundos,164,7.0,20.2,5.4,144,3
+SS114,"Frejoles con pescado, ensalada y arroz",Alimentos preparados · Segundos,205,6.9,22.8,9.5,145,3
+SS115,Frejoles con pollo a la norteña y arroz,Alimentos preparados · Segundos,114,7.0,14.9,1.9,145,1
+SS116,Frejoles con pollo al vino,Alimentos preparados · Segundos,158,4.1,29.9,2.2,145,1
+SS117,Frejoles con seco a la norteña y arroz,Alimentos preparados · Segundos,125,7.9,18.8,1.4,145,4
+SS118,Frejoles con seco y arroz,Alimentos preparados · Segundos,176,7.9,30.4,2.7,145,2
+SS119,"Frejoles con seco, ensalada y arroz",Alimentos preparados · Segundos,153,7.7,20.1,4.3,145,4
+SS120,Garbanzo con arroz y chuleta frita,Alimentos preparados · Segundos,193,8.3,31.3,3.8,146,1
+SS121,Garbanzo con chuleta y arroz,Alimentos preparados · Segundos,174,6.9,26.3,4.6,146,1
+SS122,"Garbanzo con churrasco, ensalada y arroz",Alimentos preparados · Segundos,141,6.0,22.4,3.3,146,1
+SS123,Garbanzo con pescado y arroz,Alimentos preparados · Segundos,137,6.7,20.8,3.0,146,2
+SS124,Garbanzo con pollo y arroz,Alimentos preparados · Segundos,130,5.8,18.9,3.5,146,1
+SS125,Guiso de caigua con arroz,Alimentos preparados · Segundos,136,6.7,22.3,2.0,146,1
+SS126,Guiso de habas con churrasco y arroz,Alimentos preparados · Segundos,173,5.2,33.9,1.2,146,1
+SS127,Guiso de quinua con pescado y arroz,Alimentos preparados · Segundos,179,4.8,21.4,8.2,146,1
+SS128,Guiso de trigo con lomo de socona y arroz,Alimentos preparados · Segundos,78,2.5,13.9,1.0,146,1
+SS129,Guiso de trigo con pollo y arroz,Alimentos preparados · Segundos,109,6.4,15.6,1.9,146,1
+SS130,Guiso de vainita con pollo y arroz,Alimentos preparados · Segundos,95,4.3,18.8,0.7,147,1
+SS131,Hígado encebollado con arroz,Alimentos preparados · Segundos,108,3.9,15.6,1.7,147,1
+SS132,Hígado frito con arroz,Alimentos preparados · Segundos,174,5.4,24.0,5.1,147,1
+SS133,Jalea con yuca frita,Alimentos preparados · Segundos,210,10.4,11.0,13.3,147,1
+SS134,Jalea mixta,Alimentos preparados · Segundos,177,9.5,11.3,9.3,147,1
+SS135,Jalea mixta con yuca frita,Alimentos preparados · Segundos,234,8.3,14.4,16.3,147,1
+SS136,Jalea de pescado con arroz,Alimentos preparados · Segundos,108,5.0,15.6,2.8,147,2
+SS137,Jalea de pescado con yuca frita,Alimentos preparados · Segundos,190,6.8,19.2,9.6,147,2
+SS138,Kam lu wantán con arroz chaufa,Alimentos preparados · Segundos,149,6.0,17.6,5.7,147,3
+SS139,Lasagna de res,Alimentos preparados · Segundos,298,13.2,36.6,13.2,147,2
+SS140,Lenteja con adobo y arroz,Alimentos preparados · Segundos,128,7.5,23.7,0.3,148,1
+SS141,Lenteja con bisteck y arroz,Alimentos preparados · Segundos,183,9.9,33.1,1.2,148,1
+SS142,Lenteja con chuleta y arroz,Alimentos preparados · Segundos,150,8.0,22.9,2.9,148,3
+SS143,Lenteja con estofado y arroz,Alimentos preparados · Segundos,133,7.9,20.3,1.9,148,3
+SS144,Lenteja con filete de pechuga y arroz,Alimentos preparados · Segundos,140,8.4,14.1,5.4,148,2
+SS145,Lenteja con hígado y arroz,Alimentos preparados · Segundos,179,8.8,30.5,2.4,148,1
+SS146,Lenteja con lomito y arroz,Alimentos preparados · Segundos,137,7.2,23.5,1.5,148,1
+SS147,Lenteja con milanesa y arroz,Alimentos preparados · Segundos,154,9.3,23.9,2.1,148,2
+SS148,Lenteja con pescado y arroz,Alimentos preparados · Segundos,162,7.1,23.9,4.2,149,4
+SS149,Locro con hígado frito y arroz,Alimentos preparados · Segundos,134,3.1,17.3,5.6,149,1
+SS150,Locro de zapallo con bisteck y arroz,Alimentos preparados · Segundos,116,4.1,17.3,3.1,149,2
+SS151,Locro de zapallo con filete de pollo y arroz,Alimentos preparados · Segundos,134,5.8,20.4,2.8,149,2
+SS152,Lomo al jugo con menestra y arroz,Alimentos preparados · Segundos,112,5.0,17.9,1.4,149,2
+SS153,Lomo a lo strogonof con arroz,Alimentos preparados · Segundos,149,9.3,21.7,1.9,149,1
+SS154,Lomito de atún con arroz,Alimentos preparados · Segundos,162,4.6,26.6,3.6,149,2
+SS155,Lomo saltado con arroz,Alimentos preparados · Segundos,166,5.3,19.8,6.6,150,5
+SS156,Lomo saltado con menestra y arroz,Alimentos preparados · Segundos,159,6.0,23.4,4.6,150,1
+SS157,Macarrones con pollo,Alimentos preparados · Segundos,145,7.8,21.2,3.1,150,4
+SS158,Macarrones con res,Alimentos preparados · Segundos,174,6.4,31.8,2.3,150,1
+SS159,Malaya dorada con arroz,Alimentos preparados · Segundos,149,6.6,28.3,0.9,150,1
+SS160,Milanesa con arroz,Alimentos preparados · Segundos,175,5.4,20.9,7.3,150,1
+SS161,Milanesa con ensalada y arroz,Alimentos preparados · Segundos,155,5.1,23.2,4.2,151,3
+SS162,Milanesa con menestra y arroz,Alimentos preparados · Segundos,155,9.3,19.3,3.6,151,1
+SS163,Milanesa con papas fritas y arroz,Alimentos preparados · Segundos,156,4.8,19.4,6.2,151,1
+SS164,Molleja saltada con arroz,Alimentos preparados · Segundos,98,7.0,14.5,1.2,151,1
+SS165,Mondonguito a la italiana con arroz,Alimentos preparados · Segundos,138,5.2,22.0,2.8,151,4
+SS166,Olluquito con arroz integral,Alimentos preparados · Segundos,126,5.1,20.4,2.4,151,1
+SS167,Olluquito de charqui con arroz,Alimentos preparados · Segundos,161,6.2,26.4,3.1,151,1
+SS168,Olluquito de res con arroz,Alimentos preparados · Segundos,129,5.0,25.4,0.5,151,1
+SS169,Pachamanca a la olla con arroz,Alimentos preparados · Segundos,131,8.5,18.9,1.9,151,3
+SS170,Pallares con chuleta y arroz,Alimentos preparados · Segundos,119,6.2,20.5,1.3,152,1
+SS171,Pallares con guiso de pollo y arroz,Alimentos preparados · Segundos,172,9.5,26.5,2.8,152,1
+SS172,Pallares con pescado y arroz,Alimentos preparados · Segundos,148,6.8,22.5,2.4,152,2
+SS173,Pallares con pollo y arroz,Alimentos preparados · Segundos,157,8.7,22.7,2.7,152,3
+SS174,Pavita al horno con arroz,Alimentos preparados · Segundos,142,6.3,15.1,5.5,152,2
+SS175,Pavita al vino con arroz,Alimentos preparados · Segundos,161,4.4,31.8,1.3,152,1
+SS176,Pavita a la norteña con arroz,Alimentos preparados · Segundos,147,5.7,26.3,2.3,152,1
+SS177,Pavita con ensalada y arroz,Alimentos preparados · Segundos,234,4.5,18.9,15.2,152,1
+SS178,Pavita con menestra y arroz,Alimentos preparados · Segundos,143,6.6,21.9,3.2,153,2
+SS179,Pavita con puré y arroz,Alimentos preparados · Segundos,154,7.2,19.7,4.8,153,1
+SS180,Patita con maní y arroz,Alimentos preparados · Segundos,134,4.1,25.2,1.7,153,1
+SS181,Pasta al pesto,Alimentos preparados · Segundos,115,5.8,18.3,1.8,153,1
+SS182,Pasta otros,Alimentos preparados · Segundos,119,8.6,15.1,3.0,153,1
+SS183,Pechuga a la plancha con ensalada y arroz,Alimentos preparados · Segundos,132,6.7,16.9,3.7,153,1
+SS184,anticucho de corazón de pollo + papas fritas,Alimentos preparados · Segundos,198,9.2,10.4,12.8,153,1
+SS185,Pescado a la chorrillana con arroz,Alimentos preparados · Segundos,224,5.4,22.2,12.3,153,1
+SS186,Pescado a lo macho con arroz,Alimentos preparados · Segundos,167,7.3,21.3,5.7,153,2
+SS187,Pescado con arroz,Alimentos preparados · Segundos,148,6.7,21.3,3.6,153,4
+SS188,Pescado con ensalada y arroz,Alimentos preparados · Segundos,155,7.6,24.5,2.6,154,1
+SS189,Pescado con menestra y arroz,Alimentos preparados · Segundos,176,7.7,24.2,5.2,154,4
+SS190,Pescado en salsa de champiñones con arroz,Alimentos preparados · Segundos,183,6.7,19.1,9.0,154,1
+SS191,Pescado en salsa de langostinos con arroz,Alimentos preparados · Segundos,178,6.1,26.8,5.0,154,1
+SS192,Picante de cuy con arroz,Alimentos preparados · Segundos,194,4.3,24.2,9.1,154,2
+SS193,Picante de pollo con arroz,Alimentos preparados · Segundos,375,13.1,8.2,32.1,154,1
+SS194,Picante de res con arroz,Alimentos preparados · Segundos,118,4.9,19.8,1.6,154,1
+SS195,Pizza americana personal,Alimentos preparados · Segundos,203,7.7,26.3,7.3,154,1
+SS196,Pollo a la brasa con papas fritas,Alimentos preparados · Segundos,177,8.1,12.9,9.7,154,5
+SS197,anticucho con papas fritas,Alimentos preparados · Segundos,146,9.7,6.2,7.9,155,1
+SS198,Pollo a la chiclayana con arroz,Alimentos preparados · Segundos,137,8.7,20.8,1.5,155,1
+SS199,Pollo a la chiclayana con menestra y arroz,Alimentos preparados · Segundos,121,7.5,20.0,1.0,155,1
+SS200,Pollo a la leña,Alimentos preparados · Segundos,163,3.3,13.6,9.8,155,1
+SS201,Pollo a la naranja con arroz,Alimentos preparados · Segundos,128,10.1,15.1,2.7,155,1
+SS202,Pollo a la norteña con arroz,Alimentos preparados · Segundos,137,8.8,20.4,1.9,155,3
+SS203,Pollo a la norteña con menestra y arroz,Alimentos preparados · Segundos,117,8.4,16.1,2.0,155,3
+SS204,Pollo a la huachana con menestra y arroz,Alimentos preparados · Segundos,134,7.4,18.7,3.2,156,1
+SS205,Pollo a la olla con arroz,Alimentos preparados · Segundos,150,7.3,23.1,2.4,156,1
+SS206,Pollo a la olla con menestra y arroz,Alimentos preparados · Segundos,159,8.3,26.8,2.0,156,3
+SS207,Pollo a la olla con ensalada y arroz,Alimentos preparados · Segundos,121,6.0,19.5,1.8,156,2
+SS208,Pollo a la olla con puré y arroz,Alimentos preparados · Segundos,120,4.9,20.4,1.8,156,2
+SS209,Pollo a la parrilla con arroz y papas fritas,Alimentos preparados · Segundos,273,7.4,13.9,20.7,156,1
+SS210,Pollo a la parrilla con ensalada y arroz,Alimentos preparados · Segundos,150,6.3,22.4,3.3,156,2
+SS211,Pollo a la parrilla con ensalada rusa y arroz,Alimentos preparados · Segundos,128,6.6,11.9,5.6,156,2
+SS212,Pollo a la parrilla con puré y arroz,Alimentos preparados · Segundos,133,5.6,18.5,3.8,157,1
+SS213,Pollo a la plancha con arroz,Alimentos preparados · Segundos,81,4.8,12.5,0.9,157,1
+SS214,Pollo a la plancha con ensalada y arroz,Alimentos preparados · Segundos,140,5.8,26.4,0.8,157,2
+SS215,Pollo a la plancha con menestra y arroz,Alimentos preparados · Segundos,172,10.1,29.5,1.4,157,2
+SS216,Pollo a la plancha con papas doradas y arroz,Alimentos preparados · Segundos,158,3.1,26.3,4.0,157,1
+SS217,Pollo a la plancha con papas fritas y arroz,Alimentos preparados · Segundos,136,5.5,21.8,2.4,157,2
+SS218,"Pollo a la plancha con papas fritas, ensalada y arroz",Alimentos preparados · Segundos,165,7.3,17.4,7.1,157,1
+SS219,Pollo a la plancha con puré y arroz,Alimentos preparados · Segundos,133,9.0,15.0,3.6,157,1
+SS220,Pollo al ají con menestra y arroz,Alimentos preparados · Segundos,137,5.2,24.8,0.9,157,1
+SS221,Pollo al huacatay con arroz,Alimentos preparados · Segundos,145,10.4,22.4,1.3,157,1
+SS222,Pollo al horno con arroz,Alimentos preparados · Segundos,150,7.5,23.8,2.4,158,5
+SS223,Pollo al horno con ensalada y arroz,Alimentos preparados · Segundos,144,6.8,20.9,3.1,158,4
+SS224,Pollo al horno con ensalada rusa y arroz,Alimentos preparados · Segundos,146,7.6,19.7,3.3,158,5
+SS225,Pollo al horno con menestra y arroz,Alimentos preparados · Segundos,149,8.4,21.5,2.6,159,4
+SS226,"Pollo al horno con menestra, ensalada y arroz",Alimentos preparados · Segundos,116,6.1,15.9,2.1,159,2
+SS227,Pollo al horno con puré y arroz,Alimentos preparados · Segundos,144,7.2,20.1,3.2,159,4
+SS228,"Pollo al horno con puré, ensalada y arroz",Alimentos preparados · Segundos,132,8.0,17.9,2.8,159,2
+SS229,Pollo al jugo con menestra y arroz,Alimentos preparados · Segundos,123,7.7,18.3,1.9,159,1
+SS230,Pollo al maní con arroz,Alimentos preparados · Segundos,142,6.4,24.3,1.7,159,1
+SS231,Pollo al maní con ensalada y arroz,Alimentos preparados · Segundos,164,3.2,19.7,7.7,160,1
+SS232,Pollo al maní con menestra y arroz,Alimentos preparados · Segundos,140,9.0,18.9,2.0,160,1
+SS233,Pollo al sillao con arroz,Alimentos preparados · Segundos,142,6.8,20.5,3.1,160,4
+SS234,Pollo al sillao con ensalada y arroz,Alimentos preparados · Segundos,120,5.3,20.4,1.4,160,1
+SS235,Pollo al vino con arroz,Alimentos preparados · Segundos,137,3.0,32.7,1.1,160,1
+SS236,Pollo al vino con ensalada y arroz,Alimentos preparados · Segundos,131,6.2,21.0,1.1,160,1
+SS237,Pollo al vino con menestra y arroz,Alimentos preparados · Segundos,144,9.3,20.2,2.7,160,1
+SS238,Pollo broaster,Alimentos preparados · Segundos,192,5.4,20.2,10.2,160,1
+SS239,Pollo broaster con ensalada rusa y arroz,Alimentos preparados · Segundos,184,7.1,19.6,8.3,160,2
+SS240,Pollo broaster con papas fritas y arroz,Alimentos preparados · Segundos,143,7.9,18.6,4.0,160,1
+SS241,"Pollo broaster con papas fritas, ensalada y arroz",Alimentos preparados · Segundos,169,5.9,19.6,7.0,161,2
+SS242,Pollo con arroz,Alimentos preparados · Segundos,146,6.8,20.9,3.6,161,2
+SS243,Pollo con maní y arroz,Alimentos preparados · Segundos,136,6.6,17.8,3.7,161,1
+SS244,Pollo con verduras y arroz,Alimentos preparados · Segundos,174,7.7,18.4,6.9,161,1
+SS245,Pollo con verduras y arroz chaufa,Alimentos preparados · Segundos,144,4.6,29.1,0.7,161,1
+SS246,Pollo dorado con papas fritas y arroz,Alimentos preparados · Segundos,180,7.9,23.6,5.5,161,1
+SS247,Pollo enrollado con arroz,Alimentos preparados · Segundos,156,6.8,23.9,3.6,161,1
+SS248,Pollo frito con arroz,Alimentos preparados · Segundos,162,6.4,23.7,4.2,161,2
+SS249,Pollo frito con ensalada y arroz,Alimentos preparados · Segundos,155,6.5,18.3,5.7,161,4
+SS250,Pollo frito con ensalada rusa y arroz,Alimentos preparados · Segundos,183,5.7,26.2,5.5,162,1
+SS251,Pollo frito con menestra y arroz,Alimentos preparados · Segundos,168,5.5,25.1,4.6,162,2
+SS252,Pollo frito con papas fritas y arroz,Alimentos preparados · Segundos,189,4.4,22.8,8.6,162,3
+SS253,Pollo frito con puré y arroz,Alimentos preparados · Segundos,171,7.8,22.1,5.4,162,1
+SS254,"Pollo frito con papas fritas, ensalada y arroz",Alimentos preparados · Segundos,165,5.5,19.9,6.6,162,1
+SS255,Pollo saltado con arroz,Alimentos preparados · Segundos,183,5.5,17.3,9.6,162,1
+SS256,Puré con asado con arroz,Alimentos preparados · Segundos,130,5.8,19.1,3.1,162,4
+SS257,Puré con bisteck y arroz,Alimentos preparados · Segundos,127,4.8,21.3,2.3,163,1
+SS258,Puré con churrasco y arroz,Alimentos preparados · Segundos,167,5.7,20.4,6.9,163,1
+SS259,Puré con pavita y arroz,Alimentos preparados · Segundos,133,4.8,19.5,3.7,163,1
+SS260,Puré con pollo al sillao y arroz,Alimentos preparados · Segundos,147,5.4,28.1,1.9,163,1
+SS261,Puré con pollo y arroz,Alimentos preparados · Segundos,160,6.6,21.2,4.8,163,3
+SS262,Puré con asado y arroz integral,Alimentos preparados · Segundos,156,4.9,26.7,3.3,163,1
+SS263,"Puré con pollo, ensalada y arroz",Alimentos preparados · Segundos,134,8.1,18.8,2.6,163,1
+SS264,Quinua guisada con pollo y arroz,Alimentos preparados · Segundos,134,7.0,20.3,2.4,163,1
+SS265,Ravioles con carne,Alimentos preparados · Segundos,191,9.8,16.4,9.4,163,1
+SS266,Rocoto relleno con arroz,Alimentos preparados · Segundos,148,5.2,24.9,2.9,163,1
+SS267,Saltado de brócoli con arroz,Alimentos preparados · Segundos,156,4.1,19.2,6.8,163,1
+SS268,Saltado de pollo con arroz,Alimentos preparados · Segundos,135,5.6,21.4,2.8,163,1
+SS269,Saltado de pollo con papas fritas y arroz,Alimentos preparados · Segundos,215,3.7,24.4,10.3,164,1
+SS270,Seco a la huachana con menestra y arroz,Alimentos preparados · Segundos,152,7.2,26.9,1.8,164,2
+SS271,Seco a la norteña con arroz,Alimentos preparados · Segundos,140,6.6,24.6,1.2,164,4
+SS272,Seco a la norteña con menestra y arroz,Alimentos preparados · Segundos,125,6.6,20.5,1.2,164,4
+SS273,"Seco a la norteña con menestra, sarsa criolla y arroz",Alimentos preparados · Segundos,136,5.7,23.7,1.6,164,2
+SS274,Seco a la norteña con sarsa criolla y arroz,Alimentos preparados · Segundos,122,4.5,21.4,1.7,164,2
+SS275,Seco a la norteña de pollo con menestra y arroz,Alimentos preparados · Segundos,113,7.1,15.6,1.9,165,4
+SS276,Seco a la norteña de res con menestra y arroz,Alimentos preparados · Segundos,130,6.9,20.7,1.4,165,3
+SS277,"Seco a la norteña de res con menestra, sarsa criolla y arroz",Alimentos preparados · Segundos,127,6.0,19.0,1.9,165,3
+SS278,"Seco a la norteña con menestra, ensalada y arroz",Alimentos preparados · Segundos,104,4.3,19.5,1.1,165,1
+SS279,Seco con menestra y arroz,Alimentos preparados · Segundos,133,6.2,25.2,0.7,165,1
+SS280,Seco de cabrito a la norteña con menestra y arroz,Alimentos preparados · Segundos,151,8.7,24.4,1.8,165,1
+SS281,Seco de cabrito con arroz,Alimentos preparados · Segundos,124,6.4,19.9,1.7,166,1
+SS282,Seco de cabrito con menestra y arroz,Alimentos preparados · Segundos,129,7.5,19.0,1.8,166,3
+SS283,"Seco de cabrito con menestra, sarsa criolla y arroz",Alimentos preparados · Segundos,122,6.4,19.5,1.4,166,2
+SS284,Seco de costillar con menestra y arroz,Alimentos preparados · Segundos,126,7.5,20.6,1.4,166,1
+SS285,Seco de cordero con arroz,Alimentos preparados · Segundos,172,7.2,22.8,5.4,166,1
+SS286,Seco de cordero con menestra y arroz,Alimentos preparados · Segundos,145,6.5,20.2,3.8,166,3
+SS287,"Seco de cordero con menestra, sarsa criolla y arroz",Alimentos preparados · Segundos,161,7.2,24.6,3.4,166,2
+SS288,Seco de pato con arroz,Alimentos preparados · Segundos,203,8.0,16.2,11.1,166,2
+SS289,Seco de pollo con arroz,Alimentos preparados · Segundos,125,7.2,18.5,1.9,167,4
+SS290,Seco de pollo con menestra y arroz,Alimentos preparados · Segundos,136,7.7,22.1,1.9,167,5
+SS291,Seco de pollo con sarsa criolla y arroz,Alimentos preparados · Segundos,132,7.6,21.2,1.6,167,1
+SS292,Seco de res a la huachana con menestra y arroz,Alimentos preparados · Segundos,124,7.3,17.0,2.0,167,1
+SS293,Seco de res a la norteña con menestra y arroz,Alimentos preparados · Segundos,130,6.7,20.5,1.6,167,4
+SS294,Seco de res con arroz,Alimentos preparados · Segundos,128,6.9,19.2,1.6,168,3
+SS295,Seco de res con menestra y arroz,Alimentos preparados · Segundos,143,7.2,24.9,1.7,168,5
+SS296,"Seco de res con menestra, ensalada y arroz",Alimentos preparados · Segundos,126,5.6,19.0,2.6,168,3
+SS297,"Seco de res con menestra, sarsa criolla y arroz",Alimentos preparados · Segundos,122,6.4,20.1,1.3,168,4
+SS298,Seco de ternera con menestra y arroz,Alimentos preparados · Segundos,125,7.7,19.6,1.7,169,1
+SS299,Seco huachano con menestra y arroz,Alimentos preparados · Segundos,113,5.7,20.0,1.2,169,1
+SS300,Sopa seca con carapulcra y arroz,Alimentos preparados · Segundos,222,12.7,16.4,11.1,169,1
+SS301,Spaguetti con crema,Alimentos preparados · Segundos,176,13.9,19.9,4.3,169,1
+SS302,Steak al tequila,Alimentos preparados · Segundos,108,5.6,18.4,0.5,169,1
+SS303,Sudado de pescado con arroz,Alimentos preparados · Segundos,126,5.3,22.4,1.4,169,4
+SS304,Suprema de pescado con arroz y ensalada,Alimentos preparados · Segundos,161,8.0,28.3,1.7,169,1
+SS305,Suprema de pollo con arroz,Alimentos preparados · Segundos,177,8.1,28.1,2.6,169,1
+SS306,Tacacho con cecina,Alimentos preparados · Segundos,213,5.4,26.3,10.2,170,1
+SS307,Tacu tacu con churrasco,Alimentos preparados · Segundos,160,7.1,24.3,3.8,170,1
+SS308,Tacu tacu con filete de pollo,Alimentos preparados · Segundos,129,7.2,20.2,1.9,170,2
+SS309,Tacu tacu con lomito,Alimentos preparados · Segundos,150,7.7,21.8,3.6,170,3
+SS310,Tacu tacu con lomo y arroz,Alimentos preparados · Segundos,152,6.1,23.3,2.5,170,1
+SS311,Tacu tacu con pescado,Alimentos preparados · Segundos,160,9.5,19.7,4.3,170,2
+SS312,Tallarines al pesto con bisteck,Alimentos preparados · Segundos,140,6.1,18.0,4.8,170,1
+SS313,Tallarines al pesto con res,Alimentos preparados · Segundos,226,16.3,20.8,8.3,170,1
+SS314,Tallarines chifa,Alimentos preparados · Segundos,189,7.5,36.9,1.0,170,1
+SS315,Tallarines con pollo,Alimentos preparados · Segundos,159,10.5,24.6,1.9,170,1
+SS316,Tallarines con pollo y crema a la huancaína,Alimentos preparados · Segundos,152,10.8,19.5,3.2,171,1
+SS317,Tallarines rojos con pollo,Alimentos preparados · Segundos,133,8.4,18.9,2.2,171,4
+SS318,Tallarines saltado,Alimentos preparados · Segundos,190,8.5,33.7,1.6,171,1
+SS319,Tallarines saltados con pollo,Alimentos preparados · Segundos,174,8.2,24.8,4.2,171,2
+SS320,Tallarines verdes con chuleta,Alimentos preparados · Segundos,245,8.6,27.4,11.2,171,1
+SS321,Tallarines verdes con churrasco,Alimentos preparados · Segundos,218,8.8,28.2,7.8,171,2
+SS322,Tallarines verdes con churrasco y crema a la huancaína,Alimentos preparados · Segundos,185,7.4,31.2,4.0,171,1
+SS323,Tallarines verdes con hígado,Alimentos preparados · Segundos,165,7.0,20.1,6.1,171,3
+SS324,Tallarines verdes con milanesa,Alimentos preparados · Segundos,111,6.6,11.4,4.2,172,1
+SS325,Tallarines verdes con pollo,Alimentos preparados · Segundos,194,9.7,24.8,6.1,172,5
+SS326,Tallarines verdes con pollo y crema a la huancaína,Alimentos preparados · Segundos,179,9.2,30.5,2.3,172,2
+SS327,Tallarines verdes con res,Alimentos preparados · Segundos,177,8.7,24.9,4.7,172,5
+SS328,Ternera a la chiclayana con arroz,Alimentos preparados · Segundos,96,3.9,18.1,0.7,173,1
+SS329,Trigo con adobo de pollo y arroz,Alimentos preparados · Segundos,138,5.5,17.8,4.5,173,1
+SS330,Trigo con pollo y arroz,Alimentos preparados · Segundos,129,8.1,18.3,2.1,173,1
+SS331,Trigo guisado con pollo y arroz,Alimentos preparados · Segundos,118,7.9,13.3,3.3,173,1
+SS332,Trucha con arroz,Alimentos preparados · Segundos,299,4.2,27.9,18.8,173,1
+SS333,Trucha con menestra y arroz,Alimentos preparados · Segundos,142,5.2,20.2,4.7,173,1
+SS334,Virado paulista,Alimentos preparados · Segundos,86,3.5,11.2,2.6,173,1
+SS335,Ají de gallina con papa blanca más arroz,Alimentos preparados · Segundos,111,3.7,19.7,1.9,173,1
+SS336,Ají de pollo con zanahoria más arroz blanco,Alimentos preparados · Segundos,124,5.2,22.4,1.5,173,1
+SS337,Ajiaco de papa con huevo duro y arroz blanco,Alimentos preparados · Segundos,106,4.7,17.8,1.8,173,1
+SS338,Arroz blanco con guiso de pota,Alimentos preparados · Segundos,103,3.3,19.3,1.4,173,1
+SS339,Arroz blanco con tortilla de atún,Alimentos preparados · Segundos,210,6.7,28.8,7.6,173,1
+SS340,Arroz blanco con tortilla de atún con pota,Alimentos preparados · Segundos,210,7.2,26.3,8.4,173,1
+SS341,Arvejita verde partida con arroz blanco y ceviche de pollo,Alimentos preparados · Segundos,129,6.2,22.0,1.9,173,1
+SS342,Arvejita verde partida con croquetas de pescado y arroz blanco,Alimentos preparados · Segundos,130,5.3,24.1,1.4,174,1
+SS343,Arverjita verde partida con guiso de pescado y arroz,Alimentos preparados · Segundos,143,6.8,22.3,2.9,174,1
+SS344,Arvejita verde partida con hígado entomatado más arroz blanco,Alimentos preparados · Segundos,123,6.0,19.5,2.3,174,1
+SS345,Arvejita verde partida con papa e hígado frito más arroz blanco,Alimentos preparados · Segundos,133,5.5,20.8,3.1,174,1
+SS346,Arvejita con papa e hígado entomatado,Alimentos preparados · Segundos,124,7.4,19.2,2.0,174,1
+SS347,Arvejita con papa e hígado empimentado con arroz,Alimentos preparados · Segundos,114,5.5,21.5,0.7,174,1
+SS348,Cau cau de pollo e hígado de pollo con arroz,Alimentos preparados · Segundos,122,5.8,19.4,2.3,174,1
+SS349,Carapulcra de morón con pollo y yuca,Alimentos preparados · Segundos,76,2.4,14.8,0.9,174,1
+SS350,Carapulcra de trigo con papa y pollo más arroz,Alimentos preparados · Segundos,101,4.3,19.9,0.5,174,1
+SS351,Frejol panamíto con atún al jugo más arroz blanco,Alimentos preparados · Segundos,127,5.6,19.5,3.0,174,1
+SS352,Frejol panamito con papa y sangrecita entomatada,Alimentos preparados · Segundos,118,5.3,20.0,1.9,174,1
+SS353,Guiso de caigua con pollo,Alimentos preparados · Segundos,117,5.2,16.4,3.4,174,1
+SS354,Guiso de frejol panamito con atún más ensalada de pepinillo,Alimentos preparados · Segundos,163,6.8,20.0,6.2,174,1
+SS355,Guiso de frejol panamito con pescado frito más ensalada de pepinillo,Alimentos preparados · Segundos,132,6.6,22.6,1.7,174,1
+SS356,Lentejas con ensalada de atún y arroz blanco,Alimentos preparados · Segundos,132,6.1,22.5,2.0,175,1
+SS357,Lentejas con huevo sancochado y ensalada de zanahoria más arroz blanco,Alimentos preparados · Segundos,115,5.6,18.1,2.2,175,1
+SS358,Lentejas con pollo e hígado de pollo al jugo con arroz,Alimentos preparados · Segundos,119,6.4,19.3,1.7,175,1
+SS359,Lentejas y papa con guiso de sangrecita más arroz blanco,Alimentos preparados · Segundos,120,5.0,20.1,2.1,175,1
+SS360,Locro de zapallo con huevo sancochado y arroz blanco,Alimentos preparados · Segundos,113,4.9,17.6,2.6,175,1
+SS361,"Locro de zapallo con leche, habas frescas y guiso de hígado con arroz blanco",Alimentos preparados · Segundos,125,4.2,22.1,2.2,175,1
+SS362,Lomito saltado con hígado,Alimentos preparados · Segundos,166,6.2,27.9,3.3,175,1
+SS363,Lomito saltado con sangrecita e hígado,Alimentos preparados · Segundos,179,5.9,27.4,5.0,175,1
+SS364,Puré de brócoli con papa y guiso de carne más arroz,Alimentos preparados · Segundos,125,4.8,23.3,1.5,175,1
+SS365,Puré de espinaca con huevo sancochado y arroz blanco,Alimentos preparados · Segundos,108,4.1,18.2,2.1,175,1
+SS366,Puré de papa con hígado al jugo y arroz,Alimentos preparados · Segundos,125,4.1,20.9,2.8,175,1
+SS367,Puré de papa con huevo sancochado y arroz,Alimentos preparados · Segundos,116,4.3,15.9,3.9,175,1
+SS368,Saltado de fideos con sangrecita de pollo,Alimentos preparados · Segundos,140,5.4,21.2,3.7,175,1
+SS369,Saltado de vainita con guiso de corazón más arroz,Alimentos preparados · Segundos,143,4.3,21.1,4.6,175,1
+SS370,Saltado de vainita y papa con guiso de corazón más arroz blanco,Alimentos preparados · Segundos,133,3.9,21.5,3.5,176,1
+SS371,"Tallarines con salsa de tomate, carne, hígado de pollo",Alimentos preparados · Segundos,131,9.4,17.2,2.8,176,1
+SS372,Tallarines rojos con atún,Alimentos preparados · Segundos,107,4.3,20.1,1.0,176,1
+SS373,Tallarines rojos con carne y rodajas de camote,Alimentos preparados · Segundos,106,9.6,11.0,2.6,176,1
+SS374,Tallarines rojos con conserva de anchoveta,Alimentos preparados · Segundos,93,3.9,15.0,1.9,176,1
+SS375,Tallarines rojos con hígado de pollo,Alimentos preparados · Segundos,118,6.9,18.6,1.7,176,1
+SS376,Tallarín saltado más papa frita y sangrecita,Alimentos preparados · Segundos,135,4.1,23.5,2.7,176,1
+SS377,Tallarines verdes con hígado al jugo más camote,Alimentos preparados · Segundos,119,5.2,19.2,2.4,176,1
+T1,"Arveja partida, harina de",Leguminosas y derivados,346.0,21.6,64.4,1.1,91,1
+T2,"Arveja, fresca sin vaina",Leguminosas y derivados,85.0,7.1,13.7,0.6,91,1
+T3,"Arveja, seca sin cáscara",Leguminosas y derivados,247.0,21.7,35.6,3.2,91,1
+T4,Arvejón,Leguminosas y derivados,238.0,21.4,36.4,1.9,91,1
+T5,Frejol aguisho,Leguminosas y derivados,231.0,22.7,34.2,1.6,91,1
+T6,Frejol amarillo común,Leguminosas y derivados,232.0,21.1,35.9,1.5,91,1
+T7,Frejol bayo,Leguminosas y derivados,244.0,20.3,38.1,2.2,91,1
+T8,Frejol bayo americano,Leguminosas y derivados,232.0,20.3,36.6,1.5,91,1
+T9,"Frejol zarandaja, chileno, cancate, bocón",Leguminosas y derivados,236.0,21.7,35.7,1.8,91,1
+T10,Frejol bountiful bean,Leguminosas y derivados,334.0,17.3,65.2,0.9,91,1
+T11,Frejol bush bean,Leguminosas y derivados,227.0,24.2,31.9,1.6,91,1
+T12,Frejol caballero,Leguminosas y derivados,267.0,22.9,43.1,1.5,91,1
+T13,Frejol caballero o blanco cocido,Leguminosas y derivados,67.0,5.1,11.2,0.4,91,1
+T14,Frejol california,Leguminosas y derivados,232.0,20.7,35.0,2.1,91,1
+T15,Frejol canario,Leguminosas y derivados,236.0,21.9,35.0,2.1,92,1
+T16,Frejol canario cocido,Leguminosas y derivados,43.0,5.2,5.1,0.5,92,1
+T17,"Frejol canario, fresco (frejol verde)",Leguminosas y derivados,102.0,9.7,15.6,0.6,92,1
+T18,Frejol canario serranito,Leguminosas y derivados,238.0,19.2,38.4,1.8,92,1
+T19,Frejol caraotas,Leguminosas y derivados,228.0,21.2,35.1,1.4,92,1
+T20,Frejol castilla,Leguminosas y derivados,227.0,23.3,30.5,2.7,92,1
+T21,Frejol chavín,Leguminosas y derivados,234.0,19.2,38.2,1.4,92,1
+T22,Frejol chiclayo,Leguminosas y derivados,223.0,21.4,33.3,1.6,92,1
+T23,Frejol chiclayo dosmesino fresco,Leguminosas y derivados,100.0,8.4,16.6,0.4,92,1
+T24,Frejol cocacho,Leguminosas y derivados,230.0,21.3,35.9,1.2,92,1
+T25,Frejol dulce (Ancash),Leguminosas y derivados,236.0,19.4,37.8,1.8,92,1
+T26,Frejol negro,Leguminosas y derivados,270.0,18.2,48.2,1.3,92,1
+T27,Frejol nucya blanco,Leguminosas y derivados,237.0,20.0,37.2,1.9,92,1
+T28,Frejol nucya plomo,Leguminosas y derivados,233.0,19.8,37.1,1.6,92,1
+T29,Frejol palo,Leguminosas y derivados,345.0,18.4,66.1,1.4,93,1
+T30,"Frejol palo, fresco (Lenteja verde)",Leguminosas y derivados,82.0,7.0,12.5,0.8,93,1
+T31,Frejol panamito,Leguminosas y derivados,235.0,21.5,35.8,1.7,93,1
+T32,Frejol plomo,Leguminosas y derivados,236.0,20.1,37.1,1.8,93,1
+T33,Frejol pole bean,Leguminosas y derivados,229.0,22.4,34.8,1.2,93,1
+T34,Frejol red kidney,Leguminosas y derivados,270.0,19.2,47.4,1.2,93,1
+T35,Frejol shimpe fresco,Leguminosas y derivados,51.0,3.7,9.1,0.1,93,1
+T36,Frejol soya,Leguminosas y derivados,369.0,33.7,23.4,18.7,93,1
+T37,Frejol tarhui o chocho cocido con cáscara,Leguminosas y derivados,140.0,11.6,6.7,8.6,93,1
+T38,"Frejol tarhui o chocho, harina de",Leguminosas y derivados,458.0,49.6,12.9,27.9,93,1
+T39,"Frejol tarhui o chocho, seco",Leguminosas y derivados,277.0,17.3,17.3,17.5,93,1
+T40,Frejol terciopelo,Leguminosas y derivados,358.0,21.0,58.5,5.6,93,1
+T41,Frejol vacapaleta,Leguminosas y derivados,226.0,18.3,35.2,2.4,93,1
+T42,Frejol white kidney,Leguminosas y derivados,268.0,22.1,44.7,1.1,93,1
+T43,"Garbanzo, cocido",Leguminosas y derivados,127.0,6.9,20.2,2.5,94,1
+T44,Garbanzo,Leguminosas y derivados,293.0,17.6,45.9,5.4,94,1
+T45,Guaba fresco,Leguminosas y derivados,141.0,10.7,24.0,0.7,94,1
+T46,Guaba seco,Leguminosas y derivados,346.0,20.3,63.3,2.1,94,1
+T47,"Habas frescas, sin cáscara y sin vaina",Leguminosas y derivados,134.0,11.3,21.7,0.8,94,1
+T48,Habas secas con cáscara cruda,Leguminosas y derivados,340.0,23.8,60.1,1.5,94,1
+T49,Habas secas sin cáscara,Leguminosas y derivados,233.0,25.9,30.3,2.4,94,1
+T50,Habas secas sin cáscara cocida,Leguminosas y derivados,83.0,7.3,13.1,0.5,94,1
+T51,"Habas, harina de",Leguminosas y derivados,310.0,22.4,52.5,2.3,94,1
+T52,Lentejas chicas,Leguminosas y derivados,211.0,22.6,30.5,1.0,94,1
+T53,Lentejas chicas cocidas,Leguminosas y derivados,65.0,6.4,10.4,0.1,94,1
+T54,Lentejas grandes,Leguminosas y derivados,214.0,23.2,30.5,1.1,94,1
+T55,Pallar morado,Leguminosas y derivados,259.0,20.0,43.8,1.3,94,1
+T56,Pallar seco,Leguminosas y derivados,253.0,20.4,42.4,1.2,94,1
+T57,Pallar sin cáscara,Leguminosas y derivados,260.0,21.6,42.6,1.4,95,1
+T58,"Pallar cocido, con cáscara",Leguminosas y derivados,94.0,7.7,14.9,0.8,95,1
+T59,"Arveja colantao, fresca",Leguminosas y derivados,35.0,3.1,5.9,0.1,95,1
+T60,"Arveja, harina de",Leguminosas y derivados,306.0,19.9,53.3,2.4,95,1
+T61,"Arveja verde partida, sancochada sin sal",Leguminosas y derivados,120.0,10.1,17.3,1.8,95,1
+T62,Caza o parka,Leguminosas y derivados,342.0,25.1,58.6,2.0,95,1
+T63,Frejol bayo sancochado sin sal,Leguminosas y derivados,111.0,9.8,16.9,0.9,95,1
+T64,Frejol castilla sancochado sin sal,Leguminosas y derivados,119.0,10.1,17.1,1.8,95,1
+T65,Frejol chiclayo marrón,Leguminosas y derivados,334.0,22.6,58.4,2.1,95,1
+T66,Frejol chiclayo pindayllo,Leguminosas y derivados,343.0,25.1,57.0,2.9,95,1
+T67,Frejol chiclayo rojo,Leguminosas y derivados,335.0,21.8,58.8,2.5,95,1
+T68,Frejol de Iberia,Leguminosas y derivados,343.0,22.7,62.3,1.3,95,1
+T69,Frejol negro sancochado sin sal,Leguminosas y derivados,104.0,9.8,13.8,1.7,95,1
+T70,Frejol ñuña,Leguminosas y derivados,271.0,19.1,47.9,1.2,95,1
+T71,Frejol panamito sancochado sin sal,Leguminosas y derivados,106.0,9.5,15.1,1.4,96,1
+T72,"Frejol soya, bebida de, (""leche"" de soya UHT)",Leguminosas y derivados,49.0,3.0,6.0,1.8,96,1
+T73,"Frejol soya, cocido",Leguminosas y derivados,176.0,15.3,11.1,9.2,96,1
+T74,"Frejol soya, harina integral",Leguminosas y derivados,359.0,37.4,9.2,23.0,96,1
+T75,"Frejol soya, harina integral tostada",Leguminosas y derivados,433.0,40.5,23.9,23.4,96,1
+T76,Frejol ucayalino,Leguminosas y derivados,334.0,21.7,58.8,2.3,96,1
+T77,"Frejol zarandaja, chileno, cancate o bocón, sancochado sin sal",Leguminosas y derivados,114.0,9.9,17.6,1.0,96,1
+T78,"Gigante rojo, cáscara del grano",Leguminosas y derivados,348.0,4.4,80.3,0.7,96,1
+T79,"Gigante rojo, cáscara fresca del grano",Leguminosas y derivados,125.0,2.7,28.0,0.2,96,1
+T80,"Gigante rojo, pulpa fresca",Leguminosas y derivados,166.0,16.3,25.7,0.6,96,1
+T81,"Gigante rojo, pulpa seca",Leguminosas y derivados,333.0,31.6,52.3,1.3,96,1
+T82,Hemico leguminoso,Leguminosas y derivados,331.0,25.6,56.1,1.7,96,1
+T83,Pallar del río Manú,Leguminosas y derivados,329.0,22.0,60.2,0.9,96,1
+T84,Poroto de cumbasa,Leguminosas y derivados,357.0,22.5,57.3,5.5,96,1
+T85,"Proteínas, (proteína de soya)",Leguminosas y derivados,350.0,49.3,36.0,0.5,97,1
+T86,"Arverja verde, partida, seca",Leguminosas y derivados,290.0,21.2,49.9,1.6,97,1
+T87,Frejol chuyo,Leguminosas y derivados,265.0,18.0,46.8,1.4,97,1
+T88,"Tofu o ""queso"" de soya, crudo",Leguminosas y derivados,128.0,11.0,2.2,9.7,97,1
+U1,Arracacha o racacha,"Tubérculos, raíces y derivados",94.0,1.1,22.9,0.3,98,1
+U2,Ashipa,"Tubérculos, raíces y derivados",170.0,1.4,40.8,0.3,98,1
+U3,Camote amarillo sin cáscara,"Tubérculos, raíces y derivados",95.0,2.0,20.5,0.0,98,1
+U4,Camote blanco,"Tubérculos, raíces y derivados",114.0,1.7,28.3,0.1,98,1
+U5,Camote morado sin cáscara,"Tubérculos, raíces y derivados",105.0,1.4,25.7,0.3,98,1
+U6,"Camote, harina de","Tubérculos, raíces y derivados",341.0,2.1,81.3,0.9,98,1
+U7,Curao,"Tubérculos, raíces y derivados",62.0,1.6,14.7,0.1,98,1
+U8,Koshñipa,"Tubérculos, raíces y derivados",135.0,1.6,33.6,0.2,98,1
+U9,Kuros,"Tubérculos, raíces y derivados",93.0,1.8,22.6,0.2,98,1
+U10,Llacón,"Tubérculos, raíces y derivados",51.0,0.3,12.5,0.3,98,1
+U11,Maca (tubérculo seco),"Tubérculos, raíces y derivados",301.0,11.8,66.3,1.6,98,1
+U12,Maca silvestre,"Tubérculos, raíces y derivados",69.0,3.5,13.2,1.0,98,1
+U13,"Maca, afrechillo","Tubérculos, raíces y derivados",316.0,10.5,73.4,0.6,98,1
+U14,"Maca, almidón","Tubérculos, raíces y derivados",350.0,6.1,80.1,1.2,98,1
+U15,"Maca, pasta integral","Tubérculos, raíces y derivados",310.0,14.0,68.4,1.0,99,1
+U16,Mashua o isaño,"Tubérculos, raíces y derivados",32.0,0.7,7.7,0.1,99,1
+U17,Olluco sin cáscara,"Tubérculos, raíces y derivados",59.0,1.1,14.3,0.1,99,1
+U18,Papa amarilla sin cáscara,"Tubérculos, raíces y derivados",101.0,2.0,22.9,0.4,99,1
+U19,Papa blanca,"Tubérculos, raíces y derivados",87.0,2.1,19.9,0.1,99,1
+U20,Papa chuño negro,"Tubérculos, raíces y derivados",333.0,4.0,79.4,0.2,99,1
+U21,Papa color morado deshidratada,"Tubérculos, raíces y derivados",324.0,8.7,74.1,0.2,99,1
+U22,Papa helada amarga,"Tubérculos, raíces y derivados",180.0,1.8,42.1,0.6,99,1
+U23,Papa huayro con cáscara,"Tubérculos, raíces y derivados",71.0,1.9,15.9,0.1,99,1
+U24,Papa moraya chuño pelado,"Tubérculos, raíces y derivados",323.0,1.9,77.7,0.5,99,1
+U25,Papa seca,"Tubérculos, raíces y derivados",322.0,8.2,72.8,0.7,99,1
+U26,"Papa, harina de","Tubérculos, raíces y derivados",308.0,6.4,71.2,0.4,99,1
+U27,Papas deshidratadas con lejía,"Tubérculos, raíces y derivados",319.0,8.0,73.1,0.3,99,1
+U28,Pituca o taro,"Tubérculos, raíces y derivados",82.0,1.6,19.1,0.5,99,1
+U29,"Pituca, harina de","Tubérculos, raíces y derivados",342.0,8.1,78.6,0.3,100,1
+U30,Radiche,"Tubérculos, raíces y derivados",77.0,1.8,18.6,0.1,100,1
+U31,Betarraga,"Tubérculos, raíces y derivados",18.0,2.0,2.7,0.3,100,1
+U32,Sachapapa,"Tubérculos, raíces y derivados",96.0,1.8,19.4,1.5,100,1
+U33,"Sachapapa blanca, bulbo","Tubérculos, raíces y derivados",126.0,2.5,29.4,0.1,100,1
+U34,Yuca amarilla fresca sin cáscara,"Tubérculos, raíces y derivados",147.0,0.6,37.3,0.2,100,1
+U35,Yuca asada,"Tubérculos, raíces y derivados",168.0,0.6,42.6,0.3,100,1
+U36,Yuca blanca fresca sin cáscara,"Tubérculos, raíces y derivados",115.0,0.7,28.3,0.5,100,1
+U37,Yuca blanca sancochada,"Tubérculos, raíces y derivados",136.0,0.5,34.6,0.2,100,1
+U38,"Yuca, harina de","Tubérculos, raíces y derivados",333.0,0.3,82.1,0.1,100,1
+U39,"Achira blanca (rizoma, raíz)","Tubérculos, raíces y derivados",96.0,1.4,23.8,0.1,100,1
+U40,"Achira morada (rizoma, raíz)","Tubérculos, raíces y derivados",94.0,1.4,23.2,0.1,100,1
+U41,Camote de Huarayoc,"Tubérculos, raíces y derivados",106.0,1.6,26.1,0.2,100,1
+U42,Camote deshidratado,"Tubérculos, raíces y derivados",333.0,3.7,82.4,0.7,100,1
+U43,Camote deshidratado tratado con lejía,"Tubérculos, raíces y derivados",327.0,5.3,79.6,0.8,101,1
+U44,Cushusho (tubérculo),"Tubérculos, raíces y derivados",287.0,16.3,61.9,0.5,101,1
+U45,Dale - Dale (tubérculo),"Tubérculos, raíces y derivados",115.0,4.3,26.5,0.2,101,1
+U46,Iguana papa (tubérculo),"Tubérculos, raíces y derivados",77.0,5.0,15.3,0.2,101,1
+U47,"Maca, harina de","Tubérculos, raíces y derivados",328.0,8.7,70.3,4.1,101,1
+U48,Nopu - zumaca (tubérculo),"Tubérculos, raíces y derivados",143.0,7.1,31.1,0.4,101,1
+U49,Oca deshidratada (ccaya),"Tubérculos, raíces y derivados",311.0,4.3,75.4,1.1,101,1
+U50,Oca sin cáscara,"Tubérculos, raíces y derivados",53.0,0.7,13.1,0.0,101,1
+U51,Oca variedad nativa ccaya oga con cáscara,"Tubérculos, raíces y derivados",29.0,0.8,6.2,0.4,101,1
+U52,Oca variedad nativa garwuaricra con cáscara,"Tubérculos, raíces y derivados",28.0,0.9,5.9,0.4,101,1
+U53,Papa canchan,"Tubérculos, raíces y derivados",66.0,2.4,14.4,0.1,101,1
+U54,"Papa, chuño negro, harina de","Tubérculos, raíces y derivados",322.0,5.8,75.6,0.1,101,1
+U55,"Papa moraya, harina de","Tubérculos, raíces y derivados",332.0,2.3,80.6,0.1,101,1
+U56,Papa negra andina,"Tubérculos, raíces y derivados",63.0,1.8,13.6,0.4,101,1
+U57,"Papa sin cáscara, variedad amarilis","Tubérculos, raíces y derivados",64.0,2.1,14.4,0.1,102,1
+U58,"Papa sin cáscara, variedad huevo de indio","Tubérculos, raíces y derivados",84.0,2.1,19.1,0.2,102,1
+U59,"Papa sin cáscara, variedad tumbay","Tubérculos, raíces y derivados",86.0,2.0,19.8,0.1,102,1
+U60,"Papa sin cáscara, variedad única","Tubérculos, raíces y derivados",77.0,2.3,17.1,0.2,102,1
+U61,"Papa sin cáscara, variedad Yungay","Tubérculos, raíces y derivados",86.0,2.1,19.9,0.1,102,1
+U62,Papa variedad nativa capulí con cáscara,"Tubérculos, raíces y derivados",115.0,1.2,27.1,0.3,102,1
+U63,Papa variedad nativa caramarquina con cáscara,"Tubérculos, raíces y derivados",98.0,1.7,22.4,0.3,102,1
+U64,Papa variedad nativa chimbina amarilla con cáscara,"Tubérculos, raíces y derivados",68.0,2.3,14.8,0.2,102,1
+U65,Papa variedad nativa huagalina con cáscara,"Tubérculos, raíces y derivados",54.0,2.4,11.2,0.2,102,1
+U66,Papa variedad nativa hualash con cáscara,"Tubérculos, raíces y derivados",54.0,2.0,11.0,0.4,102,1
+U67,Papa variedad nativa huayro con cáscara,"Tubérculos, raíces y derivados",76.0,1.7,17.3,0.2,102,1
+U68,Papa variedad nativa huevo de toro con cáscara,"Tubérculos, raíces y derivados",72.0,2.4,15.6,0.3,102,1
+U69,Papa variedad nativa limeña con cáscara,"Tubérculos, raíces y derivados",68.0,2.5,14.6,0.3,102,1
+U70,Papa variedad nativa maga blanca con cáscara,"Tubérculos, raíces y derivados",65.0,3.0,13.5,0.3,102,1
+U71,Papa variedad nativa peruanita con cáscara,"Tubérculos, raíces y derivados",78.0,2.0,17.3,0.3,103,1
+U72,Papa variedad nativa puca pampamachay con cáscara,"Tubérculos, raíces y derivados",81.0,2.0,18.3,0.2,103,1
+U73,Papa variedad nativa puca pishgosh con cáscara,"Tubérculos, raíces y derivados",99.0,1.9,22.4,0.5,103,1
+U74,Papa variedad nativa quinuapa tulum con cáscara,"Tubérculos, raíces y derivados",70.0,1.9,15.1,0.5,103,1
+U75,Papa variedad nativa sapa negra con cáscara,"Tubérculos, raíces y derivados",72.0,2.2,15.7,0.3,103,1
+U76,Papa variedad nativa yana shaque con cáscara,"Tubérculos, raíces y derivados",108.0,1.8,24.7,0.4,103,1
+U77,Quillu uncucha (tubérculo),"Tubérculos, raíces y derivados",146.0,4.5,34.3,0.2,103,1
+U78,"Sachapapa, bulbo aéreo","Tubérculos, raíces y derivados",138.0,2.3,32.0,0.3,103,1
+U79,Tallapaqui culli (tubérculo),"Tubérculos, raíces y derivados",72.0,2.0,16.9,0.2,103,1
+U80,Tallapaqui yurak (tubérculo),"Tubérculos, raíces y derivados",88.0,2.0,21.2,0.1,103,1
+U81,Yuca de moja,"Tubérculos, raíces y derivados",160.0,1.5,40.2,0.2,103,1
+U82,"Papa ""cóctel"", con cáscara, cruda","Tubérculos, raíces y derivados",49.0,2.2,10.6,0.0,103,1
+U83,"Papa, prefrita en aceite vegetal, congelada, envasada","Tubérculos, raíces y derivados",92.0,2.2,19.5,0.9,103,1
+U84,"Papa, chuño de, envasado (almidón de papa o fécula de papa)","Tubérculos, raíces y derivados",326.0,0.2,80.8,0.0,103,1
+U85,Papa morada sin cáscara,"Tubérculos, raíces y derivados",120.0,2.1,28.4,0.0,104,1
+U86,"Papa, tocosh fresco","Tubérculos, raíces y derivados",172.0,0.9,42.2,0.0,104,1
+U87,"Papa, tocosh harina","Tubérculos, raíces y derivados",332.0,3.1,79.5,0.3,104,1

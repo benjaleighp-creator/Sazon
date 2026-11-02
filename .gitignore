@@ -1,0 +1,10 @@
+# El proyecto de Xcode se genera con XcodeGen; no se sube.
+*.xcodeproj
+build/
+Payload/
+*.ipa
+DerivedData/
+.DS_Store
+__pycache__/
+# El PDF del INS no se sube: se descarga del repositorio del INS.
+*.pdf
