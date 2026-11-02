@@ -139,3 +139,31 @@ extension Nutrientes {
         return (p / total, c / total, g / total)
     }
 }
+
+// MARK: - Copiar y favoritos
+
+enum Copiado {
+    /// Copias nuevas de unos registros en otro día (y, si se indica, en otra
+    /// comida). La hora se conserva para no cambiar el orden del día.
+    static func copiar(_ registros: [Registro], aDia dia: Date, comida: TipoComida? = nil,
+                       calendario: Calendar = .current) -> [Registro] {
+        let inicio = calendario.startOfDay(for: dia)
+        return registros.map { r in
+            var copia = r
+            copia.id = UUID()
+            let hora = calendario.dateComponents([.hour, .minute, .second], from: r.fecha)
+            copia.fecha = calendario.date(byAdding: hora, to: inicio) ?? inicio
+            if let comida { copia.comida = comida }
+            return copia
+        }
+    }
+
+    /// Nombre sugerido para un favorito («Desayuno: pan con palta y café»).
+    static func nombreSugerido(_ registros: [Registro], comida: TipoComida) -> String {
+        let nombres = registros.prefix(3).map { $0.nombre.lowercased() }
+        guard !nombres.isEmpty else { return comida.nombre }
+        let lista = nombres.count > 1 ? nombres.dropLast().joined(separator: ", ") + " y " + (nombres.last ?? "") : nombres[0]
+        let extra = registros.count > 3 ? "…" : ""
+        return Formato.primeraMayuscula(lista) + extra
+    }
+}

@@ -410,3 +410,42 @@ final class PruebasDeteccion: XCTestCase {
         XCTAssertEqual(d.y, 0.5, accuracy: 0.07)
     }
 }
+
+final class PruebasCopiarYFavoritos: XCTestCase {
+    func testCopiarConservaHoraYCambiaDia() {
+        let cal = Calendar(identifier: .gregorian)
+        let origen = cal.date(from: DateComponents(year: 2026, month: 10, day: 30, hour: 8, minute: 15))!
+        let destino = cal.date(from: DateComponents(year: 2026, month: 11, day: 2))!
+        let r = Registro(fecha: origen, comida: .desayuno, nombre: "Pan", gramos: 30,
+                         por100g: Nutrientes(kcal: 280, proteina: 8, carbohidratos: 57, grasas: 2), origen: .ins)
+        let copias = Copiado.copiar([r], aDia: destino, comida: .snacks, calendario: cal)
+        XCTAssertEqual(copias.count, 1)
+        XCTAssertNotEqual(copias[0].id, r.id)
+        XCTAssertEqual(copias[0].comida, .snacks)
+        XCTAssertEqual(cal.component(.day, from: copias[0].fecha), 2)
+        XCTAssertEqual(cal.component(.hour, from: copias[0].fecha), 8)
+        XCTAssertEqual(copias[0].gramos, 30)
+    }
+
+    func testNombreSugerido() {
+        func r(_ n: String) -> Registro {
+            Registro(fecha: Date(), comida: .desayuno, nombre: n, gramos: 10, por100g: .cero, origen: .manual)
+        }
+        XCTAssertEqual(Copiado.nombreSugerido([r("Pan"), r("Palta"), r("Café")], comida: .desayuno), "Pan, palta y café")
+        XCTAssertEqual(Copiado.nombreSugerido([], comida: .cena), "Cena")
+    }
+
+    func testDatosSinFavoritosSeLeen() throws {
+        let d = try DatosApp.decodificadorPrueba.decode(DatosApp.self, from: Data(#"{"version":1}"#.utf8))
+        XCTAssertTrue(d.favoritos.isEmpty)
+        XCTAssertFalse(d.comidasExtra)
+    }
+}
+
+extension DatosApp {
+    static var decodificadorPrueba: JSONDecoder {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return d
+    }
+}

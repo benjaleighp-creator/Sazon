@@ -218,6 +218,39 @@ extension Almacen {
                                       metaAguaMl: metaAgua, objetivo: datos.perfil?.objetivo, dieta: datos.perfil?.dieta)
     }
 
+    // MARK: Copiar y favoritos
+
+    /// Copia una comida del día visible a otro día (opcionalmente a otra comida).
+    func copiarComida(_ comida: TipoComida, a dia: Date, como destino: TipoComida? = nil) {
+        let origen = Diario.resumen(de: diaVisible, en: datos.registros).registros(comida)
+        agregar(Copiado.copiar(origen, aDia: dia, comida: destino))
+    }
+
+    /// Copia todo el día visible a otro día.
+    func copiarDia(a dia: Date) {
+        let origen = Diario.registros(de: diaVisible, en: datos.registros)
+        agregar(Copiado.copiar(origen, aDia: dia))
+    }
+
+    func guardarFavorito(nombre: String, registros: [Registro], comida: TipoComida) {
+        let limpio = nombre.trimmingCharacters(in: .whitespacesAndNewlines)
+        datos.favoritos.insert(ComidaFavorita(nombre: limpio.isEmpty ? Copiado.nombreSugerido(registros, comida: comida) : limpio,
+                                              registros: registros, comidaHabitual: comida), at: 0)
+    }
+
+    func eliminarFavorito(_ f: ComidaFavorita) {
+        datos.favoritos.removeAll { $0.id == f.id }
+    }
+
+    /// Registros listos para guardar a partir de un favorito, en el día visible.
+    func registrosDe(_ f: ComidaFavorita, comida: TipoComida) -> [Registro] {
+        Copiado.copiar(f.registros, aDia: diaVisible, comida: comida).map { r in
+            var r = r
+            r.fecha = Diario.fechaParaRegistrar(enDia: diaVisible)
+            return r
+        }
+    }
+
     // MARK: Widgets
 
     /// Escribe el resumen que leen los widgets y les pide actualizarse.

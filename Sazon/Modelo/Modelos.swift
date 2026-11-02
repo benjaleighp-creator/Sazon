@@ -459,6 +459,12 @@ struct DatosApp: Codable, Equatable {
     /// Suma a la meta las calorías activas que registra Apple Salud.
     var sumarActividad: Bool
 
+    // Atajos de registro
+    /// Comidas favoritas (combos que repites seguido).
+    var favoritos: [ComidaFavorita]
+    /// Muestra «Media mañana» y «Media tarde» en el diario.
+    var comidasExtra: Bool
+
     static let modeloPorDefecto = "gemini-3.8-flash"
 
     init() {
@@ -496,6 +502,8 @@ struct DatosApp: Codable, Equatable {
         coachCompartirResumen = false
         saludActiva = false
         sumarActividad = false
+        favoritos = []
+        comidasExtra = false
     }
 
     init(from decoder: Decoder) throws {
@@ -535,5 +543,7 @@ struct DatosApp: Codable, Equatable {
         coachCompartirResumen = try c.decodeIfPresent(Bool.self, forKey: .coachCompartirResumen) ?? false
         saludActiva = try c.decodeIfPresent(Bool.self, forKey: .saludActiva) ?? false
         sumarActividad = try c.decodeIfPresent(Bool.self, forKey: .sumarActividad) ?? false
+        favoritos = try c.decodeIfPresent([ComidaFavorita].self, forKey: .favoritos) ?? []
+        comidasExtra = try c.decodeIfPresent(Bool.self, forKey: .comidasExtra) ?? false
     }
 }

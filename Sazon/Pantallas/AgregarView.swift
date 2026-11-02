@@ -172,6 +172,27 @@ struct AgregarView: View {
                         azulejo("square.and.pencil", "Agregar a mano", "Datos del envase", ia: false, color: paleta.calorias) { ruta.append(.manual) }
                     }
 
+                    if !almacen.datos.favoritos.isEmpty {
+                        VStack(alignment: .leading, spacing: Espacio.s) {
+                            EncabezadoSeccion(titulo: "Favoritos", icono: "star.fill", detalle: "Un toque y listo")
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: Espacio.s) {
+                                    ForEach(almacen.datos.favoritos) { f in
+                                        TarjetaFavorito(favorito: f) {
+                                            alGuardar(almacen.registrosDe(f, comida: comida))
+                                        }
+                                        .contextMenu {
+                                            Button(role: .destructive) { almacen.eliminarFavorito(f) } label: {
+                                                Label("Quitar de favoritos", systemImage: "star.slash")
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.vertical, Espacio.xxs)
+                            }
+                        }
+                    }
+
                     if !almacen.datos.recientes.isEmpty {
                         VStack(alignment: .leading, spacing: Espacio.s) {
                             EncabezadoSeccion(titulo: "Recientes", icono: "clock.arrow.circlepath")
@@ -292,6 +313,42 @@ struct AgregarView: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// Tarjeta de una comida favorita: se agrega entera a la comida elegida.
+private struct TarjetaFavorito: View {
+    let favorito: ComidaFavorita
+    let accion: () -> Void
+    @Environment(\.paleta) private var paleta
+    @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 170
+
+    var body: some View {
+        Button(action: accion) {
+            VStack(alignment: .leading, spacing: Espacio.xs) {
+                HStack {
+                    AzulejoColor(simbolo: favorito.comidaHabitual.simbolo, color: paleta.color(favorito.comidaHabitual), tamano: 32)
+                    Spacer(minLength: 0)
+                    Image(systemName: "plus.circle.fill").font(Tipo.iconoFila).foregroundStyle(paleta.acento)
+                }
+                Text(favorito.nombre)
+                    .font(Tipo.nota.weight(.semibold))
+                    .foregroundStyle(paleta.texto)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 0)
+                Text("\(Formato.entero(favorito.total.kcal)) kcal · \(favorito.registros.count) \(favorito.registros.count == 1 ? "alimento" : "alimentos")")
+                    .font(Tipo.micro.monospacedDigit())
+                    .foregroundStyle(paleta.textoSecundario)
+            }
+            .frame(width: min(ancho, 240), height: 132, alignment: .topLeading)
+            .tarjeta(relleno: Espacio.s)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Toca para agregar todo a la comida elegida. Mantén pulsado para quitarlo.")
     }
 }
 

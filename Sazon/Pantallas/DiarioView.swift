@@ -48,7 +48,14 @@ struct DiarioView: View {
                     // 3. Las comidas.
                     VStack(spacing: Espacio.s) {
                         EncabezadoSeccion(titulo: "Tus comidas", icono: "fork.knife",
-                                          detalle: resumen.total.kcal > 0 ? Formato.kcal(resumen.total.kcal, estimado: resumen.incluyeEstimados) : nil)
+                                          detalle: resumen.total.kcal > 0 ? Formato.kcal(resumen.total.kcal, estimado: resumen.incluyeEstimados) : nil) {
+                            if !resumen.total.kcal.isZero {
+                                MenuCopiar(titulo: "Copiar el día", alElegir: { dia in
+                                    almacen.copiarDia(a: dia)
+                                    guardados += 1
+                                })
+                            }
+                        }
                         ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { indice, comida in
                             TarjetaComida(
                                 comida: comida,
@@ -342,6 +349,10 @@ private struct TarjetaComida: View {
     @Environment(\.paleta) private var paleta
     @Environment(Almacen.self) private var almacen
 
+    @State private var pedirNombre = false
+    @State private var nombreFavorito = ""
+    @State private var hechos = 0
+
     var body: some View {
         let estimado = registros.contains { $0.origen.esEstimado }
         let color = paleta.color(comida)
@@ -371,6 +382,17 @@ private struct TarjetaComida: View {
                     .frame(width: Medida.anilloComida, height: Medida.anilloComida)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("\(Formato.entero(Progreso(consumido: total.kcal, meta: meta).fraccion * 100)) por ciento de lo sugerido para \(comida.nombre.lowercased())")
+                }
+                if !registros.isEmpty {
+                    MenuCopiar(titulo: nil, extra: {
+                        Button {
+                            nombreFavorito = Copiado.nombreSugerido(registros, comida: comida)
+                            pedirNombre = true
+                        } label: { Label("Guardar como favorito", systemImage: "star") }
+                    }, alElegir: { dia in
+                        almacen.copiarComida(comida, a: dia)
+                        hechos += 1
+                    })
                 }
                 Button(action: alAgregar) {
                     Image(systemName: "plus")
@@ -411,6 +433,79 @@ private struct TarjetaComida: View {
             }
         }
         .tarjeta()
+        .sensoryFeedback(.success, trigger: hechos)
+        .alert("Guardar como favorito", isPresented: $pedirNombre) {
+            TextField("Nombre", text: $nombreFavorito)
+            Button("Guardar") {
+                almacen.guardarFavorito(nombre: nombreFavorito, registros: registros, comida: comida)
+                hechos += 1
+            }
+            Button("Cancelar", role: .cancel) {}
+        } message: {
+            Text("Lo encontrarás al registrar, en «Favoritos», para agregarlo en un toque.")
+        }
+    }
+}
+
+/// Menú «⋯» para copiar a hoy, mañana u otro día (con selector de fecha).
+struct MenuCopiar<Extra: View>: View {
+    let titulo: String?
+    @ViewBuilder var extra: () -> Extra
+    let alElegir: (Date) -> Void
+    @Environment(Almacen.self) private var almacen
+    @Environment(\.paleta) private var paleta
+    @State private var eligiendo = false
+    @State private var fecha = Date()
+
+    var body: some View {
+        let hoy = Calendar.current.startOfDay(for: Date())
+        let manana = Calendar.current.date(byAdding: .day, value: 1, to: hoy) ?? hoy
+        Menu {
+            Section(titulo ?? "Copiar") {
+                if !almacen.esHoy {
+                    Button { alElegir(hoy) } label: { Label("Copiar a hoy", systemImage: "arrow.uturn.forward") }
+                }
+                Button { alElegir(manana) } label: { Label("Copiar a mañana", systemImage: "calendar.badge.plus") }
+                Button { fecha = Date(); eligiendo = true } label: { Label("Copiar a otro día…", systemImage: "calendar") }
+            }
+            extra()
+        } label: {
+            Image(systemName: titulo == nil ? "ellipsis" : "doc.on.doc")
+                .font(Tipo.iconoChico)
+                .foregroundStyle(paleta.textoSecundario)
+                .frame(width: Medida.toque, height: Medida.toque)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(titulo ?? "Más opciones")
+        .sheet(isPresented: $eligiendo) {
+            NavigationStack {
+                Form {
+                    DatePicker("Día", selection: $fecha, displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                }
+                .navigationTitle("Copiar a…")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancelar") { eligiendo = false } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Copiar") {
+                            alElegir(Calendar.current.startOfDay(for: fecha))
+                            eligiendo = false
+                        }
+                    }
+                }
+            }
+            .presentationDetents([.large])
+            .entornoSazon(almacen)
+        }
+    }
+}
+
+extension MenuCopiar where Extra == EmptyView {
+    init(titulo: String?, alElegir: @escaping (Date) -> Void) {
+        self.titulo = titulo
+        self.extra = { EmptyView() }
+        self.alElegir = alElegir
     }
 }
 

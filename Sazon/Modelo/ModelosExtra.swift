@@ -336,3 +336,31 @@ struct MensajeCoach: Codable, Identifiable, Equatable {
         self.id = id; self.autor = autor; self.texto = texto; self.fecha = fecha
     }
 }
+
+// MARK: - Favoritos
+
+/// Combo de alimentos que repites seguido (por ejemplo, tu desayuno de siempre).
+struct ComidaFavorita: Codable, Identifiable, Equatable {
+    var id: UUID
+    var nombre: String
+    /// Alimentos con sus porciones (la fecha y la comida se ignoran al usarlo).
+    var registros: [Registro]
+    var comidaHabitual: TipoComida
+    var creada: Date
+
+    init(id: UUID = UUID(), nombre: String, registros: [Registro], comidaHabitual: TipoComida, creada: Date = Date()) {
+        self.id = id; self.nombre = nombre; self.registros = registros
+        self.comidaHabitual = comidaHabitual; self.creada = creada
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Favorito"
+        registros = try c.decodeIfPresent([Registro].self, forKey: .registros) ?? []
+        comidaHabitual = try c.decodeIfPresent(TipoComida.self, forKey: .comidaHabitual) ?? .desayuno
+        creada = try c.decodeIfPresent(Date.self, forKey: .creada) ?? Date()
+    }
+
+    var total: Nutrientes { registros.reduce(Nutrientes.cero) { $0 + $1.total } }
+}
