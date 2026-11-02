@@ -503,3 +503,30 @@ final class PruebasProgresoNuevo: XCTestCase {
         XCTAssertEqual(top.count, 2, "el arroz es de hace más de 7 días")
     }
 }
+
+final class PruebasComidasExtra: XCTestCase {
+    func testVisibles() {
+        XCTAssertEqual(TipoComida.visibles(extra: false), [.desayuno, .almuerzo, .cena, .snacks])
+        XCTAssertEqual(TipoComida.visibles(extra: true).count, 6)
+    }
+
+    func testSugeridaConExtra() {
+        XCTAssertEqual(TipoComida.sugerida(minutoDelDia: 10 * 60 + 30, extra: true), .mediaManana)
+        XCTAssertEqual(TipoComida.sugerida(minutoDelDia: 17 * 60, extra: true), .mediaTarde)
+        XCTAssertEqual(TipoComida.sugerida(minutoDelDia: 17 * 60), .snacks)
+        XCTAssertEqual(TipoComida.sugerida(minutoDelDia: 13 * 60, extra: true), .almuerzo)
+    }
+
+    func testPartesDelPlanSiguenSumandoUno() {
+        let suma = TipoComida.allCases.reduce(0) { $0 + $1.parteDelDia }
+        XCTAssertEqual(suma, 1, accuracy: 0.0001)
+    }
+
+    func testRegistroAntiguoSeLeeIgual() throws {
+        let json = #"{"comida":"almuerzo","nombre":"Arroz","gramos":150}"#
+        let r = try JSONDecoder().decode(Registro.self, from: Data(json.utf8))
+        XCTAssertEqual(r.comida, .almuerzo)
+        let nuevo = try JSONDecoder().decode(Registro.self, from: Data(#"{"comida":"mediaTarde"}"#.utf8))
+        XCTAssertEqual(nuevo.comida, .mediaTarde)
+    }
+}

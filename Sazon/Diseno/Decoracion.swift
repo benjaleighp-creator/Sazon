@@ -99,6 +99,8 @@ extension Paleta {
     func color(_ comida: TipoComida) -> Color {
         switch comida {
         case .desayuno: return carbohidratos
+        case .mediaManana: return grasas
+        case .mediaTarde: return carbohidratos
         case .almuerzo: return calorias
         case .cena: return proteina
         case .snacks: return grasas

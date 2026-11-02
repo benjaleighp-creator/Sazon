@@ -259,6 +259,8 @@ extension TipoComida {
         case .almuerzo: return 0.35
         case .cena: return 0.25
         case .snacks: return 0.15
+        // El plan automático no reparte calorías en las comidas extra.
+        case .mediaManana, .mediaTarde: return 0
         }
     }
 }

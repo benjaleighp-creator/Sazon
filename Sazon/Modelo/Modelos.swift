@@ -67,13 +67,15 @@ struct Nutrientes: Codable, Equatable, Hashable {
 // MARK: - Comidas del día
 
 enum TipoComida: String, Codable, CaseIterable, Identifiable {
-    case desayuno, almuerzo, cena, snacks
+    case desayuno, mediaManana, almuerzo, mediaTarde, cena, snacks
 
     var id: String { rawValue }
 
     var nombre: String {
         switch self {
         case .desayuno: return "Desayuno"
+        case .mediaManana: return "Media mañana"
+        case .mediaTarde: return "Media tarde"
         case .almuerzo: return "Almuerzo"
         case .cena: return "Cena"
         case .snacks: return "Snacks"
@@ -83,14 +85,31 @@ enum TipoComida: String, Codable, CaseIterable, Identifiable {
     var simbolo: String {
         switch self {
         case .desayuno: return "cup.and.saucer"
+        case .mediaManana: return "sun.max"
+        case .mediaTarde: return "sun.min"
         case .almuerzo: return "fork.knife"
         case .cena: return "moon.stars"
         case .snacks: return "carrot"
         }
     }
 
+    /// Comidas que se muestran: las 4 de siempre o, si activas las comidas
+    /// extra, también media mañana y media tarde.
+    static func visibles(extra: Bool) -> [TipoComida] {
+        extra ? allCases : [.desayuno, .almuerzo, .cena, .snacks]
+    }
+
+    var esExtra: Bool { self == .mediaManana || self == .mediaTarde }
+
     /// Comida sugerida según la hora (minutos desde medianoche).
-    static func sugerida(minutoDelDia: Int) -> TipoComida {
+    static func sugerida(minutoDelDia: Int, extra: Bool = false) -> TipoComida {
+        if extra {
+            switch minutoDelDia {
+            case 600..<690: return .mediaManana   // 10:00–11:29
+            case 960..<1080: return .mediaTarde   // 16:00–17:59
+            default: break
+            }
+        }
         switch minutoDelDia {
         case 300..<660: return .desayuno     // 05:00–10:59
         case 660..<960: return .almuerzo     // 11:00–15:59

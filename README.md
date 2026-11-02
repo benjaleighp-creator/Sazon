@@ -17,6 +17,12 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 - Mis alimentos (a mano o calculados con IA), recetas con ingredientes y
   peso cocido, comparador de alimentos.
 - Agua con meta automática o manual.
+- Copiar una comida o el día entero a otra fecha, y comidas favoritas que
+  se agregan en un toque.
+- Media mañana y media tarde opcionales (Ajustes › Comidas del día).
+- Animación al analizar la foto: puntos sobre la foto mientras la IA
+  trabaja; luego se juntan sobre cada alimento (cajas «box_2d» de Gemini,
+  validadas) o en la lista debajo si no hay caja.
 
 **Meta**
 - Mifflin-St Jeor con fórmula visible, tipo de dieta (equilibrada, alta en
@@ -25,11 +31,14 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 - Opcional: sumar calorías activas de Apple Salud.
 
 **Plan**
+- Modo cocina: ingredientes y pasos en pantalla grande, sin que se apague.
 - Plan diario automático con la tabla del INS y tus recetas, edición manual,
   «Comí» para pasarlo al diario, ajuste automático de porciones, lista de
   compras y PDF para compartir.
 
 **Progreso**
+- Peso con línea de tendencia suavizada, gasto calórico estimado con tus
+  datos, resumen de la semana y «lo que más te aporta» (calorías o sodio).
 - Peso con gráfica y tendencia, IMC, medidas corporales, % de grasa
   (fórmula de la Marina de EE. UU. o escrito a mano), fotos de progreso
   (solo en el iPhone), gráficos de nutrientes y racha.

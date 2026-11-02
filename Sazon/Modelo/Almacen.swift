@@ -95,7 +95,7 @@ final class Almacen {
     /// Comida sugerida para registrar ahora.
     var comidaSugerida: TipoComida {
         let c = Calendar.current.dateComponents([.hour, .minute], from: Date())
-        return TipoComida.sugerida(minutoDelDia: (c.hour ?? 12) * 60 + (c.minute ?? 0))
+        return TipoComida.sugerida(minutoDelDia: (c.hour ?? 12) * 60 + (c.minute ?? 0), extra: datos.comidasExtra)
     }
 
     // MARK: - Disco

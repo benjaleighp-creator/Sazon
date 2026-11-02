@@ -59,6 +59,21 @@ struct AjustesView: View {
                         }
                     }
 
+                    GrupoAjustes(titulo: "Comidas del día") {
+                        Toggle(isOn: $a.datos.comidasExtra) {
+                            HStack(spacing: Espacio.s) {
+                                AzulejoIcono(simbolo: "sun.max", tamano: 34)
+                                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                                    Text("Media mañana y media tarde").font(Tipo.cuerpo).foregroundStyle(paleta.texto)
+                                    Text("Agrega dos comidas más al diario (6 en total). Lo que ya registraste no cambia.")
+                                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                        }
+                        .tint(paleta.acento)
+                    }
+
                     GrupoAjustes(titulo: "Porciones") {
                         Picker("Unidad", selection: $a.datos.unidad) {
                             ForEach(UnidadPorcion.allCases) { Text($0.nombre).tag($0) }

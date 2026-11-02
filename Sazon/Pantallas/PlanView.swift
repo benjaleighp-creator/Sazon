@@ -36,7 +36,7 @@ struct PlanView: View {
                     }
 
                     if !plan.items.isEmpty {
-                        ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { i, comida in
+                        ForEach(Array(TipoComida.visibles(extra: almacen.datos.comidasExtra).enumerated()), id: \.element) { i, comida in
                             tarjetaComida(comida, plan: plan).aparicion(i + 2)
                         }
                         Toggle(isOn: $a.datos.ajustarPorcionesPlan) {

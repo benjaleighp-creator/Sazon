@@ -391,12 +391,13 @@ private struct TarjetaReciente: View {
 struct SelectorComidaGrande: View {
     @Binding var comida: TipoComida
     @Environment(\.paleta) private var paleta
+    @Environment(Almacen.self) private var almacen
 
     var body: some View {
         VStack(alignment: .leading, spacing: Espacio.xs) {
             TituloSeccion("¿En qué comida?")
-            HStack(spacing: Espacio.xs) {
-                ForEach(TipoComida.allCases) { c in
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: Espacio.xs)], spacing: Espacio.xs) {
+                ForEach(TipoComida.visibles(extra: almacen.datos.comidasExtra || comida.esExtra)) { c in
                     let elegido = comida == c
                     Button { animar(.seleccion) { comida = c } } label: {
                         VStack(spacing: Espacio.xxs) {
@@ -445,12 +446,13 @@ extension DestinoRegistro: Identifiable {
 /// Chips para elegir la comida.
 struct SelectorComida: View {
     @Binding var comida: TipoComida
+    @Environment(Almacen.self) private var almacen
 
     var body: some View {
         VStack(alignment: .leading, spacing: Espacio.xs) {
             TituloSeccion("Comida")
             FilaFlexible(espacio: Espacio.xs) {
-                ForEach(TipoComida.allCases) { c in
+                ForEach(TipoComida.visibles(extra: almacen.datos.comidasExtra || comida.esExtra)) { c in
                     Chip(texto: c.nombre, icono: c.simbolo, seleccionado: comida == c) { comida = c }
                 }
             }

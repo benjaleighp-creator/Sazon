@@ -8,6 +8,7 @@ struct RecetasView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @State private var editando: Receta?
+    @State private var cocinando: Receta?
 
     var body: some View {
         List {
@@ -35,10 +36,26 @@ struct RecetasView: View {
                 .swipeActions {
                     Button(role: .destructive) { almacen.eliminarReceta(r) } label: { Label("Borrar", systemImage: "trash") }
                 }
+                .swipeActions(edge: .leading) {
+                    Button { cocinando = r } label: { Label("Cocinar", systemImage: "flame") }
+                        .tint(paleta.acento)
+                }
+                .contextMenu {
+                    Button { cocinando = r } label: { Label("Modo cocina", systemImage: "flame") }
+                    Button { editando = r } label: { Label("Editar", systemImage: "pencil") }
+                }
+            }
+            if !almacen.datos.recetas.isEmpty {
+                Text("Desliza una receta a la derecha o mantenla pulsada para abrir el modo cocina.")
+                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .listRowBackground(Color.clear)
             }
         }
         .listStyle(.insetGrouped)
         .fondoDePantalla()
+        .fullScreenCover(item: $cocinando) { r in
+            ModoCocinaView(receta: r).entornoSazon(almacen)
+        }
         .navigationTitle("Mis recetas")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

@@ -56,12 +56,12 @@ struct DiarioView: View {
                                 })
                             }
                         }
-                        ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { indice, comida in
+                        ForEach(Array(TipoComida.visibles(extra: conExtra(resumen)).enumerated()), id: \.element) { indice, comida in
                             TarjetaComida(
                                 comida: comida,
                                 registros: resumen.registros(comida),
                                 total: resumen.totales(comida),
-                                metaComida: almacen.meta.map { $0.kcal * comida.parteSugerida },
+                                metaComida: almacen.meta.map { $0.kcal * comida.parteSugerida(extra: conExtra(resumen)) },
                                 alAgregar: { solicitud = SolicitudRegistro(comida: comida) },
                                 alTocar: { editando = $0 }
                             )
@@ -133,6 +133,12 @@ struct DiarioView: View {
         }
     }
 
+    /// Muestra las comidas extra si están activadas o si ese día ya tiene
+    /// algo registrado en ellas (así nunca se esconde un registro).
+    private func conExtra(_ resumen: ResumenDia) -> Bool {
+        almacen.datos.comidasExtra || !resumen.registros(.mediaManana).isEmpty || !resumen.registros(.mediaTarde).isEmpty
+    }
+
     private var heroSinMeta: some View {
         VStack(alignment: .leading, spacing: Espacio.s) {
             Image(systemName: "target")
@@ -161,13 +167,24 @@ struct DiarioView: View {
 
 extension TipoComida {
     /// Parte orientativa de las calorías del día para cada comida (suma 1).
-    /// Solo sirve para la barrita de cada tarjeta; no es una regla.
-    var parteSugerida: Double {
+    /// Solo sirve para el anillo de cada tarjeta; no es una regla.
+    func parteSugerida(extra: Bool) -> Double {
+        if extra {
+            switch self {
+            case .desayuno: return 0.20
+            case .mediaManana: return 0.10
+            case .almuerzo: return 0.30
+            case .mediaTarde: return 0.10
+            case .cena: return 0.20
+            case .snacks: return 0.10
+            }
+        }
         switch self {
         case .desayuno: return 0.25
         case .almuerzo: return 0.35
         case .cena: return 0.25
         case .snacks: return 0.15
+        case .mediaManana, .mediaTarde: return 0
         }
     }
 }
