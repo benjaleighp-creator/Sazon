@@ -185,7 +185,7 @@ final class PruebasRecetasYPlan: XCTestCase {
         let a = Planificador.generarDia(fecha(2026, 11, 3), meta: meta, opciones: o, calendario: calendarioPrueba)
         let b = Planificador.generarDia(fecha(2026, 11, 3, 18), meta: meta, opciones: o, calendario: calendarioPrueba)
         XCTAssertEqual(a.items.map(\.nombre), b.items.map(\.nombre))
-        XCTAssertEqual(Set(a.items.map(\.comida)), Set(TipoComida.allCases))
+        XCTAssertEqual(Set(a.items.map(\.comida)), Set(TipoComida.visibles(extra: false)), "El plan automático usa las 4 comidas principales")
         let total = Planificador.total(a).kcal
         XCTAssertEqual(total, 2000, accuracy: 400, "El plan debe quedar cerca de la meta")
         XCTAssertTrue(a.items.allSatisfy { Int($0.gramos) % 5 == 0 })
