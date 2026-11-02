@@ -52,13 +52,17 @@ final class Almacen {
         d.registros.append(contentsOf: nuevos)
         for r in nuevos {
             d.recientes = Diario.actualizarRecientes(d.recientes, con: r)
+            d.productos = Productos.actualizar(d.productos, con: r)
         }
         datos = d
     }
 
     func actualizar(_ registro: Registro) {
         guard let i = datos.registros.firstIndex(where: { $0.id == registro.id }) else { return }
-        datos.registros[i] = registro
+        var d = datos
+        d.registros[i] = registro
+        d.productos = Productos.actualizar(d.productos, con: registro)
+        datos = d
     }
 
     func eliminar(_ registro: Registro) {

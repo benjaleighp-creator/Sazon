@@ -219,3 +219,63 @@ final class PruebasRevisionIA: XCTestCase {
         XCTAssertFalse(item.esValido)
     }
 }
+
+final class PruebasProductosYEtiqueta: XCTestCase {
+
+    func testRecuerdaProductoEscaneado() {
+        var r = registro("Galletas de quinua", gramos: 30, kcal100: 450, p: 8, c: 65, g: 16, en: fecha(2026, 11, 1), origen: .envase)
+        r.codigoBarras = "7751234567895"
+        let productos = Productos.actualizar([:], con: r, ahora: fecha(2026, 11, 1))
+        let guardado = Productos.buscar("7751234567895", en: productos)
+        XCTAssertEqual(guardado?.nombre, "Galletas de quinua")
+        XCTAssertEqual(guardado?.origen, .envase)
+        XCTAssertEqual(guardado?.por100g.kcal, 450)
+        // Sin código no guarda nada.
+        let sinCodigo = registro("Pan", gramos: 50, kcal100: 280, en: fecha(2026, 11, 1))
+        XCTAssertTrue(Productos.actualizar([:], con: sinCodigo).isEmpty)
+    }
+
+    func testActualizaProductoCorregido() {
+        var r = registro("Yogur", gramos: 150, kcal100: 60, en: fecha(2026, 11, 1), origen: .openFoodFacts)
+        r.codigoBarras = "12345678"
+        var productos = Productos.actualizar([:], con: r)
+        r.por100g.kcal = 75
+        r.origen = .manual
+        productos = Productos.actualizar(productos, con: r)
+        XCTAssertEqual(productos.count, 1)
+        XCTAssertEqual(productos["12345678"]?.por100g.kcal, 75)
+        XCTAssertEqual(productos["12345678"]?.origen, .manual)
+    }
+
+    func testCodigoInternoDeTienda() {
+        XCTAssertTrue(LectorOpenFoodFacts.esCodigoInterno("2200201838183"))
+        XCTAssertFalse(LectorOpenFoodFacts.esCodigoInterno("7751539000025"))
+        XCTAssertFalse(LectorOpenFoodFacts.esCodigoInterno("22002018"))
+    }
+
+    func testLeeEtiqueta() throws {
+        let json = #"{"es_etiqueta": true, "nombre": "granola artesanal", "porcion_g": 40, "kcal_100g": 430, "proteina_100g": 11, "carbohidratos_100g": 62, "grasas_100g": 15, "confianza": 0.85}"#
+        let e = try LectorIA.etiqueta(desde: json)
+        XCTAssertEqual(e.nombre, "Granola artesanal")
+        XCTAssertEqual(e.porcionGramos, 40)
+        XCTAssertEqual(e.por100g, Nutrientes(kcal: 430, proteina: 11, carbohidratos: 62, grasas: 15))
+        XCTAssertEqual(e.confianza, 0.85)
+    }
+
+    func testEtiquetaIlegibleOInvalida() {
+        XCTAssertThrowsError(try LectorIA.etiqueta(desde: #"{"es_etiqueta": false, "nombre": "", "porcion_g": 0, "kcal_100g": 0, "proteina_100g": 0, "carbohidratos_100g": 0, "grasas_100g": 0, "confianza": 0}"#)) {
+            XCTAssertEqual($0 as? ErrorIA, .sinEtiqueta)
+        }
+        XCTAssertThrowsError(try LectorIA.etiqueta(desde: #"{"es_etiqueta": true, "kcal_100g": 1500, "proteina_100g": 1, "carbohidratos_100g": 1, "grasas_100g": 1}"#)) {
+            XCTAssertEqual($0 as? ErrorIA, .jsonInvalido("los valores de la etiqueta no son válidos"))
+        }
+    }
+
+    func testCuerpoEtiquetaLlevaFotoYEsquema() throws {
+        let datos = try LectorIA.cuerpoPeticionEtiqueta(imagenJPEGBase64: "QUJD", formato: .actual)
+        let texto = String(decoding: datos, as: UTF8.self)
+        XCTAssertTrue(texto.contains("es_etiqueta"))
+        XCTAssertTrue(texto.contains("QUJD"))
+        XCTAssertTrue(texto.contains("responseFormat"))
+    }
+}

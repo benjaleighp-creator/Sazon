@@ -51,10 +51,40 @@ struct Candidato: Hashable {
         cantidadMedida = registro.cantidadMedida
     }
 
-    init(manual nombre: String) {
+    init(manual nombre: String, codigoBarras: String? = nil) {
         self.nombre = nombre
         por100g = .cero
         origen = .manual
+        self.codigoBarras = codigoBarras
+    }
+
+    /// Producto escaneado que ya registraste antes.
+    init(guardado: ProductoGuardado) {
+        nombre = guardado.nombre
+        por100g = guardado.por100g
+        origen = guardado.origen
+        codigoBarras = guardado.codigo
+        medidas = guardado.porcion.map { [$0] } ?? []
+        if let porcion = guardado.porcion {
+            gramos = porcion.gramos
+            medida = porcion
+            cantidadMedida = 1
+        }
+    }
+
+    /// Valores leídos por la IA de la tabla nutricional del envase.
+    init(etiqueta: EtiquetaLeida, codigoBarras: String?) {
+        nombre = etiqueta.nombre
+        por100g = etiqueta.por100g
+        origen = .envase
+        self.codigoBarras = codigoBarras
+        if let porcion = etiqueta.porcionGramos {
+            let medidaPorcion = MedidaCasera(nombre: "porción del envase", gramos: porcion, estimada: false)
+            medidas = [medidaPorcion]
+            gramos = porcion
+            medida = medidaPorcion
+            cantidadMedida = 1
+        }
     }
 }
 
@@ -65,6 +95,8 @@ enum DestinoRegistro: Hashable {
     case escanear
     case buscar
     case manual
+    /// Leer la etiqueta nutricional con IA (con el código de barras, si hay).
+    case etiqueta(String?)
     case porcion(Candidato)
 }
 
@@ -167,14 +199,20 @@ struct AgregarView: View {
                 case .texto:
                     RegistroTextoView(comida: $comida, alGuardar: guardar)
                 case .escanear:
-                    EscanerView { producto in ruta.append(.porcion(Candidato(producto: producto))) }
+                    EscanerView(
+                        alResolver: { candidato in ruta.append(.porcion(candidato)) },
+                        alLeerEtiqueta: { codigo in abrirIA(.etiqueta(codigo)) },
+                        alBuscarTabla: { ruta.append(.buscar) }
+                    )
+                case .etiqueta(let codigo):
+                    EtiquetaView(codigo: codigo) { candidato in ruta.append(.porcion(candidato)) }
                 case .buscar:
                     BuscarView { alimento in ruta.append(.porcion(Candidato(alimento: alimento))) }
                 case .manual:
                     PorcionView(candidato: Candidato(manual: ""), comida: $comida, editableValores: true, alGuardar: guardarUno)
                 case .porcion(let candidato):
                     PorcionView(candidato: candidato, comida: $comida,
-                                editableValores: candidato.origen == .manual || candidato.origen == .estimadoIA,
+                                editableValores: [.manual, .estimadoIA, .envase].contains(candidato.origen),
                                 alGuardar: guardarUno)
                 }
             }
@@ -193,7 +231,7 @@ struct AgregarView: View {
             comida = comidaInicial
             if let destinoInicial {
                 switch destinoInicial {
-                case .foto, .texto: abrirIA(destinoInicial)
+                case .foto, .texto, .etiqueta: abrirIA(destinoInicial)
                 default: ruta.append(destinoInicial)
                 }
             }
@@ -333,6 +371,7 @@ extension DestinoRegistro: Identifiable {
         case .escanear: return "escanear"
         case .buscar: return "buscar"
         case .manual: return "manual"
+        case .etiqueta(let c): return "etiqueta-\(c ?? "")"
         case .porcion(let c): return "porcion-\(c.nombre)-\(c.codigoINS ?? "")-\(c.codigoBarras ?? "")"
         }
     }

@@ -95,6 +95,8 @@ enum OrigenDato: String, Codable, CaseIterable {
     case estimadoIA
     /// Escrito a mano por ti.
     case manual
+    /// Leído por la IA de la tabla nutricional del envase (revisado por ti).
+    case envase
 
     var etiqueta: String {
         switch self {
@@ -102,11 +104,45 @@ enum OrigenDato: String, Codable, CaseIterable {
         case .openFoodFacts: return "Open Food Facts"
         case .estimadoIA: return "≈ estimado por IA"
         case .manual: return "Manual"
+        case .envase: return "Etiqueta del envase"
         }
     }
 
     /// Si es true, la interfaz marca las cifras con "≈".
     var esEstimado: Bool { self == .estimadoIA }
+}
+
+// MARK: - Productos escaneados que recuerda la app
+
+/// Producto con código de barras que registraste. La próxima vez que lo
+/// escanees, la app lo encuentra aquí primero (sin internet).
+struct ProductoGuardado: Codable, Equatable {
+    var codigo: String
+    var nombre: String
+    var por100g: Nutrientes
+    var origen: OrigenDato
+    /// Porción del envase o la medida que usaste, si la hay.
+    var porcion: MedidaCasera?
+    var actualizado: Date
+
+    init(codigo: String, nombre: String, por100g: Nutrientes, origen: OrigenDato, porcion: MedidaCasera?, actualizado: Date) {
+        self.codigo = codigo
+        self.nombre = nombre
+        self.por100g = por100g
+        self.origen = origen
+        self.porcion = porcion
+        self.actualizado = actualizado
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        codigo = try c.decodeIfPresent(String.self, forKey: .codigo) ?? ""
+        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Producto"
+        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
+        origen = try c.decodeIfPresent(OrigenDato.self, forKey: .origen) ?? .manual
+        porcion = try c.decodeIfPresent(MedidaCasera.self, forKey: .porcion)
+        actualizado = try c.decodeIfPresent(Date.self, forKey: .actualizado) ?? Date()
+    }
 }
 
 // MARK: - Medidas caseras
@@ -360,6 +396,8 @@ struct DatosApp: Codable, Equatable {
     var recientes: [Registro]
     /// Tu nombre para el saludo (opcional, solo en este iPhone).
     var nombre: String
+    /// Productos con código de barras que ya registraste (clave: código).
+    var productos: [String: ProductoGuardado]
 
     static let modeloPorDefecto = "gemini-3.8-flash"
 
@@ -377,6 +415,7 @@ struct DatosApp: Codable, Equatable {
         formatoPeticionIA = .actual
         recientes = []
         nombre = ""
+        productos = [:]
     }
 
     init(from decoder: Decoder) throws {
@@ -395,5 +434,6 @@ struct DatosApp: Codable, Equatable {
         formatoPeticionIA = try c.decodeIfPresent(FormatoPeticionIA.self, forKey: .formatoPeticionIA) ?? .actual
         recientes = try c.decodeIfPresent([Registro].self, forKey: .recientes) ?? []
         nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? ""
+        productos = try c.decodeIfPresent([String: ProductoGuardado].self, forKey: .productos) ?? [:]
     }
 }

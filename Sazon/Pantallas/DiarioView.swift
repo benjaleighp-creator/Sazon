@@ -440,6 +440,7 @@ struct FilaRegistro: View {
         case .openFoodFacts: return "barcode"
         case .estimadoIA: return "sparkles"
         case .manual: return "pencil"
+        case .envase: return "doc.text.viewfinder"
         }
     }
 }

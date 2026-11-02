@@ -30,6 +30,7 @@ enum ErrorIA: Error, Equatable {
     case modeloNoDisponible(String)
     case bloqueado(String)
     case sinAlimentos
+    case sinEtiqueta
     case respuestaVacia
     case jsonInvalido(String)
     case peticionInvalida(String)
@@ -46,6 +47,7 @@ enum ErrorIA: Error, Equatable {
         case .modeloNoDisponible: return "Modelo no disponible"
         case .bloqueado: return "Gemini no respondió"
         case .sinAlimentos: return "No se reconoció comida"
+        case .sinEtiqueta: return "No se pudo leer la etiqueta"
         case .respuestaVacia, .jsonInvalido: return "Respuesta con errores"
         case .peticionInvalida: return "Gemini rechazó la petición"
         case .servidor: return "Gemini tuvo un problema"
@@ -71,6 +73,8 @@ enum ErrorIA: Error, Equatable {
             return "Gemini no devolvió una respuesta (\(motivo)). Prueba con otra foto o escribe el plato."
         case .sinAlimentos:
             return "No se encontró comida en la foto o el texto. Prueba de nuevo o agrega el alimento a mano."
+        case .sinEtiqueta:
+            return "No se ve una tabla de información nutricional legible. Toma la foto de frente, con buena luz y que se lea «por 100 g» o «por porción». También puedes agregarlo a mano."
         case .respuestaVacia:
             return "Gemini respondió sin contenido. Puedes intentarlo otra vez o agregar el alimento a mano."
         case .jsonInvalido(let detalle):
@@ -155,7 +159,11 @@ enum LectorIA {
             pedido += "\n\nIdentifica los alimentos de la foto."
         }
         partes.append(["text": pedido])
+        return try cuerpo(partes: partes, esquema: esquema, formato: formato)
+    }
 
+    /// Arma el cuerpo de `generateContent` con las partes y el esquema pedido.
+    static func cuerpo(partes: [[String: Any]], esquema: [String: Any], formato: FormatoPeticionIA) throws -> Data {
         let configuracion: [String: Any]
         switch formato {
         case .actual:
@@ -297,5 +305,88 @@ enum LectorIA {
         }
         if codigo >= 500 { return .servidor(codigo) }
         return .desconocido("Error \(codigo) de Gemini. \(String(mensaje.prefix(180)))")
+    }
+}
+
+// MARK: - Etiqueta nutricional del envase
+
+/// Valores leídos por la IA de la tabla nutricional de un envase.
+struct EtiquetaLeida: Equatable {
+    var nombre: String
+    /// Siempre por 100 g (o 100 ml); la IA convierte si la etiqueta da "por porción".
+    var por100g: Nutrientes
+    /// Tamaño de porción del envase en gramos, si aparece.
+    var porcionGramos: Double?
+    var confianza: Double
+}
+
+extension LectorIA {
+
+    static let instruccionesEtiqueta = """
+    La foto muestra la tabla de información nutricional de un producto envasado (probablemente en español, de Perú).
+    Lee los valores que aparecen; no inventes ninguno.
+
+    Devuelve:
+    - "es_etiqueta": true solo si se ve una tabla nutricional legible; si no, false y el resto en 0.
+    - "nombre": el nombre del producto si se ve; si no, vacío.
+    - "porcion_g": el tamaño de la porción en gramos (o ml) si aparece; si no, 0.
+    - "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g": valores POR 100 g (o 100 ml).
+      Si la tabla solo da valores por porción, conviértelos a 100 g con el tamaño de la porción.
+      Si la energía solo está en kJ, divídela entre 4,184.
+    - "confianza": de 0 a 1, qué tan seguro estás de haber leído bien los números.
+    Responde solo con el JSON pedido.
+    """
+
+    static var esquemaEtiqueta: [String: Any] {
+        let numero: (String, Double, Double) -> [String: Any] = { descripcion, minimo, maximo in
+            ["type": "number", "description": descripcion, "minimum": minimo, "maximum": maximo]
+        }
+        let propiedades: [String: Any] = [
+            "es_etiqueta": ["type": "boolean", "description": "Se ve una tabla nutricional legible"],
+            "nombre": ["type": "string", "description": "Nombre del producto o vacío"],
+            "porcion_g": numero("Porción en gramos (0 si no aparece)", 0, 5000),
+            "kcal_100g": numero("kcal por 100 g", 0, 900),
+            "proteina_100g": numero("Proteína por 100 g", 0, 100),
+            "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
+            "grasas_100g": numero("Grasas por 100 g", 0, 100),
+            "confianza": numero("Confianza de 0 a 1", 0, 1)
+        ]
+        return [
+            "type": "object",
+            "properties": propiedades,
+            "required": ["es_etiqueta", "nombre", "porcion_g", "kcal_100g", "proteina_100g",
+                         "carbohidratos_100g", "grasas_100g", "confianza"]
+        ]
+    }
+
+    static func cuerpoPeticionEtiqueta(imagenJPEGBase64: String, formato: FormatoPeticionIA) throws -> Data {
+        let datosImagen: [String: Any] = ["mime_type": "image/jpeg", "data": imagenJPEGBase64]
+        let partes: [[String: Any]] = [["inline_data": datosImagen], ["text": instruccionesEtiqueta]]
+        return try cuerpo(partes: partes, esquema: esquemaEtiqueta, formato: formato)
+    }
+
+    /// Lee y valida el JSON de la etiqueta.
+    static func etiqueta(desde texto: String) throws -> EtiquetaLeida {
+        let limpio = limpiarBloqueCodigo(texto)
+        guard let datos = limpio.data(using: .utf8),
+              let raiz = try? JSONSerialization.jsonObject(with: datos) as? [String: Any] else {
+            throw ErrorIA.jsonInvalido("no es un JSON válido")
+        }
+        let esEtiqueta = (raiz["es_etiqueta"] as? Bool) ?? ((raiz["es_etiqueta"] as? NSNumber)?.boolValue ?? false)
+        guard esEtiqueta else { throw ErrorIA.sinEtiqueta }
+        guard let kcal = numero(raiz["kcal_100g"]), (0...900).contains(kcal),
+              let p = numero(raiz["proteina_100g"]), (0...100).contains(p),
+              let c = numero(raiz["carbohidratos_100g"]), (0...100).contains(c),
+              let g = numero(raiz["grasas_100g"]), (0...100).contains(g) else {
+            throw ErrorIA.jsonInvalido("los valores de la etiqueta no son válidos")
+        }
+        let nombre = (raiz["nombre"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let porcion = numero(raiz["porcion_g"]).flatMap { Porciones.esValido($0) ? $0 : nil }
+        return EtiquetaLeida(
+            nombre: nombre.isEmpty ? "" : Formato.primeraMayuscula(nombre),
+            por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g),
+            porcionGramos: porcion,
+            confianza: min(max(numero(raiz["confianza"]) ?? 0.5, 0), 1)
+        )
     }
 }

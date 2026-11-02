@@ -9,6 +9,9 @@ import Foundation
 protocol ProveedorIA {
     func analizar(texto: String) async throws -> [AlimentoIdentificado]
     func analizar(fotoJPEG: Data) async throws -> [AlimentoIdentificado]
+    /// Lee la tabla nutricional de un envase (para productos que no están
+    /// en Open Food Facts).
+    func leerEtiqueta(fotoJPEG: Data) async throws -> EtiquetaLeida
 }
 
 enum ServicioIA {
@@ -46,7 +49,17 @@ struct ProveedorGemini: ProveedorIA {
         return try await enviar(cuerpo)
     }
 
+    func leerEtiqueta(fotoJPEG: Data) async throws -> EtiquetaLeida {
+        let cuerpo = try LectorIA.cuerpoPeticionEtiqueta(imagenJPEGBase64: fotoJPEG.base64EncodedString(), formato: formato)
+        return try LectorIA.etiqueta(desde: try await pedirTexto(cuerpo))
+    }
+
     private func enviar(_ cuerpo: Data) async throws -> [AlimentoIdentificado] {
+        try LectorIA.alimentos(desde: try await pedirTexto(cuerpo))
+    }
+
+    /// Hace la única llamada a Gemini y devuelve el texto de la respuesta.
+    private func pedirTexto(_ cuerpo: Data) async throws -> String {
         let nombre = modelo.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let ruta = nombre.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
               let url = URL(string: Self.base + ruta + ":generateContent") else {
@@ -80,7 +93,6 @@ struct ProveedorGemini: ProveedorIA {
         guard (200..<300).contains(http.statusCode) else {
             throw LectorIA.errorHTTP(codigo: http.statusCode, cuerpo: datos, modelo: nombre)
         }
-        let texto = try LectorIA.textoDeRespuesta(datos)
-        return try LectorIA.alimentos(desde: texto)
+        return try LectorIA.textoDeRespuesta(datos)
     }
 }

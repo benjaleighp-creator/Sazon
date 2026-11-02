@@ -242,7 +242,7 @@ struct RegistroFotoView: View {
 }
 
 /// Cámara del sistema (UIImagePickerController).
-private struct Camara: UIViewControllerRepresentable {
+struct Camara: UIViewControllerRepresentable {
     let alTomar: (UIImage) -> Void
     @Environment(\.dismiss) private var cerrar
 

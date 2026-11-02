@@ -43,6 +43,17 @@ struct PorcionView: View {
                         InsigniaOrigen(origen: candidato.origen)
                         if let marca = candidato.marca { Insignia(texto: marca) }
                     }
+                    if candidato.origen == .envase {
+                        Text("Valores leídos por la IA de la etiqueta: compáralos con el envase antes de guardar.")
+                            .font(Tipo.pie)
+                            .foregroundStyle(paleta.aviso)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    if let codigo = candidato.codigoBarras {
+                        Label("Código \(codigo) · se recordará para la próxima vez", systemImage: "barcode")
+                            .font(Tipo.pie)
+                            .foregroundStyle(paleta.textoSecundario)
+                    }
                     if candidato.datosIncompletos {
                         Text("Open Food Facts no trae todos los macronutrientes de este producto; los que faltan quedaron en 0. Puedes corregirlos después de guardar.")
                             .font(Tipo.pie)
