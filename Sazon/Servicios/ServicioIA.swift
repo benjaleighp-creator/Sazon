@@ -31,8 +31,10 @@ enum ServicioIA {
 /// Documentación: https://ai.google.dev/gemini-api/docs
 /// - Endpoint: POST https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent
 /// - Autenticación: cabecera `x-goog-api-key`.
-/// - Una sola llamada por registro y sin reintentos automáticos: si falla,
-///   la app muestra el error y tú decides si vuelves a intentarlo.
+/// - Si Google está saturado (503 y otros 5xx), reintenta el mismo modelo
+///   una vez y luego prueba, en orden, los modelos de respaldo gratuitos.
+///   Un 429 (límite del modelo) o un 404 (modelo retirado) pasan directo
+///   al siguiente modelo. Clave inválida o sin internet no se reintentan.
 struct ProveedorGemini: ProveedorIA {
     let clave: String
     let modelo: String
@@ -66,9 +68,49 @@ struct ProveedorGemini: ProveedorIA {
         try LectorIA.analisis(desde: try await pedirTexto(cuerpo))
     }
 
-    /// Hace la única llamada a Gemini y devuelve el texto de la respuesta.
+    /// Modelos que se prueban si el elegido falla por saturación o límite.
+    /// En noviembre de 2026 figuraban como gratuitos en
+    /// https://ai.google.dev/gemini-api/docs/pricing — si Google los retira,
+    /// simplemente se saltan (404) y se sigue con el siguiente.
+    static let modelosRespaldo = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
+
+    /// Prueba el modelo elegido y, si Google está saturado, los de respaldo.
     private func pedirTexto(_ cuerpo: Data) async throws -> String {
-        let nombre = modelo.trimmingCharacters(in: .whitespacesAndNewlines)
+        let elegido = modelo.trimmingCharacters(in: .whitespacesAndNewlines)
+        var cadena = [elegido]
+        for m in Self.modelosRespaldo where !cadena.contains(m) { cadena.append(m) }
+
+        var primerError: Error?
+        for (indice, nombre) in cadena.enumerated() {
+            let intentos = indice == 0 ? 2 : 1
+            for intento in 1...intentos {
+                try Task.checkCancellation()
+                do {
+                    return try await pedirTexto(cuerpo, modelo: nombre)
+                } catch let error as ErrorIA {
+                    switch error {
+                    case .servidor:
+                        if primerError == nil { primerError = error }
+                        if intento < intentos {
+                            try await Task.sleep(nanoseconds: 2_000_000_000)
+                        }
+                        continue
+                    case .limiteAlcanzado, .modeloNoDisponible, .peticionInvalida:
+                        // Propio de este modelo: probar el siguiente. Si es el
+                        // elegido y no hay más, se muestra este error.
+                        if primerError == nil { primerError = error }
+                    default:
+                        throw error
+                    }
+                }
+                break
+            }
+        }
+        throw primerError ?? ErrorIA.servidor(503)
+    }
+
+    /// Hace una llamada a Gemini con un modelo y devuelve el texto de la respuesta.
+    private func pedirTexto(_ cuerpo: Data, modelo nombre: String) async throws -> String {
         guard let ruta = nombre.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
               let url = URL(string: Self.base + ruta + ":generateContent") else {
             throw ErrorIA.modeloNoDisponible(nombre)
