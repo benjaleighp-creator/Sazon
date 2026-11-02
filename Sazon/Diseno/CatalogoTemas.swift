@@ -26,7 +26,11 @@ enum CatalogoTemas {
                 calorias: "C2501F",
                 proteina: "7A3E9D",
                 carbohidratos: "A07000",
-                grasas: "4E7D2E"
+                grasas: "4E7D2E",
+                heroInicio: "A63E17",
+                heroFin: "6E2410",
+                textoHero: "FFF7EC",
+                textoHeroSecundario: "FBE6D7"
             ),
             oscuro: Paleta(
                 fondo: "17120E",
@@ -44,7 +48,11 @@ enum CatalogoTemas {
                 calorias: "F2875A",
                 proteina: "C79BE6",
                 carbohidratos: "F2C14E",
-                grasas: "9CCB6E"
+                grasas: "9CCB6E",
+                heroInicio: "7A2C12",
+                heroFin: "3A160A",
+                textoHero: "FFF1E4",
+                textoHeroSecundario: "EBCDB8"
             )
         ),
         Tema(
@@ -68,7 +76,11 @@ enum CatalogoTemas {
                 calorias: "B5481F",
                 proteina: "6D2F8E",
                 carbohidratos: "9C7000",
-                grasas: "3F7A33"
+                grasas: "3F7A33",
+                heroInicio: "7B3AA0",
+                heroFin: "3E1A5A",
+                textoHero: "FBF5FF",
+                textoHeroSecundario: "E6D3F2"
             ),
             oscuro: Paleta(
                 fondo: "140E19",
@@ -86,7 +98,11 @@ enum CatalogoTemas {
                 calorias: "F2875A",
                 proteina: "C49BE3",
                 carbohidratos: "F0C24B",
-                grasas: "9ACB6C"
+                grasas: "9ACB6C",
+                heroInicio: "4E2470",
+                heroFin: "24112F",
+                textoHero: "F8F0FF",
+                textoHeroSecundario: "DCC8EC"
             )
         )
     ]

@@ -72,6 +72,8 @@ enum DestinoRegistro: Hashable {
 /// barras, tabla o a mano) y en qué comida.
 struct AgregarView: View {
     let comidaInicial: TipoComida
+    /// Si viene, se abre directo ese método (desde el botón flotante).
+    var destinoInicial: DestinoRegistro? = nil
     /// Recibe los registros listos para guardar.
     let alGuardar: ([Registro]) -> Void
 
@@ -81,54 +83,69 @@ struct AgregarView: View {
     @State private var comida: TipoComida = .almuerzo
     @State private var ruta: [DestinoRegistro] = []
     @State private var pedirAviso: DestinoRegistro?
+    @State private var listo = false
+
+    private let columnas = [GridItem(.flexible(), spacing: Espacio.s), GridItem(.flexible(), spacing: Espacio.s)]
 
     var body: some View {
         NavigationStack(path: $ruta) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Espacio.l) {
-                    SelectorComida(comida: $comida)
-                    VStack(alignment: .leading, spacing: Espacio.s) {
-                        TituloSeccion("Con inteligencia artificial")
-                        opcion("camera", "Foto del plato", "La IA identifica alimentos y porciones; tú revisas antes de guardar.") { abrirIA(.foto) }
-                        opcion("text.bubble", "Escribir o dictar", "Por ejemplo «2 panes con palta y un café». Para dictar, toca el micrófono del teclado.") { abrirIA(.texto) }
+                    SelectorComidaGrande(comida: $comida)
+
+                    // Destacado: foto con IA.
+                    Button { abrirIA(.foto) } label: {
+                        HStack(spacing: Espacio.m) {
+                            VStack(alignment: .leading, spacing: Espacio.xs) {
+                                Label("Con IA", systemImage: "sparkles")
+                                    .font(Tipo.micro)
+                                    .foregroundStyle(paleta.heroFin)
+                                    .padding(.horizontal, Espacio.xs)
+                                    .padding(.vertical, Espacio.xxs)
+                                    .background(Capsule().fill(paleta.textoHero))
+                                Text("Foto del plato")
+                                    .font(Tipo.titulo3)
+                                    .foregroundStyle(paleta.textoHero)
+                                Text("Toma una foto y la IA identifica alimentos y porciones. Tú revisas antes de guardar.")
+                                    .font(Tipo.nota)
+                                    .foregroundStyle(paleta.textoHeroSecundario)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .multilineTextAlignment(.leading)
+                            Spacer(minLength: 0)
+                            Image(systemName: "camera.fill")
+                                .font(Tipo.iconoGrande)
+                                .foregroundStyle(paleta.textoHero)
+                                .frame(width: 64, height: 64)
+                                .background(Circle().fill(paleta.textoHero.opacity(0.16)))
+                                .accessibilityHidden(true)
+                        }
+                        .hero(relleno: Espacio.m)
+                        .contentShape(Rectangle())
                     }
-                    VStack(alignment: .leading, spacing: Espacio.s) {
-                        TituloSeccion("Sin inteligencia artificial")
-                        opcion("barcode.viewfinder", "Escanear código de barras", "Productos envasados con datos de Open Food Facts.") { ruta.append(.escanear) }
-                        opcion("magnifyingglass", "Buscar en la tabla", "Tabla del INS dentro de la app. Funciona sin internet.") { ruta.append(.buscar) }
-                        opcion("square.and.pencil", "Agregar a mano", "Escribe el nombre y los valores del envase.") { ruta.append(.manual) }
+                    .buttonStyle(.plain)
+                    .accessibilityElement(children: .combine)
+
+                    LazyVGrid(columns: columnas, spacing: Espacio.s) {
+                        azulejo("text.bubble", "Escribir o dictar", "Con IA", ia: true) { abrirIA(.texto) }
+                        azulejo("barcode.viewfinder", "Escanear código", "Open Food Facts", ia: false) { ruta.append(.escanear) }
+                        azulejo("magnifyingglass", "Buscar en la tabla", "INS · sin internet", ia: false) { ruta.append(.buscar) }
+                        azulejo("square.and.pencil", "Agregar a mano", "Datos del envase", ia: false) { ruta.append(.manual) }
                     }
+
                     if !almacen.datos.recientes.isEmpty {
-                        VStack(alignment: .leading, spacing: Espacio.xs) {
+                        VStack(alignment: .leading, spacing: Espacio.s) {
                             TituloSeccion("Recientes")
-                            VStack(spacing: 0) {
-                                ForEach(almacen.datos.recientes.prefix(8)) { r in
-                                    Button {
-                                        ruta.append(.porcion(Candidato(registro: r)))
-                                    } label: {
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: Espacio.xxxs) {
-                                                Text(r.nombre).font(Tipo.cuerpo).foregroundStyle(paleta.texto)
-                                                    .multilineTextAlignment(.leading)
-                                                Text(Porciones.texto(gramos: r.gramos, unidad: almacen.datos.unidad, medida: r.medida, cantidadMedida: r.cantidadMedida))
-                                                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                                            }
-                                            Spacer()
-                                            Text(Formato.kcal(r.total.kcal, estimado: r.origen.esEstimado))
-                                                .font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.textoSecundario)
-                                            Image(systemName: "chevron.right").font(Tipo.iconoChico).foregroundStyle(paleta.textoSecundario)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: Espacio.s) {
+                                    ForEach(almacen.datos.recientes.prefix(10)) { r in
+                                        TarjetaReciente(registro: r, unidad: almacen.datos.unidad) {
+                                            ruta.append(.porcion(Candidato(registro: r)))
                                         }
-                                        .padding(.vertical, Espacio.s)
-                                        .contentShape(Rectangle())
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityElement(children: .combine)
-                                    if r.id != almacen.datos.recientes.prefix(8).last?.id {
-                                        Divider().overlay(paleta.borde)
                                     }
                                 }
+                                .padding(.vertical, Espacio.xxs)
                             }
-                            .tarjeta(relleno: Espacio.m)
                         }
                     }
                 }
@@ -170,7 +187,17 @@ struct AgregarView: View {
                 .entornoSazon(almacen)
             }
         }
-        .onAppear { comida = comidaInicial }
+        .onAppear {
+            guard !listo else { return }
+            listo = true
+            comida = comidaInicial
+            if let destinoInicial {
+                switch destinoInicial {
+                case .foto, .texto: abrirIA(destinoInicial)
+                default: ruta.append(destinoInicial)
+                }
+            }
+        }
     }
 
     private func abrirIA(_ destino: DestinoRegistro) {
@@ -189,24 +216,112 @@ struct AgregarView: View {
         alGuardar([registro])
     }
 
-    private func opcion(_ simbolo: String, _ titulo: String, _ texto: String, accion: @escaping () -> Void) -> some View {
+    private func azulejo(_ simbolo: String, _ titulo: String, _ detalle: String, ia: Bool, accion: @escaping () -> Void) -> some View {
         Button(action: accion) {
-            HStack(alignment: .center, spacing: Espacio.s) {
-                IconoCirculo(simbolo: simbolo, tamano: 40)
+            VStack(alignment: .leading, spacing: Espacio.s) {
+                HStack(alignment: .top) {
+                    AzulejoIcono(simbolo: simbolo, tamano: 44)
+                    Spacer(minLength: 0)
+                    if ia {
+                        Image(systemName: "sparkles")
+                            .font(Tipo.iconoChico)
+                            .foregroundStyle(paleta.acento)
+                            .accessibilityHidden(true)
+                    }
+                }
                 VStack(alignment: .leading, spacing: Espacio.xxxs) {
-                    Text(titulo).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                    Text(texto).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    Text(titulo)
+                        .font(Tipo.cuerpoFuerte)
+                        .foregroundStyle(paleta.texto)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(detalle)
+                        .font(Tipo.pie)
+                        .foregroundStyle(paleta.textoSecundario)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .multilineTextAlignment(.leading)
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right").font(Tipo.iconoChico).foregroundStyle(paleta.textoSecundario)
             }
+            .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
+            .tarjeta(relleno: Espacio.m)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Tarjeta pequeña de un alimento reciente (carrusel horizontal).
+private struct TarjetaReciente: View {
+    let registro: Registro
+    let unidad: UnidadPorcion
+    let accion: () -> Void
+    @Environment(\.paleta) private var paleta
+    @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 150
+
+    var body: some View {
+        Button(action: accion) {
+            VStack(alignment: .leading, spacing: Espacio.xs) {
+                Text(registro.nombre)
+                    .font(Tipo.nota.weight(.semibold))
+                    .foregroundStyle(paleta.texto)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 0)
+                Text(Formato.kcal(registro.total.kcal, estimado: registro.origen.esEstimado))
+                    .font(Tipo.cuerpoFuerte.monospacedDigit())
+                    .foregroundStyle(paleta.acento)
+                Text(Porciones.texto(gramos: registro.gramos, unidad: unidad))
+                    .font(Tipo.micro)
+                    .foregroundStyle(paleta.textoSecundario)
+            }
+            .frame(width: min(ancho, 230), height: 120, alignment: .topLeading)
             .tarjeta(relleno: Espacio.s)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+        .accessibilityHint("Toca para elegir la porción y agregarlo")
+    }
+}
+
+/// Selector de comida con íconos grandes (en la hoja de registro).
+struct SelectorComidaGrande: View {
+    @Binding var comida: TipoComida
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Espacio.xs) {
+            TituloSeccion("¿En qué comida?")
+            HStack(spacing: Espacio.xs) {
+                ForEach(TipoComida.allCases) { c in
+                    let elegido = comida == c
+                    Button { animar(.seleccion) { comida = c } } label: {
+                        VStack(spacing: Espacio.xxs) {
+                            Image(systemName: c.simbolo)
+                                .font(Tipo.iconoFila)
+                            Text(c.nombre)
+                                .font(Tipo.micro)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                        .foregroundStyle(elegido ? paleta.textoSobreAcento : paleta.texto)
+                        .frame(maxWidth: .infinity, minHeight: 64)
+                        .background(
+                            RoundedRectangle(cornerRadius: Radio.medio, style: .continuous)
+                                .fill(elegido ? paleta.acento : paleta.superficie)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Radio.medio, style: .continuous)
+                                .strokeBorder(elegido ? Color.clear : paleta.borde, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(elegido ? .isSelected : [])
+                }
+            }
+            .sensoryFeedback(.selection, trigger: comida)
+        }
     }
 }
 

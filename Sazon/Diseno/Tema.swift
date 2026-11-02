@@ -33,11 +33,17 @@ struct Paleta: Equatable {
     let proteina: Color
     let carbohidratos: Color
     let grasas: Color
+    /// Encabezado con degradado (inicio arriba a la izquierda, fin abajo a la derecha).
+    let heroInicio: Color
+    let heroFin: Color
+    let textoHero: Color
+    let textoHeroSecundario: Color
 
     init(fondo: String, superficie: String, superficieAlta: String, borde: String,
          texto: String, textoSecundario: String, acento: String, textoSobreAcento: String,
          acentoSuave: String, exito: String, aviso: String, peligro: String,
-         calorias: String, proteina: String, carbohidratos: String, grasas: String) {
+         calorias: String, proteina: String, carbohidratos: String, grasas: String,
+         heroInicio: String, heroFin: String, textoHero: String, textoHeroSecundario: String) {
         self.fondo = Color(hex: fondo)
         self.superficie = Color(hex: superficie)
         self.superficieAlta = Color(hex: superficieAlta)
@@ -54,6 +60,15 @@ struct Paleta: Equatable {
         self.proteina = Color(hex: proteina)
         self.carbohidratos = Color(hex: carbohidratos)
         self.grasas = Color(hex: grasas)
+        self.heroInicio = Color(hex: heroInicio)
+        self.heroFin = Color(hex: heroFin)
+        self.textoHero = Color(hex: textoHero)
+        self.textoHeroSecundario = Color(hex: textoHeroSecundario)
+    }
+
+    /// Degradado del encabezado (el contraste del texto se verifica en ambos extremos).
+    var degradadoHero: LinearGradient {
+        LinearGradient(colors: [heroInicio, heroFin], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
     func color(_ macro: Macro) -> Color {

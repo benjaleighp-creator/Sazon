@@ -71,3 +71,25 @@ enum Formato {
         (estimado ? "≈ " : "") + numero(valor, decimales: valor < 10 ? 1 : 0) + " g"
     }
 }
+
+extension Formato {
+    /// "Buenos días" (5:00–11:59), "Buenas tardes" (12:00–18:59) o "Buenas noches".
+    static func saludo(hora: Int) -> String {
+        switch hora {
+        case 5..<12: return "Buenos días"
+        case 12..<19: return "Buenas tardes"
+        default: return "Buenas noches"
+        }
+    }
+
+    /// Inicial del día de la semana: L, M, M, J, V, S, D.
+    static func inicialDia(_ fecha: Date, calendario: Calendar = .current) -> String {
+        let iniciales = ["D", "L", "M", "M", "J", "V", "S"]
+        return iniciales[calendario.component(.weekday, from: fecha) - 1]
+    }
+
+    /// Número del día del mes: "1", "15".
+    static func numeroDia(_ fecha: Date, calendario: Calendar = .current) -> String {
+        String(calendario.component(.day, from: fecha))
+    }
+}

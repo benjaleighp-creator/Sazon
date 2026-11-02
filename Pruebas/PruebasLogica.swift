@@ -290,3 +290,47 @@ final class PruebasDatosGuardados: XCTestCase {
         XCTAssertEqual(vuelta, d)
     }
 }
+
+final class PruebasSemanaYSaludo: XCTestCase {
+
+    func testInicioDeSemanaEsLunes() {
+        // 1 de noviembre de 2026 es domingo: su semana empieza el lunes 26 de octubre.
+        XCTAssertEqual(Diario.inicioSemana(fecha(2026, 11, 1, 18), calendario: calendarioPrueba), fecha(2026, 10, 26, 0))
+        XCTAssertEqual(Diario.inicioSemana(fecha(2026, 10, 26, 9), calendario: calendarioPrueba), fecha(2026, 10, 26, 0))
+        XCTAssertEqual(Diario.inicioSemana(fecha(2026, 11, 2, 9), calendario: calendarioPrueba), fecha(2026, 11, 2, 0))
+    }
+
+    func testSemanaConCalorias() {
+        let todos = [
+            registro("Pan", gramos: 100, kcal100: 280, en: fecha(2026, 10, 27, 8)),
+            registro("Arroz", gramos: 200, kcal100: 130, en: fecha(2026, 11, 1, 13))
+        ]
+        let meta = Nutrientes(kcal: 2000, proteina: 100, carbohidratos: 250, grasas: 60)
+        let semana = Diario.semana(de: fecha(2026, 10, 29), en: todos, meta: meta, calendario: calendarioPrueba)
+        XCTAssertEqual(semana.count, 7)
+        XCTAssertEqual(semana[1].kcal, 280, accuracy: 0.001)
+        XCTAssertEqual(semana[1].fraccion, 0.14, accuracy: 0.0001)
+        XCTAssertTrue(semana[1].tieneRegistros)
+        XCTAssertFalse(semana[2].tieneRegistros)
+        XCTAssertEqual(semana[6].kcal, 260, accuracy: 0.001)
+        XCTAssertEqual(Diario.semana(de: fecha(2026, 10, 29), en: todos, meta: nil, calendario: calendarioPrueba)[1].fraccion, 0)
+    }
+
+    func testRepartoEnergia() {
+        let r = Nutrientes(kcal: 0, proteina: 25, carbohidratos: 25, grasas: 0).repartoEnergia
+        XCTAssertEqual(r.proteina, 0.5, accuracy: 1e-9)
+        XCTAssertEqual(r.carbohidratos, 0.5, accuracy: 1e-9)
+        XCTAssertEqual(r.grasas, 0)
+        XCTAssertEqual(Nutrientes.cero.repartoEnergia.proteina, 0)
+    }
+
+    func testSaludoEInicial() {
+        XCTAssertEqual(Formato.saludo(hora: 7), "Buenos días")
+        XCTAssertEqual(Formato.saludo(hora: 15), "Buenas tardes")
+        XCTAssertEqual(Formato.saludo(hora: 22), "Buenas noches")
+        XCTAssertEqual(Formato.saludo(hora: 2), "Buenas noches")
+        XCTAssertEqual(Formato.inicialDia(fecha(2026, 11, 1), calendario: calendarioPrueba), "D")
+        XCTAssertEqual(Formato.inicialDia(fecha(2026, 11, 2), calendario: calendarioPrueba), "L")
+        XCTAssertEqual(Formato.numeroDia(fecha(2026, 11, 1), calendario: calendarioPrueba), "1")
+    }
+}

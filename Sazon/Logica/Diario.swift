@@ -93,3 +93,49 @@ enum Diario {
         return Array(lista.prefix(limite))
     }
 }
+
+// MARK: - Semana
+
+/// Un día de la tira semanal del diario.
+struct DiaSemana: Identifiable, Equatable {
+    let fecha: Date
+    let kcal: Double
+    /// 0 a 1 frente a la meta (0 si no hay meta).
+    let fraccion: Double
+    let tieneRegistros: Bool
+    var id: Date { fecha }
+}
+
+extension Diario {
+
+    /// Lunes de la semana de `dia` (semanas de lunes a domingo, como en Perú).
+    static func inicioSemana(_ dia: Date, calendario: Calendar = .current) -> Date {
+        let inicio = calendario.startOfDay(for: dia)
+        let diaSemana = calendario.component(.weekday, from: inicio)   // 1 = domingo … 7 = sábado
+        let desdeLunes = (diaSemana + 5) % 7
+        return calendario.date(byAdding: .day, value: -desdeLunes, to: inicio) ?? inicio
+    }
+
+    /// Los 7 días (lunes a domingo) de la semana de `dia`, con sus calorías.
+    static func semana(de dia: Date, en todos: [Registro], meta: Nutrientes?, calendario: Calendar = .current) -> [DiaSemana] {
+        let lunes = inicioSemana(dia, calendario: calendario)
+        return (0..<7).map { (i: Int) -> DiaSemana in
+            let fecha = calendario.date(byAdding: .day, value: i, to: lunes) ?? lunes
+            let delDia = registros(de: fecha, en: todos, calendario: calendario)
+            let kcal = suma(delDia).kcal
+            let fraccion = Progreso(consumido: kcal, meta: meta?.kcal ?? 0).fraccion
+            return DiaSemana(fecha: fecha, kcal: kcal, fraccion: fraccion, tieneRegistros: !delDia.isEmpty)
+        }
+    }
+}
+
+extension Nutrientes {
+    /// Parte de la energía que viene de proteína, carbohidratos y grasas
+    /// (factores 4, 4 y 9). Suman 1, o todo 0 si no hay macros.
+    var repartoEnergia: (proteina: Double, carbohidratos: Double, grasas: Double) {
+        let p = proteina * 4, c = carbohidratos * 4, g = grasas * 9
+        let total = p + c + g
+        guard total > 0 else { return (0, 0, 0) }
+        return (p / total, c / total, g / total)
+    }
+}

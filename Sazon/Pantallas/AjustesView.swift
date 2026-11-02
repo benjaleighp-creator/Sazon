@@ -1,196 +1,305 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Ajustes: meta, IA, porciones, apariencia, batería, respaldo y fuentes.
+/// Ajustes: meta, IA, preferencias, respaldo y fuentes.
 struct AjustesView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @State private var hayClave = Llavero.hayClave
 
     var body: some View {
+        @Bindable var a = almacen
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Espacio.l) {
-                    seccionMeta
-                    SeccionIA()
-                    seccionPorciones
-                    seccionApariencia
-                    seccionBateria
-                    SeccionRespaldo()
-                    seccionAcercaDe
+                    Text("Ajustes")
+                        .font(Tipo.titulo1)
+                        .foregroundStyle(paleta.texto)
+                        .accessibilityAddTraits(.isHeader)
+                        .padding(.top, Espacio.s)
+
+                    heroMeta
+
+                    GrupoAjustes(titulo: "Perfil") {
+                        HStack(spacing: Espacio.s) {
+                            AzulejoIcono(simbolo: "person", tamano: 34)
+                            TextField("Tu nombre (para el saludo)", text: $a.datos.nombre)
+                                .font(Tipo.cuerpo)
+                                .foregroundStyle(paleta.texto)
+                                .textContentType(.givenName)
+                        }
+                        .padding(.vertical, Espacio.xs)
+                        Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "target", titulo: "Meta diaria", valor: textoMeta) { MetaView() }
+                    }
+
+                    GrupoAjustes(titulo: "Inteligencia artificial") {
+                        FilaAjuste(simbolo: "sparkles", titulo: "Google Gemini",
+                                   valor: hayClave ? "Clave guardada · \(almacen.datos.modeloIA)" : "Falta tu clave de API",
+                                   color: hayClave ? paleta.exito : paleta.aviso) {
+                            PantallaIA()
+                        }
+                    }
+
+                    GrupoAjustes(titulo: "Porciones") {
+                        Picker("Unidad", selection: $a.datos.unidad) {
+                            ForEach(UnidadPorcion.allCases) { Text($0.nombre).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        Text("Todo se guarda en gramos; esto solo cambia cómo lo ves y escribes. Al registrar también puedes usar medidas caseras.")
+                            .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    VStack(alignment: .leading, spacing: Espacio.xs) {
+                        TituloSeccion("Apariencia")
+                        HStack(spacing: Espacio.s) {
+                            ForEach(CatalogoTemas.todos) { tema in
+                                TarjetaTema(tema: tema, elegido: almacen.datos.temaID == tema.id) {
+                                    animar(.pantalla) { almacen.datos.temaID = tema.id }
+                                }
+                            }
+                        }
+                        .sensoryFeedback(.selection, trigger: almacen.datos.temaID)
+                        Picker("Modo", selection: $a.datos.apariencia) {
+                            ForEach(Apariencia.allCases) { Text($0.nombre).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.top, Espacio.xs)
+                    }
+
+                    GrupoAjustes(titulo: "Batería") {
+                        Toggle(isOn: $a.datos.ahorroBateria) {
+                            HStack(spacing: Espacio.s) {
+                                AzulejoIcono(simbolo: "battery.75percent", tamano: 34)
+                                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                                    Text("Ahorro de batería").font(Tipo.cuerpo).foregroundStyle(paleta.texto)
+                                    Text("Quita las animaciones. Se activa solo con el modo de bajo consumo.")
+                                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                        }
+                        .tint(paleta.acento)
+                    }
+
+                    GrupoAjustes(titulo: "Datos") {
+                        FilaAjuste(simbolo: "externaldrive", titulo: "Respaldo",
+                                   valor: "\(almacen.datos.registros.count) registros guardados en este iPhone") {
+                            PantallaRespaldo()
+                        }
+                        Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "info.circle", titulo: "Acerca de y fuentes", valor: versionApp) {
+                            PantallaAcercaDe(version: versionApp)
+                        }
+                    }
+
                     if let error = almacen.errorGuardado {
                         Aviso(icono: "externaldrive.badge.exclamationmark", titulo: "Error al guardar", texto: error, color: paleta.peligro)
                     }
                 }
                 .padding(.horizontal, Espacio.margen)
-                .padding(.vertical, Espacio.m)
-                .padding(.bottom, Espacio.xl)
+                .padding(.bottom, Espacio.xxl)
             }
             .fondoDePantalla()
-            .navigationTitle("Ajustes")
+            .toolbar(.hidden, for: .navigationBar)
+            .onAppear { hayClave = Llavero.hayClave }
         }
     }
 
-    // MARK: Meta
+    private var textoMeta: String {
+        guard let meta = almacen.meta else { return "Sin configurar" }
+        return "\(Formato.entero(meta.kcal)) kcal · " + (almacen.datos.metaManual != nil ? "escrita a mano" : (almacen.datos.perfil?.objetivo.nombre.lowercased() ?? ""))
+    }
 
-    private var seccionMeta: some View {
-        VStack(alignment: .leading, spacing: Espacio.xs) {
-            TituloSeccion("Meta diaria")
-            NavigationLink {
-                MetaView()
-            } label: {
+    @ViewBuilder
+    private var heroMeta: some View {
+        NavigationLink {
+            MetaView()
+        } label: {
+            VStack(alignment: .leading, spacing: Espacio.s) {
                 HStack {
-                    VStack(alignment: .leading, spacing: Espacio.xxxs) {
-                        if let meta = almacen.meta {
-                            Text("\(Formato.entero(meta.kcal)) kcal · P \(Formato.entero(meta.proteina)) · C \(Formato.entero(meta.carbohidratos)) · G \(Formato.entero(meta.grasas)) g")
-                                .font(Tipo.cuerpo).foregroundStyle(paleta.texto)
-                            Text(almacen.datos.metaManual != nil ? "Escrita a mano" : (almacen.datos.perfil?.objetivo.nombre ?? ""))
-                                .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                        } else {
-                            Text("Configurar mi meta").font(Tipo.cuerpo).foregroundStyle(paleta.texto)
-                            Text("Bajar grasa, mantener o ganar músculo").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                        }
-                    }
+                    Label(almacen.datos.perfil?.objetivo.nombre ?? "Tu meta diaria", systemImage: "target")
+                        .font(Tipo.pie)
+                        .foregroundStyle(paleta.textoHeroSecundario)
                     Spacer()
-                    Image(systemName: "chevron.right").font(Tipo.iconoChico).foregroundStyle(paleta.textoSecundario)
+                    Image(systemName: "chevron.right").font(Tipo.iconoChico).foregroundStyle(paleta.textoHeroSecundario)
                 }
-                .tarjeta()
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    // MARK: Porciones
-
-    private var seccionPorciones: some View {
-        @Bindable var a = almacen
-        return VStack(alignment: .leading, spacing: Espacio.xs) {
-            TituloSeccion("Porciones")
-            VStack(alignment: .leading, spacing: Espacio.s) {
-                Picker("Unidad", selection: $a.datos.unidad) {
-                    ForEach(UnidadPorcion.allCases) { Text($0.nombre).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                Text("Todo se guarda en gramos; esto solo cambia cómo lo ves y escribes. También puedes usar medidas caseras al registrar.")
-                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .tarjeta()
-        }
-    }
-
-    // MARK: Apariencia
-
-    private var seccionApariencia: some View {
-        @Bindable var a = almacen
-        return VStack(alignment: .leading, spacing: Espacio.xs) {
-            TituloSeccion("Apariencia")
-            VStack(alignment: .leading, spacing: Espacio.s) {
-                ForEach(CatalogoTemas.todos) { tema in
-                    Button {
-                        animar(.pantalla) { almacen.datos.temaID = tema.id }
-                    } label: {
-                        HStack(spacing: Espacio.s) {
-                            MuestraTema(tema: tema)
-                            VStack(alignment: .leading, spacing: Espacio.xxxs) {
-                                Text(tema.nombre).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                                Text(tema.concepto).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .multilineTextAlignment(.leading)
-                            Spacer(minLength: 0)
-                            if almacen.datos.temaID == tema.id {
-                                Image(systemName: "checkmark.circle.fill").font(Tipo.iconoFila).foregroundStyle(paleta.acento)
-                            }
-                        }
-                        .contentShape(Rectangle())
+                if let meta = almacen.meta {
+                    HStack(alignment: .firstTextBaseline, spacing: Espacio.xs) {
+                        Text(Formato.entero(meta.kcal))
+                            .font(Tipo.cifraGrande)
+                            .foregroundStyle(paleta.textoHero)
+                        Text("kcal al día").font(Tipo.nota).foregroundStyle(paleta.textoHeroSecundario)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(almacen.datos.temaID == tema.id ? .isSelected : [])
-                    .sensoryFeedback(.selection, trigger: almacen.datos.temaID)
-                }
-                Picker("Modo", selection: $a.datos.apariencia) {
-                    ForEach(Apariencia.allCases) { Text($0.nombre).tag($0) }
-                }
-                .pickerStyle(.segmented)
-            }
-            .tarjeta()
-        }
-    }
-
-    // MARK: Batería
-
-    private var seccionBateria: some View {
-        @Bindable var a = almacen
-        return VStack(alignment: .leading, spacing: Espacio.xs) {
-            TituloSeccion("Batería")
-            Toggle(isOn: $a.datos.ahorroBateria) {
-                VStack(alignment: .leading, spacing: Espacio.xxxs) {
-                    Text("Ahorro de batería").font(Tipo.cuerpo).foregroundStyle(paleta.texto)
-                    Text("Quita las animaciones. Se activa solo con el modo de bajo consumo del iPhone.")
-                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                        .fixedSize(horizontal: false, vertical: true)
+                    FilaFlexible(espacio: Espacio.xs) {
+                        capsula("Proteína", meta.proteina)
+                        capsula("Carbohidratos", meta.carbohidratos)
+                        capsula("Grasas", meta.grasas)
+                    }
+                } else {
+                    Text("Configura tu meta")
+                        .font(Tipo.titulo3)
+                        .foregroundStyle(paleta.textoHero)
+                    Text("Calcula tus calorías y macros según tu objetivo.")
+                        .font(Tipo.nota)
+                        .foregroundStyle(paleta.textoHeroSecundario)
                 }
             }
-            .tint(paleta.acento)
-            .tarjeta()
+            .hero(relleno: Espacio.m)
+            .contentShape(Rectangle())
         }
-    }
-
-    // MARK: Acerca de
-
-    private var seccionAcercaDe: some View {
-        VStack(alignment: .leading, spacing: Espacio.xs) {
-            TituloSeccion("Acerca de")
-            VStack(alignment: .leading, spacing: Espacio.s) {
-                FilaValor(titulo: "Versión", valor: versionApp)
-                Divider().overlay(paleta.borde)
-                textoFuente("Tabla de alimentos", almacen.tabla.fuente.isEmpty ? (almacen.tabla.error ?? "") : almacen.tabla.fuente + " Se autoriza su reproducción citando la fuente.")
-                textoFuente("Productos envasados", "Open Food Facts (openfoodfacts.org), base de datos colaborativa con licencia Open Database License (ODbL).")
-                textoFuente("Inteligencia artificial", "Google Gemini con tu clave del plan gratuito. Sus cifras son estimaciones (≈).")
-                textoFuente("Importante", "Las calorías y los macros son estimaciones generales y editables, no consejo médico.")
-            }
-            .tarjeta()
-        }
-    }
-
-    private func textoFuente(_ titulo: String, _ texto: String) -> some View {
-        VStack(alignment: .leading, spacing: Espacio.xxxs) {
-            Text(titulo).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-            Text(texto).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
-                .fixedSize(horizontal: false, vertical: true)
-        }
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+    }
+
+    private func capsula(_ nombre: String, _ gramos: Double) -> some View {
+        Text("\(nombre) \(Formato.entero(gramos)) g")
+            .font(Tipo.pie.monospacedDigit())
+            .foregroundStyle(paleta.textoHero)
+            .padding(.horizontal, Espacio.s)
+            .padding(.vertical, Espacio.xxs)
+            .background(Capsule().fill(paleta.textoHero.opacity(0.14)))
     }
 
     /// Versión y número de compilación (el número coincide con el de GitHub Actions).
     private var versionApp: String {
         let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "1.0"
         let compilacion = (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String) ?? "1"
-        return "\(version) (compilación \(compilacion))"
+        return "Versión \(version) (compilación \(compilacion))"
     }
 }
 
-/// Muestra de colores de un tema (decorativa).
-private struct MuestraTema: View {
+/// Vista previa de un tema para elegirlo.
+private struct TarjetaTema: View {
     let tema: Tema
+    let elegido: Bool
+    let accion: () -> Void
+    @Environment(\.paleta) private var paleta
     @Environment(\.colorScheme) private var esquema
-    @ScaledMetric(relativeTo: .body) private var lado: CGFloat = 40
 
     var body: some View {
         let p = tema.paleta(esquema)
-        let l = min(lado, 64)
-        ZStack {
-            RoundedRectangle(cornerRadius: l * 0.3, style: .continuous).fill(p.fondo)
-            HStack(spacing: 2) {
-                ForEach([p.calorias, p.proteina, p.carbohidratos, p.grasas], id: \.self) { c in
-                    Capsule().fill(c).frame(width: l * 0.12, height: l * 0.5)
+        Button(action: accion) {
+            VStack(alignment: .leading, spacing: Espacio.s) {
+                // Mini encabezado del tema
+                ZStack(alignment: .bottomLeading) {
+                    RoundedRectangle(cornerRadius: Radio.medio, style: .continuous)
+                        .fill(p.degradadoHero)
+                        .frame(height: 64)
+                    HStack(spacing: 4) {
+                        ForEach([p.calorias, p.proteina, p.carbohidratos, p.grasas], id: \.self) { c in
+                            Circle().fill(c).frame(width: 12, height: 12)
+                                .overlay(Circle().strokeBorder(p.textoHero.opacity(0.6), lineWidth: 1))
+                        }
+                    }
+                    .padding(Espacio.xs)
+                }
+                .accessibilityHidden(true)
+                HStack {
+                    VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                        Text(tema.nombre).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                        Text(tema.concepto).font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: elegido ? "checkmark.circle.fill" : "circle")
+                        .font(Tipo.iconoFila)
+                        .foregroundStyle(elegido ? paleta.acento : paleta.textoSecundario)
+                        .accessibilityHidden(true)
                 }
             }
+            .padding(Espacio.s)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: Radio.tarjeta, style: .continuous).fill(paleta.superficie))
+            .overlay(
+                RoundedRectangle(cornerRadius: Radio.tarjeta, style: .continuous)
+                    .strokeBorder(elegido ? paleta.acento : paleta.borde, lineWidth: elegido ? 2 : 1)
+            )
+            .contentShape(Rectangle())
         }
-        .frame(width: l, height: l)
-        .overlay(RoundedRectangle(cornerRadius: l * 0.3, style: .continuous).strokeBorder(p.borde, lineWidth: 1))
-        .accessibilityHidden(true)
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Tema \(tema.nombre)")
+        .accessibilityAddTraits(elegido ? .isSelected : [])
+    }
+}
+
+// MARK: - Pantallas de detalle
+
+private struct PantallaIA: View {
+    var body: some View {
+        ScrollView {
+            SeccionIA()
+                .padding(.horizontal, Espacio.margen)
+                .padding(.vertical, Espacio.m)
+        }
+        .fondoDePantalla()
+        .navigationTitle("Inteligencia artificial")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct PantallaRespaldo: View {
+    var body: some View {
+        ScrollView {
+            SeccionRespaldo()
+                .padding(.horizontal, Espacio.margen)
+                .padding(.vertical, Espacio.m)
+        }
+        .fondoDePantalla()
+        .navigationTitle("Respaldo")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct PantallaAcercaDe: View {
+    let version: String
+    @Environment(Almacen.self) private var almacen
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Espacio.l) {
+                VStack(spacing: Espacio.s) {
+                    Image("Logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 96, height: 96)
+                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .accessibilityHidden(true)
+                    Text("Sazón").font(Tipo.titulo2).foregroundStyle(paleta.texto)
+                    Text(version).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(alignment: .leading, spacing: Espacio.m) {
+                    fuente("book.closed", "Tabla de alimentos",
+                           almacen.tabla.fuente.isEmpty ? (almacen.tabla.error ?? "") : almacen.tabla.fuente + " Se autoriza su reproducción citando la fuente.")
+                    fuente("barcode", "Productos envasados", "Open Food Facts (openfoodfacts.org), base de datos colaborativa con licencia Open Database License (ODbL).")
+                    fuente("sparkles", "Inteligencia artificial", "Google Gemini con tu clave del plan gratuito. Sus cifras son estimaciones (≈).")
+                    fuente("heart.text.square", "Importante", "Las calorías y los macros son estimaciones generales y editables, no consejo médico.")
+                }
+                .tarjeta()
+            }
+            .padding(.horizontal, Espacio.margen)
+            .padding(.vertical, Espacio.m)
+        }
+        .fondoDePantalla()
+        .navigationTitle("Acerca de")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func fuente(_ simbolo: String, _ titulo: String, _ texto: String) -> some View {
+        HStack(alignment: .top, spacing: Espacio.s) {
+            AzulejoIcono(simbolo: simbolo, tamano: 34)
+            VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                Text(titulo).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                Text(texto).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

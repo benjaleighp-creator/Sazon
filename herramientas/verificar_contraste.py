@@ -8,6 +8,8 @@ Mínimos (adaptados de Remanso):
  - texto sobre acento: 4.5 (AA)
  - acento sobre fondo: 3.0; sobre superficie y acentoSuave: 4.5 (texto de botones)
  - éxito/aviso/peligro sobre superficie: 4.5 (se usan como texto pequeño)
+ - texto del encabezado (y su versión secundaria) sobre los dos extremos
+   del degradado: 4.5 (AA)
  - colores de datos (calorías y macros) sobre superficie y superficieAlta: 3.0
    (WCAG 1.4.11, objetos gráficos: anillos y barras sobre su pista).
    Los nombres de los macros NUNCA se escriben con su color: van con el
@@ -49,6 +51,10 @@ for t in datos["temas"]:
         for f in ("calorias", "proteina", "carbohidratos", "grasas"):
             pruebas.append((f"{f}/superficie", ratio(p[f], p["superficie"]), 3.0))
             pruebas.append((f"{f}/superficieAlta", ratio(p[f], p["superficieAlta"]), 3.0))
+        # Encabezado con degradado: texto claro sobre ambos extremos.
+        for f in ("heroInicio", "heroFin"):
+            pruebas.append((f"textoHero/{f}", ratio(p["textoHero"], p[f]), 4.5))
+            pruebas.append((f"textoHeroSecundario/{f}", ratio(p["textoHeroSecundario"], p[f]), 4.5))
         for nombre, r, m in pruebas:
             if r < m:
                 fallos += 1

@@ -358,6 +358,8 @@ struct DatosApp: Codable, Equatable {
     var formatoPeticionIA: FormatoPeticionIA
     /// Alimentos usados hace poco (para el acceso rápido).
     var recientes: [Registro]
+    /// Tu nombre para el saludo (opcional, solo en este iPhone).
+    var nombre: String
 
     static let modeloPorDefecto = "gemini-3.8-flash"
 
@@ -374,6 +376,7 @@ struct DatosApp: Codable, Equatable {
         modeloIA = DatosApp.modeloPorDefecto
         formatoPeticionIA = .actual
         recientes = []
+        nombre = ""
     }
 
     init(from decoder: Decoder) throws {
@@ -391,5 +394,6 @@ struct DatosApp: Codable, Equatable {
         modeloIA = modelo.isEmpty ? DatosApp.modeloPorDefecto : modelo
         formatoPeticionIA = try c.decodeIfPresent(FormatoPeticionIA.self, forKey: .formatoPeticionIA) ?? .actual
         recientes = try c.decodeIfPresent([Registro].self, forKey: .recientes) ?? []
+        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? ""
     }
 }
