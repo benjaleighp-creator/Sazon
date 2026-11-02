@@ -45,6 +45,7 @@ struct RegistroTextoView: View {
     @State private var identificados: [AlimentoIdentificado] = []
     @State private var revisar = false
     @State private var envios = 0
+    @State private var dictado = Dictado()
 
     var body: some View {
         ScrollView {
@@ -53,9 +54,25 @@ struct RegistroTextoView: View {
                     TituloSeccion("¿Qué comiste?")
                     CampoTexto(titulo: "Por ejemplo: 2 panes con palta y un café con leche", texto: $texto, eje: .vertical)
                         .lineLimit(3...8)
-                    Label("Para dictar, toca el micrófono del teclado y habla.", systemImage: "mic")
+                    Button {
+                        dictado.texto = texto
+                        Task { await dictado.alternar() }
+                    } label: {
+                        Label(dictado.escuchando ? "Escuchando… toca para terminar" : "Dictar con la voz",
+                              systemImage: dictado.escuchando ? "waveform" : "mic.fill")
+                            .symbolEffect(.variableColor.iterative, isActive: dictado.escuchando)
+                    }
+                    .buttonStyle(.secundario)
+                    if let e = dictado.error {
+                        Text(e).font(Tipo.pie).foregroundStyle(paleta.aviso)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Text(dictado.enDispositivo
+                         ? "El dictado se procesa en tu iPhone. También puedes usar el micrófono del teclado."
+                         : "El dictado lo procesa Apple (puede usar sus servidores). También puedes usar el micrófono del teclado.")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 FormularioClaveSiFalta()
                 EstadoIAVista(estado: estado, texto: "Gemini está identificando los alimentos…")
@@ -68,6 +85,10 @@ struct RegistroTextoView: View {
             .padding(.vertical, Espacio.m)
         }
         .fondoDePantalla()
+        .onChange(of: dictado.texto) { _, nuevo in
+            if dictado.escuchando { texto = nuevo }
+        }
+        .onDisappear { dictado.detener() }
         .navigationTitle("Escribir o dictar")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -91,6 +112,7 @@ struct RegistroTextoView: View {
     }
 
     private func analizar() {
+        dictado.detener()
         envios += 1
         estado = .analizando
         let pedido = texto

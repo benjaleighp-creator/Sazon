@@ -88,7 +88,8 @@ enum LectorOpenFoodFacts {
             por100g: Nutrientes(kcal: kcal, proteina: prot ?? 0, carbohidratos: carb ?? 0, grasas: gras ?? 0,
                                 fibra: LectorIA.numero(n["fiber_100g"]) ?? 0,
                                 // Open Food Facts da el sodio en gramos; aquí va en miligramos.
-                                sodio: (LectorIA.numero(n["sodium_100g"]) ?? 0) * 1000),
+                                sodio: (LectorIA.numero(n["sodium_100g"]) ?? 0) * 1000,
+                                azucar: LectorIA.numero(n["sugars_100g"]) ?? 0),
             datosIncompletos: prot == nil || carb == nil || gras == nil,
             porcion: porcion
         )

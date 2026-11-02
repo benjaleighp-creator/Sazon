@@ -266,3 +266,38 @@ final class PruebasExportarYCoach: XCTestCase {
         XCTAssertFalse(c.contains("kg"))
     }
 }
+
+final class PruebasAzucarYEtiqueta: XCTestCase {
+    func testAzucarSeSumaYEscala() {
+        let a = Nutrientes(kcal: 100, proteina: 1, carbohidratos: 20, grasas: 0, azucar: 10)
+        let b = Nutrientes(kcal: 50, proteina: 0, carbohidratos: 5, grasas: 0, azucar: 4)
+        XCTAssertEqual((a + b).azucar, 14, accuracy: 0.001)
+        XCTAssertEqual((a * 0.5).azucar, 5, accuracy: 0.001)
+    }
+
+    func testDatosAntiguosSinAzucar() throws {
+        let json = #"{"kcal":100,"proteina":2,"carbohidratos":10,"grasas":5}"#
+        let n = try JSONDecoder().decode(Nutrientes.self, from: Data(json.utf8))
+        XCTAssertEqual(n.azucar, 0)
+        XCTAssertEqual(n.kcal, 100)
+    }
+
+    func testEtiquetaConAzucarFibraYSodio() throws {
+        let texto = #"{"es_etiqueta":true,"nombre":"galletas","porcion_g":30,"kcal_100g":480,"proteina_100g":6,"carbohidratos_100g":68,"grasas_100g":20,"azucares_100g":28,"fibra_100g":2.5,"sodio_mg_100g":350,"confianza":0.9}"#
+        let e = try LectorIA.etiqueta(desde: texto)
+        XCTAssertEqual(e.por100g.azucar, 28, accuracy: 0.001)
+        XCTAssertEqual(e.por100g.fibra, 2.5, accuracy: 0.001)
+        XCTAssertEqual(e.por100g.sodio, 350, accuracy: 0.001)
+    }
+
+    func testEtiquetaSinCamposOpcionales() throws {
+        let texto = #"{"es_etiqueta":true,"nombre":"","porcion_g":0,"kcal_100g":40,"proteina_100g":1,"carbohidratos_100g":9,"grasas_100g":0,"confianza":0.7}"#
+        let e = try LectorIA.etiqueta(desde: texto)
+        XCTAssertEqual(e.por100g.azucar, 0)
+        XCTAssertEqual(e.por100g.sodio, 0)
+    }
+
+    func testCSVIncluyeAzucar() {
+        XCTAssertTrue(Exportar.csvRegistros([]).hasPrefix("fecha,comida,alimento,gramos,kcal,proteina_g,carbohidratos_g,grasas_g,fibra_g,sodio_mg,azucar_g,origen"))
+    }
+}

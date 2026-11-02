@@ -333,6 +333,7 @@ extension LectorIA {
     - "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g": valores POR 100 g (o 100 ml).
       Si la tabla solo da valores por porción, conviértelos a 100 g con el tamaño de la porción.
       Si la energía solo está en kJ, divídela entre 4,184.
+    - "azucares_100g", "fibra_100g" (gramos) y "sodio_mg_100g" (miligramos) por 100 g; usa 0 si no aparecen.
     - "confianza": de 0 a 1, qué tan seguro estás de haber leído bien los números.
     Responde solo con el JSON pedido.
     """
@@ -349,6 +350,9 @@ extension LectorIA {
             "proteina_100g": numero("Proteína por 100 g", 0, 100),
             "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
             "grasas_100g": numero("Grasas por 100 g", 0, 100),
+            "azucares_100g": numero("Azúcares por 100 g (0 si no aparece)", 0, 100),
+            "fibra_100g": numero("Fibra por 100 g (0 si no aparece)", 0, 100),
+            "sodio_mg_100g": numero("Sodio en mg por 100 g (0 si no aparece)", 0, 40000),
             "confianza": numero("Confianza de 0 a 1", 0, 1)
         ]
         return [
@@ -363,6 +367,12 @@ extension LectorIA {
         let datosImagen: [String: Any] = ["mime_type": "image/jpeg", "data": imagenJPEGBase64]
         let partes: [[String: Any]] = [["inline_data": datosImagen], ["text": instruccionesEtiqueta]]
         return try cuerpo(partes: partes, esquema: esquemaEtiqueta, formato: formato)
+    }
+
+    /// Número opcional dentro de un rango; 0 si falta o no tiene sentido.
+    static func opcional(_ valor: Any?, _ rango: ClosedRange<Double>) -> Double {
+        guard let v = numero(valor), rango.contains(v) else { return 0 }
+        return v
     }
 
     /// Lee y valida el JSON de la etiqueta.
@@ -384,7 +394,10 @@ extension LectorIA {
         let porcion = numero(raiz["porcion_g"]).flatMap { Porciones.esValido($0) ? $0 : nil }
         return EtiquetaLeida(
             nombre: nombre.isEmpty ? "" : Formato.primeraMayuscula(nombre),
-            por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g),
+            por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g,
+                                fibra: opcional(raiz["fibra_100g"], 0...100),
+                                sodio: opcional(raiz["sodio_mg_100g"], 0...40000),
+                                azucar: opcional(raiz["azucares_100g"], 0...100)),
             porcionGramos: porcion,
             confianza: min(max(numero(raiz["confianza"]) ?? 0.5, 0), 1)
         )

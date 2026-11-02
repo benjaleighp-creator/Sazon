@@ -34,8 +34,12 @@
 	<string>Sazón lee tus pasos, calorías activas y peso de Apple Salud para ajustar tu meta del día. No sale de tu iPhone.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Sazón guarda en Apple Salud el peso que anotas en la app.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Sazón usa el micrófono solo mientras dictas lo que comiste.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sazón usa tu galería solo para que elijas una foto de tu plato y la IA identifique los alimentos.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Sazón convierte tu voz en texto para registrar lo que comiste. Luego ese texto se envía a la IA solo cuando tocas «Analizar».</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

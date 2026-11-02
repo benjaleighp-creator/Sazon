@@ -281,12 +281,12 @@ enum Exportar {
 
     /// Historial de comidas en CSV (se abre en Excel o Google Sheets).
     static func csvRegistros(_ registros: [Registro]) -> String {
-        var lineas = ["fecha,comida,alimento,gramos,kcal,proteina_g,carbohidratos_g,grasas_g,fibra_g,sodio_mg,origen"]
+        var lineas = ["fecha,comida,alimento,gramos,kcal,proteina_g,carbohidratos_g,grasas_g,fibra_g,sodio_mg,azucar_g,origen"]
         for r in registros.sorted(by: { $0.fecha < $1.fecha }) {
             let t = r.total
             let valores = [iso(r.fecha), r.comida.nombre, campo(r.nombre), Formato.numeroCSV(r.gramos),
                            Formato.numeroCSV(t.kcal), Formato.numeroCSV(t.proteina), Formato.numeroCSV(t.carbohidratos),
-                           Formato.numeroCSV(t.grasas), Formato.numeroCSV(t.fibra), Formato.numeroCSV(t.sodio), r.origen.etiqueta]
+                           Formato.numeroCSV(t.grasas), Formato.numeroCSV(t.fibra), Formato.numeroCSV(t.sodio), Formato.numeroCSV(t.azucar), r.origen.etiqueta]
             lineas.append(valores.joined(separator: ","))
         }
         return lineas.joined(separator: "\n") + "\n"

@@ -261,7 +261,12 @@ struct ProgresoView: View {
                     Spacer()
                     Text("\(Formato.entero(promedio.sodio)) mg").font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.texto)
                 }
-                Text("La fibra y el sodio solo cuentan los alimentos que traen ese dato.")
+                HStack {
+                    Text("Azúcares promedio").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    Spacer()
+                    Text("\(Formato.numero(promedio.azucar)) g").font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.texto)
+                }
+                Text("Fibra, sodio y azúcares solo cuentan los alimentos que traen ese dato (la tabla del INS no informa azúcares).")
                     .font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
             }
         }

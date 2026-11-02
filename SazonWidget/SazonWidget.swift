@@ -141,7 +141,13 @@ struct VistaCalorias: View {
                         macro("Proteína", r.proteina, r.metaProteina, texto, secundario)
                         macro("Carbohidratos", r.carbohidratos, r.metaCarbohidratos, texto, secundario)
                         macro("Grasas", r.grasas, r.metaGrasas, texto, secundario)
-                        if e.esEjemplo { AvisoEjemplo(r: r) }
+                        if e.esEjemplo {
+                            AvisoEjemplo(r: r)
+                        } else if r.racha > 0 {
+                            Label("\(r.racha) \(r.racha == 1 ? "día" : "días") seguidos", systemImage: "flame.fill")
+                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .foregroundStyle(secundario)
+                        }
                     }
                 }
             } else {

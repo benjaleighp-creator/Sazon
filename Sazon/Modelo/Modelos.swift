@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Nutrientes
 
-/// Energía y macronutrientes (más fibra y sodio cuando la fuente los trae).
+/// Energía y macronutrientes (más fibra, sodio y azúcar cuando la fuente los trae).
 /// Según el contexto son "por 100 g" o el total de una porción; el nombre de
 /// la variable lo deja claro. Fibra y sodio valen 0 si la fuente no los informa.
 struct Nutrientes: Codable, Equatable, Hashable {
@@ -21,16 +21,19 @@ struct Nutrientes: Codable, Equatable, Hashable {
     var fibra: Double
     /// Sodio en miligramos.
     var sodio: Double
+    /// Azúcares totales en gramos (la tabla del INS no los trae; sí Open Food Facts y las etiquetas).
+    var azucar: Double
 
     static let cero = Nutrientes(kcal: 0, proteina: 0, carbohidratos: 0, grasas: 0)
 
-    init(kcal: Double, proteina: Double, carbohidratos: Double, grasas: Double, fibra: Double = 0, sodio: Double = 0) {
+    init(kcal: Double, proteina: Double, carbohidratos: Double, grasas: Double, fibra: Double = 0, sodio: Double = 0, azucar: Double = 0) {
         self.kcal = kcal
         self.proteina = proteina
         self.carbohidratos = carbohidratos
         self.grasas = grasas
         self.fibra = fibra
         self.sodio = sodio
+        self.azucar = azucar
     }
 
     init(from decoder: Decoder) throws {
@@ -41,18 +44,19 @@ struct Nutrientes: Codable, Equatable, Hashable {
         grasas = try c.decodeIfPresent(Double.self, forKey: .grasas) ?? 0
         fibra = try c.decodeIfPresent(Double.self, forKey: .fibra) ?? 0
         sodio = try c.decodeIfPresent(Double.self, forKey: .sodio) ?? 0
+        azucar = try c.decodeIfPresent(Double.self, forKey: .azucar) ?? 0
     }
 
     static func + (a: Nutrientes, b: Nutrientes) -> Nutrientes {
         Nutrientes(kcal: a.kcal + b.kcal, proteina: a.proteina + b.proteina,
                    carbohidratos: a.carbohidratos + b.carbohidratos, grasas: a.grasas + b.grasas,
-                   fibra: a.fibra + b.fibra, sodio: a.sodio + b.sodio)
+                   fibra: a.fibra + b.fibra, sodio: a.sodio + b.sodio, azucar: a.azucar + b.azucar)
     }
 
     static func * (a: Nutrientes, factor: Double) -> Nutrientes {
         Nutrientes(kcal: a.kcal * factor, proteina: a.proteina * factor,
                    carbohidratos: a.carbohidratos * factor, grasas: a.grasas * factor,
-                   fibra: a.fibra * factor, sodio: a.sodio * factor)
+                   fibra: a.fibra * factor, sodio: a.sodio * factor, azucar: a.azucar * factor)
     }
 
     /// Energía que dan los macros con los factores generales de Atwater

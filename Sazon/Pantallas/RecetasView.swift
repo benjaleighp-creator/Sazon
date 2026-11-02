@@ -199,12 +199,36 @@ struct EditorAlimentoPropio: View {
     @Environment(\.dismiss) private var cerrar
     @State private var nombreMedida = ""
     @State private var gramosMedida: Double = 0
+    @State private var calculando = false
+    @State private var errorIA: ErrorIA?
+    @State private var estimadoIA = false
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     TextField("Nombre", text: $alimento.nombre)
+                }
+                Section {
+                    Button {
+                        calcularConIA()
+                    } label: {
+                        if calculando {
+                            HStack { ProgressView(); Text("Calculando…") }
+                        } else {
+                            Label("Calcular los valores con IA", systemImage: "sparkles")
+                        }
+                    }
+                    .disabled(calculando || alimento.nombre.trimmingCharacters(in: .whitespaces).count < 2)
+                    if let errorIA {
+                        Text(errorIA.mensaje).font(Tipo.pie).foregroundStyle(.red)
+                    }
+                    if estimadoIA {
+                        Text("≈ Valores estimados por la IA a partir del nombre. Revísalos y corrígelos si tienes la etiqueta.")
+                            .font(Tipo.pie)
+                    }
+                } footer: {
+                    Text("Escribe el nombre con detalle (por ejemplo «causa limeña de pollo, 1 porción») y Gemini estima calorías y macros. Solo se envía ese nombre.")
                 }
                 Section("Por 100 g") {
                     CampoNumero(titulo: "Calorías", valor: $alimento.por100g.kcal, unidad: "kcal", decimales: 0)
@@ -213,6 +237,7 @@ struct EditorAlimentoPropio: View {
                     CampoNumero(titulo: "Grasas", valor: $alimento.por100g.grasas, unidad: "g")
                     CampoNumero(titulo: "Fibra (opcional)", valor: $alimento.por100g.fibra, unidad: "g")
                     CampoNumero(titulo: "Sodio (opcional)", valor: $alimento.por100g.sodio, unidad: "mg", decimales: 0)
+                    CampoNumero(titulo: "Azúcares (opcional)", valor: $alimento.por100g.azucar, unidad: "g")
                 }
                 Section {
                     ForEach(alimento.medidas) { m in
@@ -231,6 +256,7 @@ struct EditorAlimentoPropio: View {
                 }
             }
             .navigationTitle(alimento.nombre.isEmpty ? "Nuevo alimento" : alimento.nombre)
+            .sensoryFeedback(.success, trigger: estimadoIA)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancelar") { cerrar() } }
@@ -242,6 +268,31 @@ struct EditorAlimentoPropio: View {
                     }
                     .disabled(alimento.nombre.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
+            }
+        }
+    }
+
+    private func calcularConIA() {
+        errorIA = nil
+        calculando = true
+        let pedido = alimento.nombre
+        Task {
+            defer { calculando = false }
+            do {
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                let lista = try await proveedor.analizar(texto: pedido)
+                let gramos = lista.reduce(0) { $0 + $1.gramos }
+                guard gramos > 0 else { throw ErrorIA.sinAlimentos }
+                let total = lista.reduce(Nutrientes.cero) { $0 + $1.por100g * ($1.gramos / 100) }
+                alimento.por100g = total * (100 / gramos)
+                if !alimento.medidas.contains(where: { $0.nombre == "porción" }) {
+                    alimento.medidas.append(MedidaCasera(nombre: "porción", gramos: gramos.rounded(), estimada: true))
+                }
+                estimadoIA = true
+            } catch let e as ErrorIA {
+                errorIA = e
+            } catch {
+                errorIA = .desconocido(error.localizedDescription)
             }
         }
     }
@@ -327,9 +378,10 @@ struct ComparadorView: View {
                         fila("Grasas", a.por100g.grasas, b.por100g.grasas, "g", menosEsMejor: nil)
                         fila("Fibra", a.por100g.fibra, b.por100g.fibra, "g", menosEsMejor: false)
                         fila("Sodio", a.por100g.sodio, b.por100g.sodio, "mg", menosEsMejor: true)
+                        fila("Azúcares", a.por100g.azucar, b.por100g.azucar, "g", menosEsMejor: true)
                     }
                     .tarjeta()
-                    Text("Se resalta la mayor proteína y fibra y el menor sodio. Calorías, carbohidratos y grasas dependen de tu objetivo.")
+                    Text("Se resalta la mayor proteína y fibra y el menor sodio y azúcar (la tabla del INS no informa azúcares: ahí verás 0). Calorías, carbohidratos y grasas dependen de tu objetivo.")
                         .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                         .fixedSize(horizontal: false, vertical: true)
                 }
