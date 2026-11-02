@@ -148,7 +148,13 @@ final class PruebasPorciones: XCTestCase {
     func testMedidaCasera() {
         let unidad = MedidaCasera(nombre: "unidad", gramos: 30, estimada: true)
         XCTAssertEqual(Porciones.gramos(cantidad: 2, de: unidad), 60)
-        XCTAssertEqual(Porciones.texto(gramos: 60, unidad: .gramos, medida: unidad, cantidadMedida: 2), "2 unidad (≈ 60 g)")
+        XCTAssertEqual(Porciones.texto(gramos: 60, unidad: .gramos, medida: unidad, cantidadMedida: 2), "2 unidades (≈ 60 g)")
+        XCTAssertEqual(Porciones.texto(gramos: 30, unidad: .gramos, medida: unidad, cantidadMedida: 1), "1 unidad (≈ 30 g)")
+        XCTAssertEqual(Porciones.plural("rebanada"), "rebanadas")
+        XCTAssertEqual(Porciones.plural("porción del envase"), "porciones del envase")
+        XCTAssertEqual(Porciones.plural("unidad mediana"), "unidades medianas")
+        XCTAssertEqual(Porciones.plural("porción (30 g)"), "porciones (30 g)")
+        XCTAssertEqual(Porciones.plural("cucharada"), "cucharadas")
     }
 
     func testTextoSimple() {

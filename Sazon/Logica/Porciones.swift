@@ -30,7 +30,41 @@ enum Porciones {
         }
         guard let medida, let cantidad = cantidadMedida, cantidad > 0 else { return base }
         let aprox = medida.estimada ? "≈ " : ""
-        return "\(Formato.numero(cantidad)) \(medida.nombre) (\(aprox)\(base))"
+        let nombre = cantidad == 1 ? medida.nombre : plural(medida.nombre)
+        return "\(Formato.numero(cantidad)) \(nombre) (\(aprox)\(base))"
+    }
+
+    /// Plural en español de una medida casera: «rebanada» → «rebanadas»,
+    /// «unidad mediana» → «unidades medianas», «porción del envase» →
+    /// «porciones del envase». Cambia las palabras hasta llegar a «de», «del»,
+    /// «con», «por» o a un paréntesis; el resto queda igual.
+    static func plural(_ texto: String) -> String {
+        var palabras = texto.components(separatedBy: " ")
+        let paradas: Set<String> = ["de", "del", "con", "por", "para", "en"]
+        for i in palabras.indices {
+            let p = palabras[i]
+            if p.isEmpty { continue }
+            if paradas.contains(p.lowercased()) || p.hasPrefix("(") || p.first?.isNumber == true { break }
+            palabras[i] = pluralPalabra(p)
+        }
+        return palabras.joined(separator: " ")
+    }
+
+    private static func pluralPalabra(_ p: String) -> String {
+        guard let ultima = p.last?.lowercased().first else { return p }
+        if "aeiouáéó".contains(ultima) { return p + "s" }
+        if ultima == "z" { return String(p.dropLast()) + "ces" }
+        if ultima == "s" || ultima == "x" {
+            // «mes» → «meses», pero «tórax» o «análisis» no cambian.
+            return p.count <= 3 ? p + "es" : p
+        }
+        // «porción» → «porciones»: la tilde de la última sílaba se pierde.
+        let sinTilde: [Character: Character] = ["á": "a", "é": "e", "í": "i", "ó": "o", "ú": "u"]
+        var letras = Array(p)
+        if letras.count >= 2, let reemplazo = sinTilde[letras[letras.count - 2]] {
+            letras[letras.count - 2] = reemplazo
+        }
+        return String(letras) + "es"
     }
 
     /// Gramos válidos para guardar: mayores que 0 y como máximo 5 kg.
