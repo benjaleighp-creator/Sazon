@@ -219,3 +219,104 @@ enum Ayuno {
         return "\(total / 60) h " + String(format: "%02d", total % 60) + " min"
     }
 }
+
+// MARK: - Tendencia, gasto adaptativo, revisión semanal y análisis
+
+extension Cuerpo {
+    /// Peso «de tendencia»: promedio móvil exponencial que suaviza las
+    /// subidas y bajadas de un día (agua, sal, horario). El peso de cada
+    /// medición nueva depende de los días que pasaron desde la anterior.
+    static func tendenciaSuavizada(_ pesos: [RegistroPeso], alfaDiario: Double = 0.1) -> [PuntoSerie] {
+        let orden = ordenados(pesos)
+        guard let primero = orden.first else { return [] }
+        var valor = primero.kg
+        var anterior = primero.fecha
+        var puntos = [PuntoSerie(fecha: primero.fecha, valor: valor)]
+        for p in orden.dropFirst() {
+            let dias = max(p.fecha.timeIntervalSince(anterior) / 86400, 0.25)
+            let alfa = 1 - pow(1 - alfaDiario, dias)
+            valor += alfa * (p.kg - valor)
+            anterior = p.fecha
+            puntos.append(PuntoSerie(fecha: p.fecha, valor: valor))
+        }
+        return puntos
+    }
+}
+
+/// Gasto calórico estimado con tus datos: lo que comes en promedio menos
+/// lo que explica el cambio de tu peso (1 kg ≈ 7700 kcal, aproximación).
+struct GastoEstimado: Equatable {
+    let kcalDia: Double
+    let promedioComido: Double
+    let cambioSemanal: Double
+    let diasConRegistro: Int
+}
+
+enum GastoAdaptativo {
+    /// nil si faltan datos: hacen falta al menos 10 días registrados en los
+    /// últimos 21 y una tendencia de peso.
+    static func estimar(registros: [Registro], pesos: [RegistroPeso], hoy: Date, calendario: Calendar = .current) -> GastoEstimado? {
+        let dias = Series.nutrientesPorDia(registros, hasta: hoy, dias: 21, calendario: calendario)
+        let conDatos = dias.filter { $0.total.kcal > 0 }
+        guard conDatos.count >= 10, let tendencia = Cuerpo.tendenciaSemanal(pesos, hasta: hoy) else { return nil }
+        let promedio = conDatos.reduce(0) { $0 + $1.total.kcal } / Double(conDatos.count)
+        let gasto = promedio - tendencia * AjusteDinamico.kcalPorKg / 7
+        guard gasto.isFinite, (800...6000).contains(gasto) else { return nil }
+        return GastoEstimado(kcalDia: (gasto / 10).rounded() * 10, promedioComido: promedio,
+                             cambioSemanal: tendencia, diasConRegistro: conDatos.count)
+    }
+}
+
+/// Resumen de los últimos 7 días.
+struct ResumenSemanal: Equatable {
+    let diasRegistrados: Int
+    let diasEnMeta: Int
+    let promedio: Nutrientes
+    let cambioPeso: Double?
+}
+
+enum RevisionSemanal {
+    /// Un día está «en meta» si las calorías quedan a ±10 % de la meta.
+    static func calcular(registros: [Registro], pesos: [RegistroPeso], meta: Nutrientes?, hoy: Date,
+                         calendario: Calendar = .current) -> ResumenSemanal {
+        let dias = Series.nutrientesPorDia(registros, hasta: hoy, dias: 7, calendario: calendario)
+        let conDatos = dias.filter { $0.total.kcal > 0 }
+        let enMeta = meta.map { m in
+            conDatos.filter { m.kcal > 0 && abs($0.total.kcal - m.kcal) <= m.kcal * 0.10 }.count
+        } ?? 0
+        let desde = calendario.date(byAdding: .day, value: -7, to: hoy) ?? hoy
+        let semana = Cuerpo.ordenados(pesos).filter { $0.fecha >= desde && $0.fecha <= hoy }
+        var cambio: Double?
+        if let a = semana.first, let b = semana.last, a.id != b.id { cambio = b.kg - a.kg }
+        return ResumenSemanal(diasRegistrados: conDatos.count, diasEnMeta: enMeta,
+                              promedio: Series.promedio(dias), cambioPeso: cambio)
+    }
+}
+
+/// Alimento con su aporte acumulado.
+struct AporteAlimento: Identifiable, Equatable {
+    let nombre: String
+    let veces: Int
+    let total: Nutrientes
+    var id: String { nombre }
+}
+
+enum AnalisisAlimentos {
+    /// Lo que más te aporta en los últimos `dias` días, agrupado por nombre.
+    static func principales(_ registros: [Registro], hasta: Date, dias: Int = 30, limite: Int = 5,
+                            por: (Nutrientes) -> Double, calendario: Calendar = .current) -> [AporteAlimento] {
+        let desde = calendario.date(byAdding: .day, value: -dias, to: calendario.startOfDay(for: hasta)) ?? hasta
+        var grupos: [String: (nombre: String, veces: Int, total: Nutrientes)] = [:]
+        for r in registros where r.fecha >= desde && r.fecha <= hasta.addingTimeInterval(86400) {
+            let clave = Busqueda.normalizar(r.nombre)
+            let previo = grupos[clave]
+            grupos[clave] = (previo?.nombre ?? r.nombre, (previo?.veces ?? 0) + 1, (previo?.total ?? .cero) + r.total)
+        }
+        return grupos.values
+            .map { AporteAlimento(nombre: $0.nombre, veces: $0.veces, total: $0.total) }
+            .filter { por($0.total) > 0 }
+            .sorted { por($0.total) > por($1.total) }
+            .prefix(limite)
+            .map { $0 }
+    }
+}

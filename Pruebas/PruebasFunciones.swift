@@ -449,3 +449,57 @@ extension DatosApp {
         return d
     }
 }
+
+final class PruebasProgresoNuevo: XCTestCase {
+    private let cal = Calendar(identifier: .gregorian)
+    private func dia(_ d: Int) -> Date { cal.date(from: DateComponents(year: 2026, month: 10, day: d, hour: 8))! }
+
+    func testTendenciaSuavizaUnPico() {
+        let pesos = [RegistroPeso(fecha: dia(1), kg: 70), RegistroPeso(fecha: dia(2), kg: 72), RegistroPeso(fecha: dia(3), kg: 70)]
+        let t = Cuerpo.tendenciaSuavizada(pesos)
+        XCTAssertEqual(t.count, 3)
+        XCTAssertEqual(t[0].valor, 70)
+        XCTAssertLessThan(t[1].valor, 70.5, "un pico de 2 kg casi no mueve la tendencia")
+        XCTAssertTrue(Cuerpo.tendenciaSuavizada([]).isEmpty)
+    }
+
+    func testGastoAdaptativo() throws {
+        var registros: [Registro] = []
+        var pesos: [RegistroPeso] = []
+        for d in 1...21 {
+            registros.append(Registro(fecha: dia(d), comida: .almuerzo, nombre: "Comida", gramos: 100,
+                                      por100g: Nutrientes(kcal: 2000, proteina: 100, carbohidratos: 200, grasas: 70), origen: .manual))
+            // Baja 0,5 kg por semana.
+            pesos.append(RegistroPeso(fecha: dia(d), kg: 80 - Double(d - 1) * 0.5 / 7))
+        }
+        let g = try XCTUnwrap(GastoAdaptativo.estimar(registros: registros, pesos: pesos, hoy: dia(21).addingTimeInterval(3600), calendario: cal))
+        // 2000 + 0,5 × 7700 / 7 = 2550
+        XCTAssertEqual(g.kcalDia, 2550, accuracy: 20)
+        XCTAssertNil(GastoAdaptativo.estimar(registros: Array(registros.prefix(5)), pesos: pesos, hoy: dia(21), calendario: cal))
+    }
+
+    func testRevisionSemanal() {
+        let meta = Nutrientes(kcal: 2000, proteina: 120, carbohidratos: 200, grasas: 60)
+        let registros = [1900.0, 2500, 2050].enumerated().map { i, k in
+            Registro(fecha: dia(20 + i), comida: .almuerzo, nombre: "X", gramos: 100,
+                     por100g: Nutrientes(kcal: k, proteina: 0, carbohidratos: 0, grasas: 0), origen: .manual)
+        }
+        let pesos = [RegistroPeso(fecha: dia(19), kg: 70), RegistroPeso(fecha: dia(22), kg: 69.6)]
+        let r = RevisionSemanal.calcular(registros: registros, pesos: pesos, meta: meta, hoy: dia(22).addingTimeInterval(3600), calendario: cal)
+        XCTAssertEqual(r.diasRegistrados, 3)
+        XCTAssertEqual(r.diasEnMeta, 2)
+        XCTAssertEqual(r.cambioPeso ?? 0, -0.4, accuracy: 0.001)
+    }
+
+    func testAnalisisAgrupaPorNombre() {
+        func r(_ n: String, _ k: Double, _ d: Int) -> Registro {
+            Registro(fecha: dia(d), comida: .almuerzo, nombre: n, gramos: 100,
+                     por100g: Nutrientes(kcal: k, proteina: 0, carbohidratos: 0, grasas: 0), origen: .manual)
+        }
+        let lista = [r("Pan francés", 280, 20), r("pan frances", 280, 21), r("Palta", 160, 21), r("Arroz", 100, 1)]
+        let top = AnalisisAlimentos.principales(lista, hasta: dia(22), dias: 7, por: { $0.kcal }, calendario: cal)
+        XCTAssertEqual(top.first?.veces, 2)
+        XCTAssertEqual(top.first?.total.kcal ?? 0, 560, accuracy: 0.01)
+        XCTAssertEqual(top.count, 2, "el arroz es de hace más de 7 días")
+    }
+}

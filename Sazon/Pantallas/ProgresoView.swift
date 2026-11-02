@@ -28,9 +28,15 @@ struct ProgresoView: View {
                     EncabezadoSeccion(titulo: "Peso", icono: "scalemass")
                     if let ajuste = almacen.ajusteSugerido { tarjetaAjuste(ajuste).aparicion(1) }
                     graficoPeso.aparicion(2)
+                    if let gasto = GastoAdaptativo.estimar(registros: almacen.datos.registros, pesos: almacen.datos.pesos, hoy: Date()) {
+                        tarjetaGasto(gasto).aparicion(2)
+                    }
+                    EncabezadoSeccion(titulo: "Tu semana", icono: "calendar.badge.checkmark")
+                    tarjetaSemana.aparicion(3)
                     EncabezadoSeccion(titulo: "Alimentación", icono: "fork.knife")
                     tarjetaRacha.aparicion(3)
                     graficoNutrientes.aparicion(4)
+                    tarjetaAportes.aparicion(4)
                     EncabezadoSeccion(titulo: "Cuerpo", icono: "figure.stand")
                     tarjetaCuerpo.aparicion(5)
                     FotosProgreso().aparicion(6)
@@ -160,22 +166,115 @@ struct ProgresoView: View {
             } else {
                 let minimo = (puntos.map(\.kg).min() ?? 0) - 1
                 let maximo = (puntos.map(\.kg).max() ?? 0) + 1
-                Chart(puntos) { p in
-                    AreaMark(x: .value("Fecha", p.fecha), yStart: .value("Base", minimo), yEnd: .value("Peso", p.kg))
-                        .foregroundStyle(LinearGradient(colors: [paleta.acento.opacity(0.25), paleta.acento.opacity(0.02)],
-                                                        startPoint: .top, endPoint: .bottom))
-                        .interpolationMethod(.monotone)
-                    LineMark(x: .value("Fecha", p.fecha), y: .value("Peso", p.kg))
-                        .foregroundStyle(paleta.acento)
-                        .interpolationMethod(.monotone)
-                        .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
-                    PointMark(x: .value("Fecha", p.fecha), y: .value("Peso", p.kg))
-                        .foregroundStyle(paleta.acento)
-                        .symbolSize(30)
+                let tendencia = Cuerpo.tendenciaSuavizada(almacen.datos.pesos).filter { $0.fecha >= desde }
+                Chart {
+                    ForEach(tendencia) { t in
+                        AreaMark(x: .value("Fecha", t.fecha), yStart: .value("Base", minimo), yEnd: .value("Tendencia", t.valor))
+                            .foregroundStyle(LinearGradient(colors: [paleta.acento.opacity(Opacidad.azulejoFuerte), paleta.acento.opacity(0)],
+                                                            startPoint: .top, endPoint: .bottom))
+                            .interpolationMethod(.monotone)
+                        LineMark(x: .value("Fecha", t.fecha), y: .value("Tendencia", t.valor), series: .value("Serie", "Tendencia"))
+                            .foregroundStyle(paleta.acento)
+                            .interpolationMethod(.monotone)
+                            .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
+                    }
+                    ForEach(puntos) { p in
+                        PointMark(x: .value("Fecha", p.fecha), y: .value("Peso", p.kg))
+                            .foregroundStyle(paleta.textoSecundario)
+                            .symbolSize(24)
+                    }
                 }
                 .chartYScale(domain: minimo...maximo)
                 .frame(height: 200)
-                .accessibilityLabel("Gráfica de peso con \(puntos.count) registros")
+                .accessibilityLabel("Gráfica de peso con \(puntos.count) registros y su tendencia")
+                HStack(spacing: Espacio.m) {
+                    Label("Tendencia", systemImage: "line.diagonal").foregroundStyle(paleta.texto)
+                    Label("Pesajes", systemImage: "circle.fill").foregroundStyle(paleta.textoSecundario)
+                }
+                .font(Tipo.micro)
+                Text("La línea es tu peso «de tendencia»: suaviza los cambios de un día (agua, sal, horario) para que veas el rumbo real.")
+                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tarjeta()
+    }
+
+    private func tarjetaGasto(_ g: GastoEstimado) -> some View {
+        HStack(alignment: .top, spacing: Espacio.m) {
+            AzulejoColor(simbolo: "bolt.heart.fill", color: paleta.calorias, tamano: 48)
+            VStack(alignment: .leading, spacing: Espacio.xxs) {
+                Text("Gasto estimado con tus datos").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                HStack(alignment: .firstTextBaseline, spacing: Espacio.xxs) {
+                    Text("≈ \(Formato.entero(g.kcalDia))").font(Tipo.cifra).foregroundStyle(paleta.texto)
+                    Text("kcal/día").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                }
+                if let meta = almacen.meta {
+                    Text("Tu meta: \(Formato.entero(meta.kcal)) kcal").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                }
+                Text("Comes en promedio \(Formato.entero(g.promedioComido)) kcal (\(g.diasConRegistro) días con registros de los últimos 21) y tu tendencia cambia \(Formato.numero(g.cambioSemanal, decimales: 2)) kg/semana. Es una aproximación (1 kg ≈ 7700 kcal) y solo es útil si registras casi todo lo que comes.")
+                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tarjeta()
+        .accessibilityElement(children: .combine)
+    }
+
+    private var tarjetaSemana: some View {
+        let r = RevisionSemanal.calcular(registros: almacen.datos.registros, pesos: almacen.datos.pesos, meta: almacen.meta, hoy: Date())
+        let columnas = [GridItem(.flexible(), spacing: Espacio.s), GridItem(.flexible(), spacing: Espacio.s)]
+        return LazyVGrid(columns: columnas, spacing: Espacio.s) {
+            dato("calendar", "Días registrados", "\(r.diasRegistrados) de 7", paleta.carbohidratos)
+            dato("target", "Días en tu meta (±10 %)", almacen.meta == nil ? "—" : "\(r.diasEnMeta)", paleta.grasas)
+            dato("flame.fill", "Promedio diario", r.promedio.kcal > 0 ? "\(Formato.entero(r.promedio.kcal)) kcal" : "—", paleta.calorias)
+            dato("scalemass.fill", "Cambio de peso", r.cambioPeso.map { ($0 > 0 ? "+" : "") + Formato.numero($0) + " kg" } ?? "—", paleta.proteina)
+        }
+    }
+
+    private func dato(_ icono: String, _ titulo: String, _ valor: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: Espacio.xs) {
+            AzulejoColor(simbolo: icono, color: color, tamano: 34)
+            Text(valor).font(Tipo.subtitulo.monospacedDigit()).foregroundStyle(paleta.texto)
+                .lineLimit(1).minimumScaleFactor(0.7)
+            Text(titulo).font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .tarjeta(relleno: Espacio.s)
+        .accessibilityElement(children: .combine)
+    }
+
+    @State private var aporteSodio = false
+
+    private var tarjetaAportes: some View {
+        let criterio: (Nutrientes) -> Double = aporteSodio ? { n in n.sodio } : { n in n.kcal }
+        let top = AnalisisAlimentos.principales(almacen.datos.registros, hasta: Date(), por: criterio)
+        let maximo = top.first.map { aporteSodio ? $0.total.sodio : $0.total.kcal } ?? 1
+        return VStack(alignment: .leading, spacing: Espacio.s) {
+            Text("Lo que más te aporta (30 días)").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+            Picker("Ver", selection: $aporteSodio) {
+                Text("Calorías").tag(false)
+                Text("Sodio").tag(true)
+            }
+            .pickerStyle(.segmented)
+            if top.isEmpty {
+                Text(aporteSodio ? "Aún no hay alimentos con dato de sodio." : "Registra comidas para ver qué te aporta más.")
+                    .font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
+            }
+            ForEach(top) { a in
+                let valor = aporteSodio ? a.total.sodio : a.total.kcal
+                VStack(alignment: .leading, spacing: Espacio.xxs) {
+                    HStack {
+                        Text(a.nombre).font(Tipo.nota).foregroundStyle(paleta.texto).lineLimit(1)
+                        Spacer()
+                        Text(aporteSodio ? "\(Formato.entero(valor)) mg" : "\(Formato.entero(valor)) kcal")
+                            .font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.texto)
+                    }
+                    BarraProgreso(valor: maximo > 0 ? valor / maximo : 0, color: aporteSodio ? paleta.proteina : paleta.calorias, alto: 6)
+                    Text("\(a.veces) \(a.veces == 1 ? "vez" : "veces")").font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+                }
+                .accessibilityElement(children: .combine)
             }
         }
         .tarjeta()
