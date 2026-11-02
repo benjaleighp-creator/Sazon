@@ -15,6 +15,7 @@ struct DiarioView: View {
     @State private var solicitud: SolicitudRegistro?
     @State private var editando: Registro?
     @State private var mostrarMeta = false
+    @State private var mostrarCoach = false
     @State private var guardados = 0
 
     var body: some View {
@@ -54,6 +55,13 @@ struct DiarioView: View {
                         .tarjeta()
                         .aparicion(2)
                     }
+
+                    HStack(spacing: Espacio.s) {
+                        TarjetaAgua()
+                        BotonCoach { mostrarCoach = true }
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .aparicion(2)
 
                     ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { indice, comida in
                         TarjetaComida(
@@ -100,6 +108,9 @@ struct DiarioView: View {
             .sheet(item: $editando) { registro in
                 EditarRegistroView(original: registro)
                     .entornoSazon(almacen)
+            }
+            .sheet(isPresented: $mostrarCoach) {
+                CoachView().entornoSazon(almacen)
             }
             .sheet(isPresented: $mostrarMeta) {
                 NavigationStack { MetaView() }
@@ -477,5 +488,83 @@ private struct BotonFlotante: View {
         }
         .accessibilityLabel("Registrar comida")
         .accessibilityHint("Mantén pulsado para elegir foto, texto, escáner o tabla")
+    }
+}
+
+// MARK: - Agua y coach
+
+private struct TarjetaAgua: View {
+    @Environment(Almacen.self) private var almacen
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        let ml = almacen.aguaVisible
+        let meta = almacen.metaAgua
+        VStack(alignment: .leading, spacing: Espacio.s) {
+            HStack {
+                Label("Agua", systemImage: "drop.fill")
+                    .font(Tipo.cuerpoFuerte)
+                    .foregroundStyle(paleta.texto)
+                Spacer()
+            }
+            HStack(alignment: .firstTextBaseline, spacing: Espacio.xxs) {
+                Text(Formato.numero(ml / 1000))
+                    .font(Tipo.cifra)
+                    .foregroundStyle(paleta.texto)
+                    .contentTransition(.numericText())
+                Text("/ \(Formato.numero(meta / 1000)) L").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+            }
+            BarraProgreso(valor: meta > 0 ? ml / meta : 0, color: paleta.proteina)
+            HStack(spacing: Espacio.xs) {
+                Button {
+                    animar(.enfasis) { almacen.quitarAgua() }
+                } label: {
+                    Image(systemName: "minus")
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(paleta.superficieAlta))
+                }
+                .disabled(ml <= 0)
+                .accessibilityLabel("Quitar un vaso")
+                Button {
+                    animar(.enfasis) { almacen.agregarAgua(almacen.datos.vasoMl) }
+                } label: {
+                    Label("\(Formato.entero(almacen.datos.vasoMl)) ml", systemImage: "plus")
+                        .font(Tipo.pie)
+                        .foregroundStyle(paleta.textoSobreAcento)
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(Capsule().fill(paleta.acento))
+                }
+                .accessibilityLabel("Sumar un vaso de \(Formato.entero(almacen.datos.vasoMl)) mililitros")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(paleta.acento)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .tarjeta()
+        .sensoryFeedback(.impact(weight: .light), trigger: ml)
+    }
+}
+
+private struct BotonCoach: View {
+    let accion: () -> Void
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        Button(action: accion) {
+            VStack(alignment: .leading, spacing: Espacio.s) {
+                AzulejoIcono(simbolo: "sparkles", tamano: 40)
+                Spacer(minLength: 0)
+                Text("Coach IA").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                Text("Pregunta qué comer o cómo llegar a tu meta")
+                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .tarjeta()
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: 150)
     }
 }

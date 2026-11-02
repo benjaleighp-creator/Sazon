@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Vista raíz: aplica tema, apariencia, tipografía y ahorro de batería, y
-/// muestra las dos pestañas (Diario y Ajustes).
+/// muestra las pestañas Diario, Plan, Progreso, Ayuno y Ajustes.
 struct RaizView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.colorScheme) private var esquemaSistema
@@ -16,9 +16,18 @@ struct RaizView: View {
             DiarioView()
                 .tabItem { Label("Diario", systemImage: "fork.knife") }
                 .tag(0)
+            PlanView()
+                .tabItem { Label("Plan", systemImage: "calendar") }
+                .tag(1)
+            ProgresoView()
+                .tabItem { Label("Progreso", systemImage: "chart.line.uptrend.xyaxis") }
+                .tag(2)
+            AyunoView()
+                .tabItem { Label("Ayuno", systemImage: "timer") }
+                .tag(3)
             AjustesView()
                 .tabItem { Label("Ajustes", systemImage: "gearshape") }
-                .tag(1)
+                .tag(4)
         }
         .sensoryFeedback(.selection, trigger: pestana)
         .environment(\.paleta, paleta)

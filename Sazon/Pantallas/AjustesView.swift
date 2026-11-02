@@ -41,6 +41,24 @@ struct AjustesView: View {
                         }
                     }
 
+                    GrupoAjustes(titulo: "Seguimiento") {
+                        FilaAjuste(simbolo: "drop", titulo: "Agua", valor: "Meta \(Formato.entero(almacen.metaAgua)) ml · vaso de \(Formato.entero(almacen.datos.vasoMl)) ml") {
+                            PantallaAgua()
+                        }
+                        Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "bell", titulo: "Recordatorios", valor: textoRecordatorios) {
+                            PantallaRecordatorios()
+                        }
+                        Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "heart", titulo: "Apple Salud", valor: almacen.datos.saludActiva ? "Conectado" : "Sin conectar") {
+                            PantallaSalud()
+                        }
+                        Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "square.grid.2x2", titulo: "Widgets", valor: "Calorías, agua y ayuno en tu pantalla de inicio") {
+                            PantallaWidgets()
+                        }
+                    }
+
                     GrupoAjustes(titulo: "Porciones") {
                         Picker("Unidad", selection: $a.datos.unidad) {
                             ForEach(UnidadPorcion.allCases) { Text($0.nombre).tag($0) }
@@ -89,6 +107,10 @@ struct AjustesView: View {
                             PantallaRespaldo()
                         }
                         Divider().overlay(paleta.borde)
+                        FilaAjuste(simbolo: "square.and.arrow.up", titulo: "Exportar a Excel (CSV)", valor: "Comidas y pesos") {
+                            PantallaExportar()
+                        }
+                        Divider().overlay(paleta.borde)
                         FilaAjuste(simbolo: "info.circle", titulo: "Acerca de y fuentes", valor: versionApp) {
                             PantallaAcercaDe(version: versionApp)
                         }
@@ -105,6 +127,12 @@ struct AjustesView: View {
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { hayClave = Llavero.hayClave }
         }
+    }
+
+    private var textoRecordatorios: String {
+        let r = almacen.datos.recordatorios
+        let activos = [r.comidasActivas ? "comidas" : nil, r.aguaActiva ? "agua" : nil, r.pesoActivo ? "peso" : nil, r.ayunoActivo ? "ayuno" : nil].compactMap { $0 }
+        return activos.isEmpty ? "Desactivados" : Formato.primeraMayuscula(activos.joined(separator: ", "))
     }
 
     private var textoMeta: String {

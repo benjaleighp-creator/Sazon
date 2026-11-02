@@ -12,7 +12,8 @@ struct MetaView: View {
     @State private var listo = false
 
     var body: some View {
-        let calculada = CalculoMeta.meta(perfil)
+        let extra = CalculoMeta.extraKcal(almacen.datos, actividadSalud: almacen.actividadSalud)
+        let calculada = CalculoMeta.meta(perfil, extraKcal: extra)
         ScrollView {
             VStack(alignment: .leading, spacing: Espacio.l) {
                 VStack(alignment: .leading, spacing: Espacio.s) {
@@ -23,6 +24,24 @@ struct MetaView: View {
                         }
                     }
                 }
+
+                VStack(alignment: .leading, spacing: Espacio.s) {
+                    TituloSeccion("Tipo de dieta")
+                    FilaFlexible(espacio: Espacio.xs) {
+                        ForEach(TipoDieta.allCases) { d in
+                            Chip(texto: d.nombre, seleccionado: perfil.dieta == d) { perfil.dieta = d }
+                        }
+                    }
+                    Text(perfil.dieta.descripcion)
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if perfil.dieta == .keto {
+                        Text("La dieta keto es muy restrictiva; conviene hacerla con acompañamiento profesional.")
+                            .font(Tipo.pie).foregroundStyle(paleta.aviso)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .sensoryFeedback(.selection, trigger: perfil.dieta)
 
                 VStack(alignment: .leading, spacing: Espacio.s) {
                     TituloSeccion("Tus datos")
@@ -68,7 +87,7 @@ struct MetaView: View {
                 // Fórmula
                 VStack(alignment: .leading, spacing: Espacio.s) {
                     TituloSeccion("Cómo se calcula")
-                    ForEach(Array(CalculoMeta.explicacion(perfil).enumerated()), id: \.offset) { i, paso in
+                    ForEach(Array(CalculoMeta.explicacion(perfil, extraKcal: extra).enumerated()), id: \.offset) { i, paso in
                         HStack(alignment: .top, spacing: Espacio.xs) {
                             Text("\(i + 1).").font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.textoSecundario)
                             Text(paso).font(Tipo.pie).foregroundStyle(paleta.texto)
@@ -81,6 +100,31 @@ struct MetaView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .tarjeta()
+
+                // Ajustes automáticos
+                if almacen.datos.ajusteAutomatico && almacen.datos.ajusteKcal != 0 || almacen.datos.sumarActividad {
+                    VStack(alignment: .leading, spacing: Espacio.s) {
+                        TituloSeccion("Ajustes que se suman")
+                        if almacen.datos.ajusteAutomatico && almacen.datos.ajusteKcal != 0 {
+                            HStack {
+                                FilaValor(titulo: "Ajuste por tu peso", valor: "\(almacen.datos.ajusteKcal > 0 ? "+" : "")\(Formato.entero(almacen.datos.ajusteKcal)) kcal")
+                                Button("Quitar") {
+                                    var d = almacen.datos
+                                    d.ajusteKcal = 0
+                                    d.ajusteAutomatico = false
+                                    almacen.datos = d
+                                }
+                                .font(Tipo.pie)
+                            }
+                        }
+                        if almacen.datos.sumarActividad {
+                            FilaValor(titulo: "Calorías activas de hoy (Apple Salud)", valor: "+\(Formato.entero(almacen.actividadSalud)) kcal")
+                        }
+                        Text("Solo se aplican a la meta calculada, no a la escrita a mano.")
+                            .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    }
+                    .tarjeta()
+                }
 
                 // Manual
                 VStack(alignment: .leading, spacing: Espacio.s) {
@@ -139,7 +183,7 @@ struct MetaView: View {
                 manual = m
                 usarManual = true
             } else {
-                manual = CalculoMeta.meta(perfil)
+                manual = CalculoMeta.meta(perfil, extraKcal: CalculoMeta.extraKcal(almacen.datos, actividadSalud: almacen.actividadSalud))
             }
         }
     }
