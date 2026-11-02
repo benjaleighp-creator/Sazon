@@ -42,7 +42,7 @@ struct RegistroTextoView: View {
     @Environment(\.paleta) private var paleta
     @State private var texto = ""
     @State private var estado: EstadoIA = .inactivo
-    @State private var identificados: [AlimentoIdentificado] = []
+    @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
     @State private var envios = 0
     @State private var dictado = Dictado()
@@ -103,7 +103,7 @@ struct RegistroTextoView: View {
             .padding(.bottom, Espacio.xs)
         }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: identificados, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
@@ -119,7 +119,7 @@ struct RegistroTextoView: View {
         Task {
             do {
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos)
-                identificados = try await proveedor.analizar(texto: pedido)
+                analisis = try await proveedor.analizar(texto: pedido)
                 estado = .inactivo
                 revisar = true
             } catch let e as ErrorIA {
@@ -146,7 +146,7 @@ struct RegistroFotoView: View {
     @State private var seleccion: PhotosPickerItem?
     @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
-    @State private var identificados: [AlimentoIdentificado] = []
+    @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
     @State private var envios = 0
     @State private var errorFoto: String?
@@ -218,7 +218,7 @@ struct RegistroFotoView: View {
             }
         }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: identificados, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
@@ -249,7 +249,7 @@ struct RegistroFotoView: View {
         Task {
             do {
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos)
-                identificados = try await proveedor.analizar(fotoJPEG: jpeg)
+                analisis = try await proveedor.analizar(fotoJPEG: jpeg)
                 estado = .inactivo
                 revisar = true
             } catch let e as ErrorIA {

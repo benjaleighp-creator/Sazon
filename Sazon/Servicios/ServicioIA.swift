@@ -5,10 +5,10 @@ import Foundation
 // escribir otra implementación y devolverla en `ServicioIA.proveedorActual`.
 
 /// Lo que la app necesita de cualquier IA: convertir un texto o una foto
-/// en una lista de alimentos con porciones.
+/// en una lista de alimentos con porciones (y posibles ingredientes ocultos).
 protocol ProveedorIA {
-    func analizar(texto: String) async throws -> [AlimentoIdentificado]
-    func analizar(fotoJPEG: Data) async throws -> [AlimentoIdentificado]
+    func analizar(texto: String) async throws -> AnalisisIA
+    func analizar(fotoJPEG: Data) async throws -> AnalisisIA
     /// Lee la tabla nutricional de un envase (para productos que no están
     /// en Open Food Facts).
     func leerEtiqueta(fotoJPEG: Data) async throws -> EtiquetaLeida
@@ -41,12 +41,12 @@ struct ProveedorGemini: ProveedorIA {
 
     static let base = "https://generativelanguage.googleapis.com/v1beta/models/"
 
-    func analizar(texto: String) async throws -> [AlimentoIdentificado] {
+    func analizar(texto: String) async throws -> AnalisisIA {
         let cuerpo = try LectorIA.cuerpoPeticion(texto: texto, imagenJPEGBase64: nil, formato: formato)
         return try await enviar(cuerpo)
     }
 
-    func analizar(fotoJPEG: Data) async throws -> [AlimentoIdentificado] {
+    func analizar(fotoJPEG: Data) async throws -> AnalisisIA {
         let cuerpo = try LectorIA.cuerpoPeticion(texto: nil, imagenJPEGBase64: fotoJPEG.base64EncodedString(), formato: formato)
         return try await enviar(cuerpo)
     }
@@ -62,8 +62,8 @@ struct ProveedorGemini: ProveedorIA {
         return texto.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private func enviar(_ cuerpo: Data) async throws -> [AlimentoIdentificado] {
-        try LectorIA.alimentos(desde: try await pedirTexto(cuerpo))
+    private func enviar(_ cuerpo: Data) async throws -> AnalisisIA {
+        try LectorIA.analisis(desde: try await pedirTexto(cuerpo))
     }
 
     /// Hace la única llamada a Gemini y devuelve el texto de la respuesta.

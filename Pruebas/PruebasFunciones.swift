@@ -301,3 +301,58 @@ final class PruebasAzucarYEtiqueta: XCTestCase {
         XCTAssertTrue(Exportar.csvRegistros([]).hasPrefix("fecha,comida,alimento,gramos,kcal,proteina_g,carbohidratos_g,grasas_g,fibra_g,sodio_mg,azucar_g,origen"))
     }
 }
+
+final class PruebasRangosYOcultos: XCTestCase {
+    private let json = #"""
+    {"alimentos":[{"nombre":"Lomo saltado","gramos":400,"confianza":0.7,"medida":"","cantidad":0,"gramos_por_medida":0,
+    "kcal_100g":150,"proteina_100g":10,"carbohidratos_100g":12,"grasas_100g":7,"gramos_min":300,"gramos_max":550}],
+    "posibles_ocultos":["aceite","Aceite","sillao","ají"]}
+    """#
+
+    func testRangoYOcultos() throws {
+        let a = try LectorIA.analisis(desde: json)
+        XCTAssertEqual(a.alimentos.first?.gramosMin, 300)
+        XCTAssertEqual(a.alimentos.first?.gramosMax, 550)
+        XCTAssertEqual(a.posiblesOcultos, ["aceite", "sillao", "ají"])
+        let rel = ExtraOculto.relacionar(a.posiblesOcultos)
+        XCTAssertEqual(rel.extras.map(\.id), ["aceite", "soya"])
+        XCTAssertEqual(rel.otros, ["ají"])
+    }
+
+    func testRangoIncoherenteSeIgnora() throws {
+        let malo = json.replacingOccurrences(of: "\"gramos_min\":300", with: "\"gramos_min\":450")
+        let a = try LectorIA.analisis(desde: malo)
+        XCTAssertNil(a.alimentos.first?.gramosMin)
+    }
+
+    func testRespuestaAntiguaSinCamposNuevos() throws {
+        let viejo = #"{"alimentos":[{"nombre":"Pan francés","gramos":30,"confianza":0.9,"medida":"unidad","cantidad":1,"gramos_por_medida":30,"kcal_100g":290,"proteina_100g":8,"carbohidratos_100g":58,"grasas_100g":2}]}"#
+        let a = try LectorIA.analisis(desde: viejo)
+        XCTAssertEqual(a.alimentos.count, 1)
+        XCTAssertTrue(a.posiblesOcultos.isEmpty)
+        XCTAssertNil(a.alimentos[0].gramosMax)
+    }
+
+    func testRangoDeCalorias() throws {
+        let a = try LectorIA.analisis(desde: json)
+        let item = ItemRevision(identificado: a.alimentos[0], coincidencia: nil)
+        let r = try XCTUnwrap(item.rangoKcal)
+        XCTAssertEqual(r.lowerBound, 450, accuracy: 0.01)
+        XCTAssertEqual(r.upperBound, 825, accuracy: 0.01)
+        let aceite = AlimentoBase(codigo: "D4", nombre: "Aceite vegetal de girasol", grupo: "D", por100g: Nutrientes(kcal: 884, proteina: 0, carbohidratos: 0, grasas: 100))
+        let extra = ItemRevision(extra: ExtraOculto.todos[0], alimento: aceite)
+        XCTAssertEqual(extra.gramos, 14)
+        XCTAssertEqual(extra.origen, .ins)
+        let total = try XCTUnwrap(ItemRevision.rangoTotal([item, extra]))
+        XCTAssertEqual(total.lowerBound, 450 + 884 * 0.14, accuracy: 0.01)
+    }
+
+    func testExtrasExistenEnLaTablaDelINS() throws {
+        let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Sazon/Datos/alimentos-ins.json")
+        let datos = try Data(contentsOf: url)
+        let raiz = try XCTUnwrap(JSONSerialization.jsonObject(with: datos) as? [String: Any])
+        let codigos = Set(((raiz["alimentos"] as? [[String: Any]]) ?? []).compactMap { $0["codigo"] as? String })
+        for e in ExtraOculto.todos { XCTAssertTrue(codigos.contains(e.codigoINS), "Falta \(e.codigoINS)") }
+    }
+}

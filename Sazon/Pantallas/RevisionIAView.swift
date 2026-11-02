@@ -4,6 +4,7 @@ import SwiftUI
 /// fuente de los valores antes de guardar. Nada se guarda sin tu confirmación.
 struct RevisionIAView: View {
     let identificados: [AlimentoIdentificado]
+    var posiblesOcultos: [String] = []
     @Binding var comida: TipoComida
     let alGuardar: ([Registro]) -> Void
 
@@ -12,6 +13,7 @@ struct RevisionIAView: View {
     @State private var items: [ItemRevision] = []
     @State private var listo = false
     @State private var buscandoPara: UUID?
+    @State private var agregados = 0
 
     var body: some View {
         let total = items.reduce(Nutrientes.cero) { $0 + $1.total }
@@ -44,6 +46,13 @@ struct RevisionIAView: View {
                         datoHero("C", total.carbohidratos)
                         datoHero("G", total.grasas)
                     }
+                    if let rango = ItemRevision.rangoTotal(items) {
+                        Label("Rango probable: \(Formato.entero(rango.lowerBound))–\(Formato.entero(rango.upperBound)) kcal",
+                              systemImage: "arrow.left.and.right")
+                            .font(Tipo.pie)
+                            .foregroundStyle(paleta.textoHero)
+                            .accessibilityLabel("Rango probable entre \(Formato.entero(rango.lowerBound)) y \(Formato.entero(rango.upperBound)) kilocalorías")
+                    }
                     Text(delINS == items.count && !items.isEmpty
                          ? "Todos los valores salen de la tabla del INS."
                          : "\(delINS) con valores del INS · \(items.count - delINS) estimados por la IA (≈)")
@@ -73,6 +82,13 @@ struct RevisionIAView: View {
                     EstadoVacio(icono: "tray", titulo: "No queda nada para guardar",
                                 texto: "Quitaste todos los alimentos. Vuelve atrás para intentarlo de nuevo.")
                 }
+
+                TarjetaOcultos(sugeridos: posiblesOcultos) { extra in
+                    guard let alimento = almacen.tabla.alimentos.first(where: { $0.codigo == extra.codigoINS }) else { return }
+                    animar(.estandar) { items.append(ItemRevision(extra: extra, alimento: alimento)) }
+                    agregados += 1
+                }
+                .sensoryFeedback(.impact(weight: .light), trigger: agregados)
 
                 SelectorComidaGrande(comida: $comida)
             }
@@ -238,5 +254,59 @@ private struct TarjetaItem: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(m.nombre) \(Formato.entero(valor)) gramos")
+    }
+}
+
+/// Pregunta por lo que no se ve en la foto: aceite, mayonesa, azúcar…
+private struct TarjetaOcultos: View {
+    let sugeridos: [String]
+    let alAgregar: (ExtraOculto) -> Void
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        let relacion = ExtraOculto.relacionar(sugeridos)
+        let resto = ExtraOculto.todos.filter { !relacion.extras.contains($0) }
+        VStack(alignment: .leading, spacing: Espacio.s) {
+            HStack(spacing: Espacio.s) {
+                AzulejoIcono(simbolo: "eye.slash", tamano: 38, color: paleta.aviso)
+                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                    Text("¿Llevaba algo que no se ve?").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                    Text("El aceite, las salsas y el azúcar suman muchas calorías y la IA no los ve. Toca para agregar una porción y ajústala arriba.")
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            if !relacion.extras.isEmpty || !relacion.otros.isEmpty {
+                Text("La IA sugiere revisar").font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+                FilaFlexible(espacio: Espacio.xs) {
+                    ForEach(relacion.extras) { e in boton(e, destacado: true) }
+                }
+                if !relacion.otros.isEmpty {
+                    Text("También: " + relacion.otros.joined(separator: ", ") + ". Búscalos en la tabla si los tenía.")
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Text("Otros").font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+            }
+            FilaFlexible(espacio: Espacio.xs) {
+                ForEach(resto) { e in boton(e, destacado: false) }
+            }
+            Text("Valores de la tabla del INS; los gramos por cucharada son aproximados (≈).")
+                .font(Tipo.micro).foregroundStyle(paleta.textoSecundario)
+        }
+        .tarjeta()
+    }
+
+    private func boton(_ e: ExtraOculto, destacado: Bool) -> some View {
+        Button { alAgregar(e) } label: {
+            Label("\(e.nombre) · 1 \(e.medida)", systemImage: "plus")
+                .font(Tipo.pie)
+                .foregroundStyle(destacado ? paleta.textoSobreAcento : paleta.acento)
+                .padding(.horizontal, Espacio.s)
+                .padding(.vertical, Espacio.xs)
+                .background(Capsule().fill(destacado ? paleta.acento : paleta.acentoSuave))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Agregar 1 \(e.medida) de \(e.nombre.lowercased())")
     }
 }

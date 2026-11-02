@@ -280,7 +280,7 @@ struct EditorAlimentoPropio: View {
             defer { calculando = false }
             do {
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos)
-                let lista = try await proveedor.analizar(texto: pedido)
+                let lista = try await proveedor.analizar(texto: pedido).alimentos
                 let gramos = lista.reduce(0) { $0 + $1.gramos }
                 guard gramos > 0 else { throw ErrorIA.sinAlimentos }
                 let total = lista.reduce(Nutrientes.cero) { $0 + $1.por100g * ($1.gramos / 100) }

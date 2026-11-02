@@ -13,11 +13,23 @@ struct AlimentoIdentificado: Equatable, Identifiable {
     var cantidadMedida: Double?
     /// Estimación de la IA por 100 g (se usa solo si no hay coincidencia en el INS).
     var por100g: Nutrientes
+    /// Rango probable de la porción (la foto no muestra el peso real).
+    var gramosMin: Double? = nil
+    var gramosMax: Double? = nil
 
     static func == (a: AlimentoIdentificado, b: AlimentoIdentificado) -> Bool {
+        a.gramosMin == b.gramosMin && a.gramosMax == b.gramosMax &&
         a.nombre == b.nombre && a.gramos == b.gramos && a.confianza == b.confianza &&
         a.medida == b.medida && a.cantidadMedida == b.cantidadMedida && a.por100g == b.por100g
     }
+}
+
+/// Resultado completo de analizar una foto o un texto.
+struct AnalisisIA: Equatable {
+    var alimentos: [AlimentoIdentificado]
+    /// Ingredientes que suelen ir en estos platos y no se ven (aceite,
+    /// mayonesa…), para preguntártelos antes de guardar.
+    var posiblesOcultos: [String]
 }
 
 /// Errores de la IA, con un mensaje claro en español.
@@ -107,6 +119,15 @@ enum LectorIA {
     - "medida", "cantidad" y "gramos_por_medida": si es natural contarlo en una medida casera (unidad, taza, vaso, cucharada, cucharadita, rebanada, plato), la medida en singular, cuántas y cuántos gramos pesa una. Si no aplica, usa medida vacía y cantidad 0.
     - "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g": tu estimación por 100 g.
 
+    - "gramos_min" y "gramos_max": el rango probable de la porción. Una foto no muestra el peso real ni lo que hay dentro \
+    (rellenos, lo que está debajo), así que el rango debe ser realista; "gramos" va dentro del rango.
+    Cómo estimar las porciones: razona paso a paso antes de responder. Compara el tamaño con lo que se ve (un plato llano \
+    mide unos 26 cm, una cuchara unos 15 cm) y, si no se puede saber, asume una porción estándar de un restaurante o una casa en Perú. \
+    No subestimes los platos grandes.
+    Además, en "posibles_ocultos" lista en español, en minúsculas y sin repetir, los ingredientes calóricos que este plato \
+    suele llevar y que no se ven o no se mencionan: aceite (frituras, salteados, arroz), mantequilla, mayonesa, azúcar, \
+    queso, crema, salsa de soya u otra salsa. Solo los probables para estos platos; si no aplica, lista vacía. \
+    No los agregues a "alimentos".
     Reglas: no inventes alimentos que no se ven o no se mencionan. Si el texto da cantidades («2 panes»), respétalas. \
     Si no hay comida, devuelve la lista vacía. Responde solo con el JSON pedido.
     """
@@ -129,17 +150,25 @@ enum LectorIA {
                 "kcal_100g": numero("kcal por 100 g", 0, 900),
                 "proteina_100g": numero("Proteína por 100 g", 0, 100),
                 "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
-                "grasas_100g": numero("Grasas por 100 g", 0, 100)
+                "grasas_100g": numero("Grasas por 100 g", 0, 100),
+                "gramos_min": numero("Mínimo probable de la porción en gramos", 0, 5000),
+                "gramos_max": numero("Máximo probable de la porción en gramos", 0, 5000)
             ] as [String: Any],
             "required": ["nombre", "gramos", "confianza", "medida", "cantidad", "gramos_por_medida",
-                         "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g"]
+                         "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g", "gramos_min", "gramos_max"]
+        ]
+        let ocultos: [String: Any] = [
+            "type": "array",
+            "description": "Ingredientes calóricos probables que no se ven (aceite, mayonesa…)",
+            "items": ["type": "string"] as [String: Any]
         ]
         return [
             "type": "object",
             "properties": [
-                "alimentos": ["type": "array", "items": alimento] as [String: Any]
+                "alimentos": ["type": "array", "items": alimento] as [String: Any],
+                "posibles_ocultos": ocultos
             ] as [String: Any],
-            "required": ["alimentos"]
+            "required": ["alimentos", "posibles_ocultos"]
         ]
     }
 
@@ -261,16 +290,44 @@ enum LectorIA {
                 medida = MedidaCasera(nombre: nombreMedida.lowercased(), gramos: porMedida, estimada: true)
                 cantidad = cant
             }
+            // El rango solo se usa si tiene sentido (mínimo ≤ porción ≤ máximo).
+            var minimo: Double?
+            var maximo: Double?
+            if let a = numero(item["gramos_min"]), let b = numero(item["gramos_max"]),
+               a > 0, a <= gramos, b >= gramos, b > a, b <= 5000 {
+                minimo = a
+                maximo = b
+            }
             resultado.append(AlimentoIdentificado(
                 nombre: Formato.primeraMayuscula(nombre),
                 gramos: gramos,
                 confianza: confianza,
                 medida: medida,
                 cantidadMedida: cantidad,
-                por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g)
+                por100g: Nutrientes(kcal: kcal, proteina: p, carbohidratos: c, grasas: g),
+                gramosMin: minimo,
+                gramosMax: maximo
             ))
         }
         return resultado
+    }
+
+    /// Alimentos y posibles ingredientes ocultos. Si la lista de ocultos
+    /// falta o viene mal, se ignora (no impide guardar los alimentos).
+    static func analisis(desde texto: String) throws -> AnalisisIA {
+        let lista = try alimentos(desde: texto)
+        var ocultos: [String] = []
+        if let datos = limpiarBloqueCodigo(texto).data(using: .utf8),
+           let raiz = try? JSONSerialization.jsonObject(with: datos) as? [String: Any],
+           let crudos = raiz["posibles_ocultos"] as? [Any] {
+            for c in crudos {
+                guard let t = (c as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+                      !t.isEmpty, t.count <= 40, !ocultos.contains(t) else { continue }
+                ocultos.append(t)
+                if ocultos.count == 6 { break }
+            }
+        }
+        return AnalisisIA(alimentos: lista, posiblesOcultos: ocultos)
     }
 
     /// Acepta números o textos con números ("60", "60,5").
