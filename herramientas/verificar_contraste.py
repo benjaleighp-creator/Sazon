@@ -26,6 +26,12 @@ def ratio(a, b):
     la, lb = sorted([lum(a), lum(b)], reverse=True)
     return (la + 0.05) / (lb + 0.05)
 
+def mezcla(a, b, t):
+    """Color a con una capa del color b encima, con opacidad t."""
+    A = [int(a[i:i+2], 16) for i in (0, 2, 4)]
+    B = [int(b[i:i+2], 16) for i in (0, 2, 4)]
+    return "".join("%02X" % round(A[k] * (1 - t) + B[k] * t) for k in range(3))
+
 ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "temas.json")
 datos = json.load(open(ruta, encoding="utf-8"))
 campos = datos["campos"]
@@ -55,6 +61,12 @@ for t in datos["temas"]:
         for f in ("heroInicio", "heroFin"):
             pruebas.append((f"textoHero/{f}", ratio(p["textoHero"], p[f]), 4.5))
             pruebas.append((f"textoHeroSecundario/{f}", ratio(p["textoHeroSecundario"], p[f]), 4.5))
+        # Peor caso: el brillo y el estampado decorativos aclaran la esquina
+        # de inicio (Opacidad.brillo + Opacidad.estampado en Tokens.swift).
+        capa = 0.08 + 0.06
+        aclarado = mezcla(p["heroInicio"], p["textoHero"], capa)
+        pruebas.append(("textoHero/heroInicio+decoracion", ratio(p["textoHero"], aclarado), 4.5))
+        pruebas.append(("textoHeroSecundario/heroInicio+decoracion", ratio(p["textoHeroSecundario"], aclarado), 4.5))
         for nombre, r, m in pruebas:
             if r < m:
                 fallos += 1

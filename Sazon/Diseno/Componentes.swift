@@ -109,7 +109,12 @@ private struct FondoPantalla: ViewModifier {
     func body(content: Content) -> some View {
         content
             .scrollContentBackground(.hidden)
-            .background(paleta.fondo.ignoresSafeArea())
+            .background {
+                ZStack {
+                    paleta.fondo.ignoresSafeArea()
+                    ResplandorFondo()
+                }
+            }
     }
 }
 

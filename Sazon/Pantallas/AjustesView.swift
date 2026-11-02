@@ -71,14 +71,16 @@ struct AjustesView: View {
 
                     VStack(alignment: .leading, spacing: Espacio.xs) {
                         TituloSeccion("Apariencia")
-                        HStack(spacing: Espacio.s) {
-                            ForEach(CatalogoTemas.todos) { tema in
-                                TarjetaTema(tema: tema, elegido: almacen.datos.temaID == tema.id) {
-                                    animar(.pantalla) { almacen.datos.temaID = tema.id }
+                        if CatalogoTemas.todos.count > 1 {
+                            HStack(spacing: Espacio.s) {
+                                ForEach(CatalogoTemas.todos) { tema in
+                                    TarjetaTema(tema: tema, elegido: almacen.datos.temaID == tema.id) {
+                                        animar(.pantalla) { almacen.datos.temaID = tema.id }
+                                    }
                                 }
                             }
+                            .sensoryFeedback(.selection, trigger: almacen.datos.temaID)
                         }
-                        .sensoryFeedback(.selection, trigger: almacen.datos.temaID)
                         Picker("Modo", selection: $a.datos.apariencia) {
                             ForEach(Apariencia.allCases) { Text($0.nombre).tag($0) }
                         }

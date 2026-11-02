@@ -21,10 +21,13 @@ private struct ModificadorHero: ViewModifier {
                 ZStack {
                     RoundedRectangle(cornerRadius: Radio.grande, style: .continuous)
                         .fill(paleta.degradadoHero)
+                    // Estampado de ingredientes (decorativo, muy tenue).
+                    EstampadoMercado(color: paleta.textoHero.opacity(Opacidad.estampado))
+                        .clipShape(RoundedRectangle(cornerRadius: Radio.grande, style: .continuous))
                     // Brillo suave arriba a la izquierda (decorativo).
                     RoundedRectangle(cornerRadius: Radio.grande, style: .continuous)
                         .fill(
-                            RadialGradient(colors: [paleta.textoHero.opacity(0.16), .clear],
+                            RadialGradient(colors: [paleta.textoHero.opacity(Opacidad.brillo), .clear],
                                            center: .topLeading, startRadius: 0, endRadius: 260)
                         )
                 }

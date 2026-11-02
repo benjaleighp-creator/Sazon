@@ -85,3 +85,33 @@ enum Medida {
     /// Lado máximo (px) de las fotos que se envían a la IA.
     static let ladoFotoIA: CGFloat = 1024
 }
+
+/// Opacidades de capas decorativas y pistas (siempre con estos nombres).
+enum Opacidad {
+    /// Estampado de ingredientes sobre el encabezado.
+    static let estampado: Double = 0.06
+    /// Brillo radial de la esquina del encabezado. Si cambias estampado o
+    /// brillo, actualiza `capa` en herramientas/verificar_contraste.py.
+    static let brillo: Double = 0.08
+    /// Resplandor cálido arriba de cada pantalla.
+    static let resplandor: Double = 0.55
+    /// Pista de anillos y barras sobre el degradado.
+    static let pistaHero: Double = 0.22
+    /// Fondo de chips y cápsulas sobre el degradado.
+    static let capsulaHero: Double = 0.16
+    /// Relleno suave de los azulejos de color.
+    static let azulejoFuerte: Double = 0.22
+    static let azulejoSuave: Double = 0.10
+}
+
+/// Tamaños de las piezas del rediseño (se escalan con @ScaledMetric donde aplica).
+extension Medida {
+    /// Anillo pequeño de cada comida.
+    static let anilloComida: CGFloat = 44
+    /// Alto del resplandor del fondo.
+    static let resplandor: CGFloat = 340
+    /// Tamaño de cada ícono del estampado.
+    static let iconoEstampado: CGFloat = 22
+    /// Separación entre íconos del estampado.
+    static let pasoEstampado: CGFloat = 46
+}

@@ -72,7 +72,7 @@ struct ResumenWidget: Codable, Equatable {
         fecha: Date(), kcal: 1350, metaKcal: 2200, proteina: 72, metaProteina: 120, carbohidratos: 160,
         metaCarbohidratos: 260, grasas: 40, metaGrasas: 65, aguaMl: 1250, metaAguaMl: 2500, racha: 5,
         ayunoInicio: nil, ayunoHoras: nil,
-        colorInicio: "A63E17", colorFin: "6E2410", colorTexto: "FFF7EC", colorSecundario: "FBE6D7")
+        colorInicio: "923512", colorFin: "5E1D0C", colorTexto: "FFF7EC", colorSecundario: "FBE6D7")
 
     static func leer() -> ResumenWidget? {
         guard let carpeta = ContenedorCompartido.carpetaGrupo,

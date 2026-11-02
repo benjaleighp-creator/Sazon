@@ -25,6 +25,17 @@ struct DiarioView: View {
             ScrollView {
                 VStack(spacing: Espacio.l) {
                     Saludo()
+
+                    // 1. Lo más importante: cuánto te queda hoy.
+                    if let meta = almacen.meta {
+                        HeroResumen(resumen: resumen, meta: meta,
+                                    racha: Series.racha(almacen.datos.registros, hoy: Date()))
+                            .aparicion(0)
+                    } else {
+                        heroSinMeta.aparicion(0)
+                    }
+
+                    // 2. La semana, compacta.
                     VStack(spacing: Espacio.s) {
                         CabeceraSemana()
                         TiraSemana(dias: semana, seleccionado: almacen.diaVisible) { dia in
@@ -32,52 +43,47 @@ struct DiarioView: View {
                         }
                     }
                     .tarjeta(relleno: Espacio.s)
-                    .aparicion(0)
+                    .aparicion(1)
 
-                    if let meta = almacen.meta {
-                        HeroResumen(resumen: resumen, meta: meta)
-                            .aparicion(1)
-                    } else {
-                        heroSinMeta.aparicion(1)
-                    }
-
-                    if resumen.total.kcal > 0 {
-                        VStack(alignment: .leading, spacing: Espacio.s) {
-                            HStack {
-                                Text("Reparto de energía").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                                Spacer()
-                                Text(Formato.kcal(resumen.total.kcal, estimado: resumen.incluyeEstimados))
-                                    .font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.textoSecundario)
-                            }
-                            BarraApilada(nutrientes: resumen.total)
-                            LeyendaMacros(nutrientes: resumen.total)
+                    // 3. Las comidas.
+                    VStack(spacing: Espacio.s) {
+                        EncabezadoSeccion(titulo: "Tus comidas", icono: "fork.knife",
+                                          detalle: resumen.total.kcal > 0 ? Formato.kcal(resumen.total.kcal, estimado: resumen.incluyeEstimados) : nil)
+                        ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { indice, comida in
+                            TarjetaComida(
+                                comida: comida,
+                                registros: resumen.registros(comida),
+                                total: resumen.totales(comida),
+                                metaComida: almacen.meta.map { $0.kcal * comida.parteSugerida },
+                                alAgregar: { solicitud = SolicitudRegistro(comida: comida) },
+                                alTocar: { editando = $0 }
+                            )
+                            .aparicion(indice + 2)
                         }
-                        .tarjeta()
-                        .aparicion(2)
                     }
 
-                    HStack(spacing: Espacio.s) {
-                        TarjetaAgua()
-                        BotonCoach { mostrarCoach = true }
+                    // 4. Complementos del día.
+                    VStack(spacing: Espacio.s) {
+                        EncabezadoSeccion(titulo: "Tu día", icono: "sun.max")
+                        HStack(spacing: Espacio.s) {
+                            TarjetaAgua()
+                            BotonCoach { mostrarCoach = true }
+                        }
+                        .fixedSize(horizontal: false, vertical: true)
+                        if resumen.total.kcal > 0 {
+                            VStack(alignment: .leading, spacing: Espacio.s) {
+                                Text("Reparto de energía").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                                BarraApilada(nutrientes: resumen.total)
+                                LeyendaMacros(nutrientes: resumen.total)
+                            }
+                            .tarjeta()
+                        }
                     }
-                    .fixedSize(horizontal: false, vertical: true)
-                    .aparicion(2)
-
-                    ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { indice, comida in
-                        TarjetaComida(
-                            comida: comida,
-                            registros: resumen.registros(comida),
-                            total: resumen.totales(comida),
-                            metaComida: almacen.meta.map { $0.kcal * comida.parteSugerida },
-                            alAgregar: { solicitud = SolicitudRegistro(comida: comida) },
-                            alTocar: { editando = $0 }
-                        )
-                        .aparicion(indice + 3)
-                    }
+                    .aparicion(6)
 
                     Text(resumen.incluyeEstimados
-                         ? "≈ Las cifras con este signo son estimaciones de la IA. Todas las calorías son estimaciones generales y no reemplazan el consejo de un profesional de salud."
-                         : "Las calorías y los macros son estimaciones generales, no consejo médico.")
+                         ? "≈ = estimado por la IA. Todas las cifras son estimaciones, no consejo médico."
+                         : "Todas las cifras son estimaciones, no consejo médico.")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoSecundario)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -247,24 +253,39 @@ private struct CabeceraSemana: View {
 private struct HeroResumen: View {
     let resumen: ResumenDia
     let meta: Nutrientes
+    let racha: Int
     @Environment(\.paleta) private var paleta
-    @ScaledMetric(relativeTo: .largeTitle) private var diametro: CGFloat = 150
+    @ScaledMetric(relativeTo: .largeTitle) private var diametro: CGFloat = 128
 
     var body: some View {
         let p = Diario.progreso(resumen.total, meta: meta)
+        let kcal = p.kcal
         let est = resumen.incluyeEstimados
-        VStack(spacing: Espacio.l) {
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: Espacio.l) {
-                    anillo(p.kcal, est)
-                    datos(p.kcal, est)
+        VStack(alignment: .leading, spacing: Espacio.m) {
+            HStack(alignment: .center, spacing: Espacio.m) {
+                VStack(alignment: .leading, spacing: Espacio.xxs) {
+                    Label(kcal.excedido ? "Te pasaste" : "Te quedan", systemImage: kcal.excedido ? "exclamationmark.circle" : "flame.fill")
+                        .font(Tipo.nota)
+                        .foregroundStyle(paleta.textoHeroSecundario)
+                    Text((est ? "≈ " : "") + Formato.entero(abs(kcal.restante)))
+                        .font(Tipo.cifraGrande)
+                        .foregroundStyle(paleta.textoHero)
+                        .contentTransition(.numericText(value: kcal.restante))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                    Text("kcal de \(Formato.entero(kcal.meta))")
+                        .font(Tipo.nota)
+                        .foregroundStyle(paleta.textoHeroSecundario)
                 }
-                VStack(spacing: Espacio.m) {
-                    anillo(p.kcal, est)
-                    datos(p.kcal, est)
-                }
+                .accessibilityElement(children: .combine)
+                Spacer(minLength: Espacio.xs)
+                anillo(kcal, est)
             }
-            Rectangle().fill(paleta.textoHero.opacity(0.18)).frame(height: 1).accessibilityHidden(true)
+            HStack(spacing: Espacio.xs) {
+                capsula("fork.knife", "Comiste \(est ? "≈ " : "")\(Formato.entero(kcal.consumido)) kcal")
+                if racha > 0 { capsula("flame", "\(racha) \(racha == 1 ? "día" : "días") seguidos") }
+            }
+            Rectangle().fill(paleta.textoHero.opacity(Opacidad.pistaHero)).frame(height: 1).accessibilityHidden(true)
             HStack(alignment: .top, spacing: Espacio.xs) {
                 MacroHero(macro: .proteina, consumido: resumen.total.proteina, meta: meta.proteina, estimado: est)
                 MacroHero(macro: .carbohidratos, consumido: resumen.total.carbohidratos, meta: meta.carbohidratos, estimado: est)
@@ -274,58 +295,38 @@ private struct HeroResumen: View {
         .hero()
     }
 
+    private func capsula(_ icono: String, _ texto: String) -> some View {
+        Label(texto, systemImage: icono)
+            .font(Tipo.pie.monospacedDigit())
+            .foregroundStyle(paleta.textoHero)
+            .padding(.horizontal, Espacio.s)
+            .padding(.vertical, Espacio.xxs)
+            .background(Capsule().fill(paleta.textoHero.opacity(Opacidad.capsulaHero)))
+            .lineLimit(1)
+    }
+
     private func anillo(_ kcal: Progreso, _ est: Bool) -> some View {
-        let lado = min(diametro, 230)
+        let lado = min(diametro, 200)
         return ZStack {
             AnilloHero(valor: kcal.fraccion, grosor: Medida.grosorAnillo)
-            VStack(spacing: Espacio.xxxs) {
-                Image(systemName: "flame.fill")
-                    .font(Tipo.iconoDato)
+            VStack(spacing: 0) {
+                Text(Formato.entero(kcal.fraccion * 100) + "%")
+                    .font(Tipo.subtitulo.monospacedDigit())
                     .foregroundStyle(paleta.textoHero)
-                Text((est ? "≈ " : "") + Formato.entero(kcal.consumido))
-                    .font(Tipo.cifra)
-                    .foregroundStyle(paleta.textoHero)
-                    .contentTransition(.numericText(value: kcal.consumido))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
-                Text("kcal")
-                    .font(Tipo.pie)
+                Text("de tu meta")
+                    .font(Tipo.micro)
                     .foregroundStyle(paleta.textoHeroSecundario)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
-            .padding(Medida.grosorAnillo + Espacio.xs)
+            .padding(Medida.grosorAnillo + Espacio.xxs)
         }
         .frame(width: lado, height: lado)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Calorías consumidas")
-        .accessibilityValue("\(est ? "aproximadamente " : "")\(Formato.entero(kcal.consumido)) de \(Formato.entero(kcal.meta))")
-    }
-
-    private func datos(_ kcal: Progreso, _ est: Bool) -> some View {
-        VStack(alignment: .leading, spacing: Espacio.s) {
-            fila("target", "Meta", Formato.kcal(kcal.meta))
-            fila("fork.knife", "Consumidas", Formato.kcal(kcal.consumido, estimado: est))
-            fila(kcal.excedido ? "exclamationmark.circle" : "hourglass",
-                 kcal.excedido ? "Sobre la meta" : "Quedan",
-                 Formato.kcal(abs(kcal.restante)))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func fila(_ simbolo: String, _ titulo: String, _ valor: String) -> some View {
-        HStack(spacing: Espacio.s) {
-            Image(systemName: simbolo)
-                .font(Tipo.iconoDato)
-                .foregroundStyle(paleta.textoHero)
-                .frame(width: 32, height: 32)
-                .background(Circle().fill(paleta.textoHero.opacity(0.16)))
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(titulo).font(Tipo.pie).foregroundStyle(paleta.textoHeroSecundario)
-                Text(valor).font(Tipo.cuerpoFuerte.monospacedDigit()).foregroundStyle(paleta.textoHero)
-                    .lineLimit(1).minimumScaleFactor(0.7)
-            }
-        }
-        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Progreso de calorías")
+        .accessibilityValue("\(est ? "aproximadamente " : "")\(Formato.entero(kcal.consumido)) de \(Formato.entero(kcal.meta)), \(Formato.entero(kcal.fraccion * 100)) por ciento")
     }
 }
 
@@ -343,9 +344,10 @@ private struct TarjetaComida: View {
 
     var body: some View {
         let estimado = registros.contains { $0.origen.esEstimado }
+        let color = paleta.color(comida)
         VStack(alignment: .leading, spacing: Espacio.s) {
             HStack(spacing: Espacio.s) {
-                AzulejoIcono(simbolo: comida.simbolo, tamano: 44)
+                AzulejoColor(simbolo: comida.simbolo, color: color, tamano: 48)
                 VStack(alignment: .leading, spacing: Espacio.xxxs) {
                     Text(comida.nombre)
                         .font(Tipo.subtitulo)
@@ -358,6 +360,18 @@ private struct TarjetaComida: View {
                         .foregroundStyle(paleta.textoSecundario)
                 }
                 Spacer(minLength: Espacio.xs)
+                if let meta = metaComida, !registros.isEmpty {
+                    ZStack {
+                        AnilloProgreso(valor: Progreso(consumido: total.kcal, meta: meta).fraccion, grosor: 5, color: color)
+                        Text(Formato.entero(Progreso(consumido: total.kcal, meta: meta).fraccion * 100) + "%")
+                            .font(Tipo.micro.monospacedDigit())
+                            .foregroundStyle(paleta.texto)
+                            .minimumScaleFactor(0.6)
+                    }
+                    .frame(width: Medida.anilloComida, height: Medida.anilloComida)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("\(Formato.entero(Progreso(consumido: total.kcal, meta: meta).fraccion * 100)) por ciento de lo sugerido para \(comida.nombre.lowercased())")
+                }
                 Button(action: alAgregar) {
                     Image(systemName: "plus")
                         .font(Tipo.iconoFila)
@@ -367,10 +381,6 @@ private struct TarjetaComida: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Agregar a \(comida.nombre.lowercased())")
-            }
-
-            if let meta = metaComida, !registros.isEmpty {
-                BarraProgreso(valor: Progreso(consumido: total.kcal, meta: meta).fraccion, color: paleta.calorias, alto: 6)
             }
 
             if registros.isEmpty {
