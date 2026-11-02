@@ -25,10 +25,13 @@ struct ProgresoView: View {
                         .padding(.top, Espacio.s)
 
                     heroPeso.aparicion(0)
+                    EncabezadoSeccion(titulo: "Peso", icono: "scalemass")
                     if let ajuste = almacen.ajusteSugerido { tarjetaAjuste(ajuste).aparicion(1) }
                     graficoPeso.aparicion(2)
+                    EncabezadoSeccion(titulo: "Alimentación", icono: "fork.knife")
                     tarjetaRacha.aparicion(3)
                     graficoNutrientes.aparicion(4)
+                    EncabezadoSeccion(titulo: "Cuerpo", icono: "figure.stand")
                     tarjetaCuerpo.aparicion(5)
                     FotosProgreso().aparicion(6)
 

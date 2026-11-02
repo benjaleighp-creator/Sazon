@@ -30,6 +30,10 @@ struct PlanView: View {
 
                     selectorDia.aparicion(0)
                     hero(plan).aparicion(1)
+                    herramientas.aparicion(2)
+                    if !plan.items.isEmpty {
+                        EncabezadoSeccion(titulo: "Comidas del día", icono: "list.bullet.rectangle")
+                    }
 
                     if !plan.items.isEmpty {
                         ForEach(Array(TipoComida.allCases.enumerated()), id: \.element) { i, comida in
@@ -44,16 +48,6 @@ struct PlanView: View {
                             }
                         }
                         .tarjeta()
-                    }
-
-                    GrupoAjustes(titulo: "Herramientas") {
-                        FilaAjuste(simbolo: "cart", titulo: "Lista de compras", valor: "De los próximos días planeados") { ListaComprasView() }
-                        Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "book", titulo: "Mis recetas", valor: "\(almacen.datos.recetas.count) guardadas") { RecetasView() }
-                        Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "carrot", titulo: "Mis alimentos", valor: "\(almacen.datos.alimentosPropios.count) creados") { AlimentosPropiosView() }
-                        Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "arrow.left.arrow.right", titulo: "Comparar alimentos", valor: "Dos alimentos lado a lado") { ComparadorView() }
                     }
 
                     Text("El plan es una sugerencia automática con datos del INS (platos promediados) y tus recetas; no es una dieta indicada por un profesional.")
@@ -87,6 +81,35 @@ struct PlanView: View {
             }
             .task(id: plan) { pdf = plan.items.isEmpty ? nil : PDFPlan.crear(plan, meta: almacen.meta) }
         }
+    }
+
+    private var herramientas: some View {
+        let columnas = [GridItem(.flexible(), spacing: Espacio.s), GridItem(.flexible(), spacing: Espacio.s)]
+        return LazyVGrid(columns: columnas, spacing: Espacio.s) {
+            acceso("cart.fill", "Lista de compras", "Próximos días", paleta.grasas) { ListaComprasView() }
+            acceso("book.fill", "Mis recetas", "\(almacen.datos.recetas.count) guardadas", paleta.calorias) { RecetasView() }
+            acceso("carrot.fill", "Mis alimentos", "\(almacen.datos.alimentosPropios.count) creados", paleta.carbohidratos) { AlimentosPropiosView() }
+            acceso("arrow.left.arrow.right", "Comparar", "Lado a lado", paleta.proteina) { ComparadorView() }
+        }
+    }
+
+    private func acceso<Destino: View>(_ simbolo: String, _ titulo: String, _ detalle: String, _ color: Color,
+                                       @ViewBuilder destino: @escaping () -> Destino) -> some View {
+        NavigationLink(destination: destino) {
+            HStack(spacing: Espacio.s) {
+                AzulejoColor(simbolo: simbolo, color: color, tamano: 40)
+                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                    Text(titulo).font(Tipo.nota.weight(.semibold)).foregroundStyle(paleta.texto)
+                        .lineLimit(1).minimumScaleFactor(0.8)
+                    Text(detalle).font(Tipo.micro).foregroundStyle(paleta.textoSecundario).lineLimit(1)
+                }
+                Spacer(minLength: 0)
+            }
+            .tarjeta(relleno: Espacio.s)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
     }
 
     private var selectorDia: some View {
@@ -174,7 +197,7 @@ struct PlanView: View {
         let kcal = items.reduce(0) { $0 + $1.total.kcal }
         return VStack(alignment: .leading, spacing: Espacio.s) {
             HStack(spacing: Espacio.s) {
-                AzulejoIcono(simbolo: comida.simbolo, tamano: 36)
+                AzulejoColor(simbolo: comida.simbolo, color: paleta.color(comida), tamano: 40)
                 Text(comida.nombre).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
                 Spacer()
                 Text("\(Formato.entero(kcal)) kcal").font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.textoSecundario)

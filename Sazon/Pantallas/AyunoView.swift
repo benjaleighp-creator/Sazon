@@ -25,14 +25,15 @@ struct AyunoView: View {
                     .aparicion(0)
 
                     VStack(alignment: .leading, spacing: Espacio.s) {
-                        Text("Protocolo").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                        FilaFlexible {
+                        EncabezadoSeccion(titulo: "Protocolo", icono: "clock.badge.checkmark")
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: Espacio.xs)], spacing: Espacio.xs) {
                             ForEach(Ayuno.protocolos, id: \.horas) { p in
-                                Chip(texto: p.nombre, seleccionado: almacen.datos.horasAyuno == p.horas) {
+                                TarjetaProtocolo(nombre: p.nombre, horas: p.horas, elegido: almacen.datos.horasAyuno == p.horas) {
                                     animar(.seleccion) { a.datos.horasAyuno = p.horas }
                                 }
                             }
                         }
+                        .sensoryFeedback(.selection, trigger: almacen.datos.horasAyuno)
                         Stepper(value: $a.datos.horasAyuno, in: 1...72, step: 1) {
                             Text("Personalizado: \(Formato.entero(almacen.datos.horasAyuno)) h de ayuno")
                                 .font(Tipo.nota).foregroundStyle(paleta.texto)
@@ -44,6 +45,8 @@ struct AyunoView: View {
                     .tarjeta()
                     .aparicion(1)
 
+                    EncabezadoSeccion(titulo: "Historial", icono: "calendar")
+                        .aparicion(2)
                     historial.aparicion(2)
 
                     Text("El ayuno no es adecuado para todas las personas (por ejemplo, en el embarazo, con diabetes u otras condiciones). Consulta a un profesional de salud antes de empezar.")
@@ -156,7 +159,6 @@ struct AyunoView: View {
     private var historial: some View {
         let terminados = almacen.datos.ayunos.filter { $0.finReal != nil }.sorted { $0.inicio > $1.inicio }
         return VStack(alignment: .leading, spacing: Espacio.s) {
-            Text("Historial").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
             if terminados.isEmpty {
                 Text("Aquí verás tus ayunos terminados.")
                     .font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
@@ -184,5 +186,46 @@ struct AyunoView: View {
             }
         }
         .tarjeta()
+    }
+}
+
+/// Protocolo de ayuno con una barra que muestra ayuno frente a ventana de comida.
+private struct TarjetaProtocolo: View {
+    let nombre: String
+    let horas: Double
+    let elegido: Bool
+    let accion: () -> Void
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        Button(action: accion) {
+            VStack(alignment: .leading, spacing: Espacio.xs) {
+                Text(nombre)
+                    .font(Tipo.subtitulo.monospacedDigit())
+                    .foregroundStyle(elegido ? paleta.textoSobreAcento : paleta.texto)
+                GeometryReader { g in
+                    HStack(spacing: 2) {
+                        Capsule().fill(elegido ? paleta.textoSobreAcento : paleta.proteina)
+                            .frame(width: max(4, (g.size.width - 2) * horas / 24))
+                        Capsule().fill(elegido ? paleta.textoSobreAcento.opacity(Opacidad.pistaHero) : paleta.carbohidratos)
+                    }
+                }
+                .frame(height: Medida.barra)
+                Text("\(Formato.entero(horas)) h ayuno · \(Formato.entero(24 - horas)) h comida")
+                    .font(Tipo.micro)
+                    .foregroundStyle(elegido ? paleta.textoSobreAcento : paleta.textoSecundario)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(Espacio.s)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: Radio.medio, style: .continuous)
+                .fill(elegido ? paleta.acento : paleta.superficieAlta))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Protocolo \(nombre): \(Formato.entero(horas)) horas de ayuno")
+        .accessibilityAddTraits(elegido ? .isSelected : [])
     }
 }

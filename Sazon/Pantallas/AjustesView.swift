@@ -42,19 +42,19 @@ struct AjustesView: View {
                     }
 
                     GrupoAjustes(titulo: "Seguimiento") {
-                        FilaAjuste(simbolo: "drop", titulo: "Agua", valor: "Meta \(Formato.entero(almacen.metaAgua)) ml · vaso de \(Formato.entero(almacen.datos.vasoMl)) ml") {
+                        FilaAjuste(simbolo: "drop.fill", titulo: "Agua", valor: "Meta \(Formato.entero(almacen.metaAgua)) ml · vaso de \(Formato.entero(almacen.datos.vasoMl)) ml", color: paleta.proteina) {
                             PantallaAgua()
                         }
                         Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "bell", titulo: "Recordatorios", valor: textoRecordatorios) {
+                        FilaAjuste(simbolo: "bell.fill", titulo: "Recordatorios", valor: textoRecordatorios, color: paleta.carbohidratos) {
                             PantallaRecordatorios()
                         }
                         Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "heart", titulo: "Apple Salud", valor: almacen.datos.saludActiva ? "Conectado" : "Sin conectar") {
+                        FilaAjuste(simbolo: "heart.fill", titulo: "Apple Salud", valor: almacen.datos.saludActiva ? "Conectado" : "Sin conectar", color: paleta.peligro) {
                             PantallaSalud()
                         }
                         Divider().overlay(paleta.borde)
-                        FilaAjuste(simbolo: "square.grid.2x2", titulo: "Widgets", valor: "Calorías, agua y ayuno en tu pantalla de inicio") {
+                        FilaAjuste(simbolo: "square.grid.2x2.fill", titulo: "Widgets", valor: "Calorías, agua y ayuno en tu pantalla de inicio", color: paleta.grasas) {
                             PantallaWidgets()
                         }
                     }

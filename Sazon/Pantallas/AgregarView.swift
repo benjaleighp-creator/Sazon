@@ -166,15 +166,15 @@ struct AgregarView: View {
                     .accessibilityElement(children: .combine)
 
                     LazyVGrid(columns: columnas, spacing: Espacio.s) {
-                        azulejo("text.bubble", "Escribir o dictar", "Con IA", ia: true) { abrirIA(.texto) }
-                        azulejo("barcode.viewfinder", "Escanear código", "Open Food Facts", ia: false) { ruta.append(.escanear) }
-                        azulejo("magnifyingglass", "Buscar en la tabla", "INS · sin internet", ia: false) { ruta.append(.buscar) }
-                        azulejo("square.and.pencil", "Agregar a mano", "Datos del envase", ia: false) { ruta.append(.manual) }
+                        azulejo("text.bubble", "Escribir o dictar", "Con IA", ia: true, color: paleta.proteina) { abrirIA(.texto) }
+                        azulejo("barcode.viewfinder", "Escanear código", "Open Food Facts", ia: false, color: paleta.carbohidratos) { ruta.append(.escanear) }
+                        azulejo("magnifyingglass", "Buscar en la tabla", "INS · sin internet", ia: false, color: paleta.grasas) { ruta.append(.buscar) }
+                        azulejo("square.and.pencil", "Agregar a mano", "Datos del envase", ia: false, color: paleta.calorias) { ruta.append(.manual) }
                     }
 
                     if !almacen.datos.recientes.isEmpty {
                         VStack(alignment: .leading, spacing: Espacio.s) {
-                            TituloSeccion("Recientes")
+                            EncabezadoSeccion(titulo: "Recientes", icono: "clock.arrow.circlepath")
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: Espacio.s) {
                                     ForEach(almacen.datos.recientes.prefix(10)) { r in
@@ -261,11 +261,11 @@ struct AgregarView: View {
         alGuardar([registro])
     }
 
-    private func azulejo(_ simbolo: String, _ titulo: String, _ detalle: String, ia: Bool, accion: @escaping () -> Void) -> some View {
+    private func azulejo(_ simbolo: String, _ titulo: String, _ detalle: String, ia: Bool, color: Color, accion: @escaping () -> Void) -> some View {
         Button(action: accion) {
             VStack(alignment: .leading, spacing: Espacio.s) {
                 HStack(alignment: .top) {
-                    AzulejoIcono(simbolo: simbolo, tamano: 44)
+                    AzulejoColor(simbolo: simbolo, color: color, tamano: 48)
                     Spacer(minLength: 0)
                     if ia {
                         Image(systemName: "sparkles")
@@ -345,6 +345,7 @@ struct SelectorComidaGrande: View {
                         VStack(spacing: Espacio.xxs) {
                             Image(systemName: c.simbolo)
                                 .font(Tipo.iconoFila)
+                                .foregroundStyle(elegido ? paleta.textoSobreAcento : paleta.color(c))
                             Text(c.nombre)
                                 .font(Tipo.micro)
                                 .lineLimit(1)
