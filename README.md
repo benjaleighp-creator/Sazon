@@ -4,27 +4,57 @@ App personal para iPhone para registrar comidas con IA, en español (Perú).
 Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 (sin Mac) y se instala con Sideloadly desde Windows.
 
-## Funciones (versión 1)
+## Funciones
 
-1. **Diario del día** por comidas (desayuno, almuerzo, cena y snacks), con
-   calorías, proteínas, carbohidratos y grasas frente a la meta. Flechas
-   para ver y corregir días anteriores.
-2. **Foto del plato**: Gemini identifica alimentos y porciones; tú revisas
-   y corriges antes de guardar.
-3. **Texto o voz**: escribe o dicta («2 panes con palta y un café») con el
-   micrófono del teclado de iOS.
-4. **Código de barras** con Open Food Facts (sin IA).
-5. **Búsqueda en la tabla del INS**, dentro de la app y sin internet.
-6. **Meta** en Ajustes (bajar grasa, mantener o ganar músculo), con la
-   fórmula visible y la opción de escribir la meta a mano.
+**Registrar**
+- Diario por comidas (desayuno, almuerzo, cena y snacks) con calorías, macros,
+  fibra, sodio y azúcares; semana con flechas para días anteriores.
+- Foto del plato, texto o **voz** (reconocimiento de voz de Apple) analizados
+  con Gemini; siempre revisas antes de guardar.
+- Código de barras (Open Food Facts), lectura de etiquetas con IA y
+  productos recordados.
+- Búsqueda en la tabla del INS sin internet, más tus alimentos y recetas.
+- Mis alimentos (a mano o calculados con IA), recetas con ingredientes y
+  peso cocido, comparador de alimentos.
+- Agua con meta automática o manual.
 
-Cada registro muestra su origen: INS, Open Food Facts, «≈ estimado por IA»
-o manual. Todas las cifras son estimaciones editables, no consejo médico.
+**Meta**
+- Mifflin-St Jeor con fórmula visible, tipo de dieta (equilibrada, alta en
+  proteína, baja en carbohidratos, keto, baja en grasa) o meta a mano.
+- Ajuste dinámico según cómo cambia tu peso (lo apruebas tú).
+- Opcional: sumar calorías activas de Apple Salud.
 
-### Posibles funciones futuras (no incluidas)
+**Plan**
+- Plan diario automático con la tabla del INS y tus recetas, edición manual,
+  «Comí» para pasarlo al diario, ajuste automático de porciones, lista de
+  compras y PDF para compartir.
 
-Plan de comidas automático, recetas, lista de compras, ayuno, agua, peso,
-Apple Salud, widgets, comunidad y coach.
+**Progreso**
+- Peso con gráfica y tendencia, IMC, medidas corporales, % de grasa
+  (fórmula de la Marina de EE. UU. o escrito a mano), fotos de progreso
+  (solo en el iPhone), gráficos de nutrientes y racha.
+
+**Ayuno**
+- Temporizador 12:12 a 20:4 o personalizado, historial, racha, aviso al
+  terminar, widget y Actividad en vivo en la pantalla bloqueada.
+
+**Más**
+- Coach con IA (solo envía lo que escribes; el resumen del día es opcional).
+- Recordatorios locales de comidas, agua, peso y ayuno.
+- Widgets de calorías y macros, agua, ayuno y pantalla bloqueada.
+- Exportar comidas y pesos a CSV; respaldo completo.
+
+Cada registro muestra su origen: INS, Open Food Facts, etiqueta del envase,
+«≈ estimado por IA» o manual. Todas las cifras son estimaciones editables,
+no consejo médico.
+
+### Funciones de Fitia que no se incluyen
+
+Necesitan servidores o cuentas de otras personas: equipos y desafíos,
+planes compartidos con familia y enviar comidas a otro usuario. Tampoco
+hay una base de datos de millones de alimentos verificada por
+nutricionistas ni un recetario de miles de recetas: se usan la tabla del
+INS, Open Food Facts y tus propias recetas.
 
 ## Datos nutricionales
 
@@ -70,13 +100,22 @@ Apple Salud, widgets, comunidad y coach.
 
 1. En GitHub, pestaña **Actions**, abre la última ejecución en verde de
    «Compilar IPA».
-2. Descarga el artefacto `Sazon-ipa-version-N` y descomprímelo.
-3. Arrastra `Sazon.ipa` a Sideloadly, elige tu iPhone y tu Apple ID.
-4. Deja activado el botón redondo de flechas azules (renovación automática).
-5. En Advanced Options deja «Use automatic bundle ID».
-6. El número de compilación se ve en Sazón › Ajustes › Acerca de.
+2. Descarga el artefacto `Sazon-ipa-version-N` y descomprímelo. Trae dos
+   archivos:
+   - `Sazon-completa.ipa`: con widgets, Actividad en vivo y Apple Salud.
+   - `Sazon-sencilla.ipa`: sin widgets ni Apple Salud (todo lo demás igual).
+3. Arrastra primero `Sazon-completa.ipa` a Sideloadly, elige tu iPhone y tu
+   Apple ID, y pulsa Start.
+4. Si Sideloadly da error por los permisos o por el límite de apps o de
+   identificadores de la cuenta gratuita, instala `Sazon-sencilla.ipa`.
+5. Deja activada la renovación automática.
+6. En Sazón › Ajustes › Widgets puedes ver qué quedó activo en tu firma.
 
-Usa 1 espacio de app y 1 identificador (`pe.benjamin.sazon`), sin extensiones.
+Por verificar: con una cuenta gratuita, la extensión de widgets puede
+contar dentro del límite de 3 apps y usar un identificador más; y no está
+confirmado que Sideloadly conserve el permiso de Apple Salud. Tus datos se
+guardan en la app, así que instalar una versión encima de la otra no los
+borra (sí se borran si eliminas la app).
 
 ## Estructura
 
@@ -88,6 +127,8 @@ Sazon/Logica       Lógica pura con pruebas: metas, sumas del día, porciones,
 Sazon/Servicios    Gemini, Open Food Facts, Llavero, fotos, tabla del INS, respaldo
 Sazon/Diseno       Sistema de diseño: espaciado, tipografía, movimiento, temas, componentes
 Sazon/Pantallas    Una vista por pantalla
+Compartido         Código que comparten la app y los widgets
+SazonWidget        Widgets y Actividad en vivo del ayuno
 Sazon/Datos        alimentos-ins.json (tabla del INS)
 Pruebas            Pruebas automáticas de la lógica
 herramientas       Temas (temas.json), generador, verificador de contraste, conversor del INS y dibujo del ícono

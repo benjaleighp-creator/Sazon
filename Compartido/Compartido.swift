@@ -7,10 +7,33 @@ import ActivityKit
 // Sin App Group (por ejemplo, si la firma no lo conserva) la app sigue
 // funcionando y los widgets muestran datos de ejemplo.
 
+/// Permisos que quedaron en la firma (perfil embedded.mobileprovision que
+/// agrega Sideloadly). Vacío en el simulador o sin perfil.
+enum PerfilFirma {
+    static let permisos: [String: Any] = {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let datos = try? Data(contentsOf: url),
+              let inicio = datos.range(of: Data("<?xml".utf8)),
+              let fin = datos.range(of: Data("</plist>".utf8), in: inicio.lowerBound..<datos.endIndex) else { return [:] }
+        let plist = datos.subdata(in: inicio.lowerBound..<fin.upperBound)
+        guard let dic = try? PropertyListSerialization.propertyList(from: plist, format: nil) as? [String: Any],
+              let ent = dic["Entitlements"] as? [String: Any] else { return [:] }
+        return ent
+    }()
+
+    static var gruposDeApp: [String] {
+        (permisos["com.apple.security.application-groups"] as? [String]) ?? []
+    }
+}
+
 enum ContenedorCompartido {
-    /// Identificador del App Group (leído del Info.plist, clave "GrupoCompartido").
+    /// Identificador del App Group. Sideloadly puede cambiarlo al firmar
+    /// (por ejemplo, con «automatic bundle ID»), así que primero se usa el
+    /// que quedó en la firma y, si no hay, el del Info.plist.
     static var identificadorGrupo: String {
-        (Bundle.main.object(forInfoDictionaryKey: "GrupoCompartido") as? String) ?? "group.pe.benjamin.sazon"
+        let grupos = PerfilFirma.gruposDeApp
+        if let g = grupos.first(where: { $0.lowercased().contains("sazon") }) ?? grupos.first { return g }
+        return (Bundle.main.object(forInfoDictionaryKey: "GrupoCompartido") as? String) ?? "group.pe.benjamin.sazon"
     }
 
     static var carpetaGrupo: URL? {

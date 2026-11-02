@@ -14,16 +14,7 @@ import ActivityKit
 /// Lee el perfil de aprovisionamiento que agrega Sideloadly al firmar
 /// (embedded.mobileprovision) para saber qué permisos quedaron activos.
 enum Firma {
-    static let permisos: [String: Any] = {
-        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
-              let datos = try? Data(contentsOf: url),
-              let inicio = datos.range(of: Data("<?xml".utf8)),
-              let fin = datos.range(of: Data("</plist>".utf8), in: inicio.lowerBound..<datos.endIndex) else { return [:] }
-        let plist = datos.subdata(in: inicio.lowerBound..<fin.upperBound)
-        guard let dic = try? PropertyListSerialization.propertyList(from: plist, format: nil) as? [String: Any],
-              let ent = dic["Entitlements"] as? [String: Any] else { return [:] }
-        return ent
-    }()
+    static var permisos: [String: Any] { PerfilFirma.permisos }
 
     /// True si la firma incluye HealthKit.
     static var salud: Bool { (permisos["com.apple.developer.healthkit"] as? Bool) == true }
