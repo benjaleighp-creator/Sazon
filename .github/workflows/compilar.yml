@@ -24,7 +24,7 @@ jobs:
     name: Compilar Sazón
     # macos-15 tiene más máquinas disponibles que macos-26. Si la imagen
     # trae Xcode 26, se usa ese (estilo de iOS 26).
-    runs-on: macos-15
+    runs-on: macos-15-intel  # Mac Intel: las de chip Apple (macos-15) se quedaban sin cupo
     timeout-minutes: 45
 
     steps:
@@ -132,7 +132,7 @@ jobs:
     name: Pruebas automáticas
     # Va aparte: si una prueba falla, el .ipa se compila igual, pero la
     # ejecución queda en rojo para revisar qué se rompió.
-    runs-on: macos-15
+    runs-on: macos-15-intel  # Mac Intel: las de chip Apple (macos-15) se quedaban sin cupo
     timeout-minutes: 30
 
     steps:
