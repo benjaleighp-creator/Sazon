@@ -89,7 +89,7 @@ struct ProveedorGemini: ProveedorIA {
                     return try await pedirTexto(cuerpo, modelo: nombre)
                 } catch let error as ErrorIA {
                     switch error {
-                    case .servidor:
+                    case .servidor, .conexionLenta:
                         if primerError == nil { primerError = error }
                         if intento < intentos {
                             try await Task.sleep(nanoseconds: 2_000_000_000)
@@ -127,9 +127,12 @@ struct ProveedorGemini: ProveedorIA {
             resultado = try await sesion.data(for: peticion)
         } catch let error as URLError {
             switch error.code {
-            case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed,
-                 .cannotFindHost, .cannotConnectToHost, .timedOut, .internationalRoamingOff:
+            case .notConnectedToInternet, .dataNotAllowed, .internationalRoamingOff:
+                // El iPhone de verdad no tiene red.
                 throw ErrorIA.sinInternet
+            case .timedOut, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost:
+                // Hay red, pero Gemini tardó o cortó: se reintenta / se prueba otro modelo.
+                throw ErrorIA.conexionLenta
             case .cancelled:
                 throw CancellationError()
             default:

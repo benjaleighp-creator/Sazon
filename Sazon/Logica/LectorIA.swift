@@ -39,6 +39,7 @@ enum ErrorIA: Error, Equatable {
     case sinClave
     case avisoNoAceptado
     case sinInternet
+    case conexionLenta
     case limiteAlcanzado
     case claveInvalida
     case modeloNoDisponible(String)
@@ -56,6 +57,7 @@ enum ErrorIA: Error, Equatable {
         case .sinClave: return "Falta tu clave de Gemini"
         case .avisoNoAceptado: return "Falta aceptar el aviso de privacidad"
         case .sinInternet: return "Sin conexión"
+        case .conexionLenta: return "Gemini tardó demasiado"
         case .limiteAlcanzado: return "Llegaste al límite gratuito"
         case .claveInvalida: return "La clave no funciona"
         case .modeloNoDisponible: return "Modelo no disponible"
@@ -77,6 +79,8 @@ enum ErrorIA: Error, Equatable {
             return "Antes de usar la IA tienes que leer y aceptar el aviso de privacidad."
         case .sinInternet:
             return "La IA necesita internet. Puedes seguir con la búsqueda en la tabla, que funciona sin conexión."
+        case .conexionLenta:
+            return "Tu conexión funciona, pero Gemini no respondió a tiempo (probablemente está saturado). Ya se probaron los modelos de respaldo. Inténtalo de nuevo en un momento."
         case .limiteAlcanzado:
             return "El plan gratuito de Gemini tiene un límite de peticiones por minuto y por día. Espera un momento o sigue con la búsqueda manual o el escáner. El límite diario se reinicia a medianoche hora del Pacífico (2:00 o 3:00 a. m. en Lima)."
         case .claveInvalida:
