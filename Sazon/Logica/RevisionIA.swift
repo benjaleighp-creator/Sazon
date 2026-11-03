@@ -53,7 +53,8 @@ struct ItemRevision: Identifiable, Equatable {
 
     /// Calorías mínima y máxima según el rango de la IA (nil si no hay rango).
     var rangoKcal: ClosedRange<Double>? {
-        guard let a = gramosMin, let b = gramosMax, b > a else { return nil }
+        // Si cambiaste la porción fuera del rango de la IA, el rango ya no aplica.
+        guard let a = gramosMin, let b = gramosMax, b > a, (a...b).contains(gramos) else { return nil }
         return (por100g.kcal * a / 100)...(por100g.kcal * b / 100)
     }
 

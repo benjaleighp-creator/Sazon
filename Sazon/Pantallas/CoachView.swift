@@ -80,7 +80,7 @@ struct CoachView: View {
                 }
                 .padding(.horizontal, Espacio.margen)
                 .padding(.vertical, Espacio.s)
-                .background(paleta.fondo)
+                .background(paleta.fondo.ignoresSafeArea(edges: .bottom))
             }
             .navigationTitle("Coach")
             .navigationBarTitleDisplayMode(.inline)

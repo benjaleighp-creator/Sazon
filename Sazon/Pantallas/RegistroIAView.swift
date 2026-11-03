@@ -101,6 +101,7 @@ struct RegistroTextoView: View {
             .disabled(texto.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || estado == .analizando)
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
+            .barraInferior()
         }
         .navigationDestination(isPresented: $revisar) {
             RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
@@ -207,6 +208,7 @@ struct RegistroFotoView: View {
             .disabled(imagen == nil || estado == .analizando || esDetectando)
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
+            .barraInferior()
         }
         .fullScreenCover(isPresented: $mostrarCamara) {
             Camara { foto in

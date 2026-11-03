@@ -33,6 +33,7 @@ struct AvisoPrivacidadView: View {
                 }
                 .padding(.horizontal, Espacio.margen)
                 .padding(.bottom, Espacio.xs)
+                .barraInferior()
                 .background(paleta.fondo)
             }
             .toolbar {

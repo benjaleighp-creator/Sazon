@@ -530,3 +530,45 @@ final class PruebasComidasExtra: XCTestCase {
         XCTAssertEqual(nuevo.comida, .mediaTarde)
     }
 }
+
+final class PruebasDiagnostico: XCTestCase {
+
+    func testCoachEmpiezaConLaPersonaYAlterna() throws {
+        // Respuesta fallida: dos mensajes tuyos seguidos. Y un recorte que
+        // deja primero al coach.
+        let mensajes = [MensajeCoach(autor: .coach, texto: "Hola"),
+                        MensajeCoach(autor: .usuario, texto: "¿Qué ceno?"),
+                        MensajeCoach(autor: .usuario, texto: "¿Y con más proteína?")]
+        let datos = try LectorIA.cuerpoCoach(mensajes: mensajes, contexto: nil)
+        let raiz = try XCTUnwrap(JSONSerialization.jsonObject(with: datos) as? [String: Any])
+        let contenidos = try XCTUnwrap(raiz["contents"] as? [[String: Any]])
+        XCTAssertEqual(contenidos.map { $0["role"] as? String }, ["user"])
+        let texto = String(decoding: datos, as: UTF8.self)
+        XCTAssertTrue(texto.contains("¿Qué ceno?") && texto.contains("¿Y con más proteína?"))
+        XCTAssertFalse(texto.contains("\"Hola\""))
+    }
+
+    func testPorcentajeRealPasaDeCien() {
+        let p = Progreso(consumido: 3000, meta: 2000)
+        XCTAssertEqual(p.fraccion, 1)
+        XCTAssertEqual(p.porcentaje, 150, accuracy: 0.001)
+        XCTAssertEqual(Progreso(consumido: 500, meta: 0).porcentaje, 0)
+    }
+
+    func testRangoNoAplicaSiCambiasLaPorcion() {
+        let a = AlimentoIdentificado(nombre: "Arroz chaufa", gramos: 300, confianza: 0.8, medida: nil, cantidadMedida: nil,
+                                     por100g: Nutrientes(kcal: 180, proteina: 6, carbohidratos: 25, grasas: 6),
+                                     gramosMin: 250, gramosMax: 400)
+        var item = ItemRevision(identificado: a, coincidencia: nil)
+        XCTAssertNotNil(item.rangoKcal)
+        item.gramos = 600
+        XCTAssertNil(item.rangoKcal)
+    }
+
+    func testOpenFoodFactsDescartaCaloriasImposibles() {
+        let json = #"{"status": 1, "product": {"product_name": "Raro", "nutriments": {"energy-kcal_100g": 4000}}}"#
+        XCTAssertThrowsError(try LectorOpenFoodFacts.producto(desde: Data(json.utf8), codigo: "7750000000000")) { e in
+            XCTAssertEqual(e as? ErrorOpenFoodFacts, .sinDatosNutricionales)
+        }
+    }
+}

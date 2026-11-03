@@ -507,11 +507,24 @@ extension LectorIA {
     static func cuerpoCoach(mensajes: [MensajeCoach], contexto: String?, limite: Int = 12) throws -> Data {
         var sistema = instruccionesCoach
         if let contexto, !contexto.isEmpty { sistema += "\n\n" + contexto }
-        let recientes = mensajes.suffix(limite)
+        // Gemini espera que la conversación empiece con la persona y que los
+        // turnos se alternen. Si una respuesta falló, quedan dos mensajes
+        // tuyos seguidos: se unen en uno. Si el recorte deja primero al
+        // coach, ese mensaje se omite.
+        var turnos: [(rol: String, texto: String)] = []
+        for m in mensajes.suffix(limite) {
+            let rol = m.autor == .usuario ? "user" : "model"
+            if turnos.isEmpty && rol == "model" { continue }
+            if let ultimo = turnos.last, ultimo.rol == rol {
+                turnos[turnos.count - 1].texto += "\n\n" + m.texto
+            } else {
+                turnos.append((rol, m.texto))
+            }
+        }
         var contenidos: [[String: Any]] = []
-        for m in recientes {
-            let parte: [String: Any] = ["text": m.texto]
-            contenidos.append(["role": m.autor == .usuario ? "user" : "model", "parts": [parte]])
+        for t in turnos {
+            let parte: [String: Any] = ["text": t.texto]
+            contenidos.append(["role": t.rol, "parts": [parte]])
         }
         let parteSistema: [String: Any] = ["text": sistema]
         let instrucciones: [String: Any] = ["parts": [parteSistema]]

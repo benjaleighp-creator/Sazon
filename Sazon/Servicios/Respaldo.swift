@@ -38,11 +38,19 @@ extension Almacen {
         return "Sazon-respaldo-\(f.string(from: Date()))"
     }
 
+    /// Solo acepta archivos que parecen un respaldo de Sazón (con «version»
+    /// y «registros»). Cualquier otro JSON se leería como datos vacíos y
+    /// borraría todo al restaurarlo.
     func leerRespaldo(_ contenido: Data) -> DatosApp? {
-        try? DatosApp.decodificador.decode(DatosApp.self, from: contenido)
+        guard let raiz = try? JSONSerialization.jsonObject(with: contenido) as? [String: Any],
+              raiz["version"] != nil, raiz["registros"] is [Any] else { return nil }
+        return try? DatosApp.decodificador.decode(DatosApp.self, from: contenido)
     }
 
     func restaurar(_ respaldo: DatosApp) {
+        // Si los datos anteriores no se podían abrir, restaurar sí los reemplaza.
+        permitirGuardar()
         datos = respaldo
+        avisoCarga = nil
     }
 }

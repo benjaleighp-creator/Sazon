@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 import VisionKit
 
@@ -20,9 +21,12 @@ struct EscanerView: View {
     @State private var ultimoCodigo: String?
     @State private var tarea: Task<Void, Never>?
     @State private var detectados = 0
+    /// Cambia cuando respondes el permiso de la cámara, para volver a revisar.
+    @State private var permisoRevisado = false
 
     private var escanerDisponible: Bool {
-        DataScannerViewController.isSupported && DataScannerViewController.isAvailable
+        _ = permisoRevisado
+        return DataScannerViewController.isSupported && DataScannerViewController.isAvailable
     }
 
     var body: some View {
@@ -91,6 +95,14 @@ struct EscanerView: View {
         .sensoryFeedback(.selection, trigger: detectados)
         .sensoryFeedback(.warning, trigger: resultado?.problema)
         .onDisappear { tarea?.cancel() }
+        .task {
+            // La primera vez se pide el permiso de la cámara; sin esto el
+            // escáner podía figurar como «no disponible» sin preguntar nunca.
+            if AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined {
+                _ = await AVCaptureDevice.requestAccess(for: .video)
+                permisoRevisado.toggle()
+            }
+        }
     }
 
     private func buscar(_ codigo: String, manual: Bool) {
@@ -159,7 +171,7 @@ private struct TarjetaResultado: View {
             }
             .accessibilityElement(children: .combine)
 
-            if resultado.problema == .sinInternet || isServidor {
+            if resultado.problema == .sinInternet || resultado.problema == .lento || isServidor {
                 Button("Intentar de nuevo", action: alReintentar)
                     .buttonStyle(.secundario)
             } else {

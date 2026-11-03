@@ -172,7 +172,7 @@ extension Almacen {
         var d = datos
         d.plan.removeAll { Calendar.current.isDate($0.dia, inSameDayAs: plan.dia) }
         if !plan.items.isEmpty { d.plan.append(plan) }
-        // Se guardan como máximo 60 días de plan.
+        // Se borran los planes de hace más de 30 días (los futuros se quedan).
         let limite = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
         d.plan.removeAll { $0.dia < limite }
         datos = d

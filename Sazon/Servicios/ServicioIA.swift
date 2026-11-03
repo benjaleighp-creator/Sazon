@@ -72,29 +72,43 @@ struct ProveedorGemini: ProveedorIA {
     /// En noviembre de 2026 figuraban como gratuitos en
     /// https://ai.google.dev/gemini-api/docs/pricing — si Google los retira,
     /// simplemente se saltan (404) y se sigue con el siguiente.
+    /// Segundos (aprox.) tras los cuales ya no se prueban más modelos.
+    static let esperaMaxima: TimeInterval = 100
+
     static let modelosRespaldo = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
 
     /// Prueba el modelo elegido y, si Google está saturado, los de respaldo.
     private func pedirTexto(_ cuerpo: Data) async throws -> String {
         let elegido = modelo.trimmingCharacters(in: .whitespacesAndNewlines)
-        var cadena = [elegido]
+        // Si el campo del modelo quedó vacío, se usa el de por defecto.
+        var cadena = [elegido.isEmpty ? DatosApp.modeloPorDefecto : elegido]
         for m in Self.modelosRespaldo where !cadena.contains(m) { cadena.append(m) }
 
+        // Tope de espera total: con Gemini saturado, probar todos los
+        // modelos podía tardar varios minutos.
+        let inicio = Date()
         var primerError: Error?
-        for (indice, nombre) in cadena.enumerated() {
+        recorrido: for (indice, nombre) in cadena.enumerated() {
             let intentos = indice == 0 ? 2 : 1
             for intento in 1...intentos {
                 try Task.checkCancellation()
+                if (indice > 0 || intento > 1), Date().timeIntervalSince(inicio) > Self.esperaMaxima {
+                    break recorrido
+                }
                 do {
                     return try await pedirTexto(cuerpo, modelo: nombre)
                 } catch let error as ErrorIA {
                     switch error {
-                    case .servidor, .conexionLenta:
+                    case .servidor:
                         if primerError == nil { primerError = error }
                         if intento < intentos {
                             try await Task.sleep(nanoseconds: 2_000_000_000)
                         }
                         continue
+                    case .conexionLenta:
+                        // Ya se esperó una vez: no se repite el mismo modelo,
+                        // se pasa directo al siguiente.
+                        if primerError == nil { primerError = error }
                     case .limiteAlcanzado, .modeloNoDisponible, .peticionInvalida:
                         // Propio de este modelo: probar el siguiente. Si es el
                         // elegido y no hay más, se muestra este error.
@@ -117,7 +131,7 @@ struct ProveedorGemini: ProveedorIA {
         }
         var peticion = URLRequest(url: url)
         peticion.httpMethod = "POST"
-        peticion.timeoutInterval = 60
+        peticion.timeoutInterval = 45
         peticion.setValue("application/json", forHTTPHeaderField: "Content-Type")
         peticion.setValue(clave, forHTTPHeaderField: "x-goog-api-key")
         peticion.httpBody = cuerpo

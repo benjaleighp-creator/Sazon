@@ -133,6 +133,9 @@ struct AjustesView: View {
                         }
                     }
 
+                    if let aviso = almacen.avisoCarga {
+                        Aviso(icono: "externaldrive.badge.exclamationmark", titulo: "Problema al abrir tus datos", texto: aviso, color: paleta.peligro)
+                    }
                     if let error = almacen.errorGuardado {
                         Aviso(icono: "externaldrive.badge.exclamationmark", titulo: "Error al guardar", texto: error, color: paleta.peligro)
                     }

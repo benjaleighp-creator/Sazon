@@ -17,6 +17,7 @@ enum ErrorOpenFoodFacts: Error, Equatable {
     case codigoInvalido
     case noEncontrado
     case sinInternet
+    case lento
     case sinDatosNutricionales
     case servidor(Int)
     case respuestaInvalida
@@ -26,6 +27,7 @@ enum ErrorOpenFoodFacts: Error, Equatable {
         case .codigoInvalido: return "El código de barras no es válido. Debe tener solo números (8 a 14 dígitos)."
         case .noEncontrado: return "Este producto no está en Open Food Facts. Puedes buscarlo en la tabla o agregarlo a mano."
         case .sinInternet: return "Para consultar Open Food Facts hace falta internet. La búsqueda en la tabla funciona sin conexión."
+        case .lento: return "Open Food Facts tardó demasiado en responder. Tu conexión funciona; inténtalo de nuevo en un momento."
         case .sinDatosNutricionales: return "El producto está en Open Food Facts, pero sin calorías por 100 g. Agrégalo a mano con los datos del envase."
         case .servidor(let codigo): return "Open Food Facts respondió con el error \(codigo). Inténtalo más tarde."
         case .respuestaInvalida: return "La respuesta de Open Food Facts no se pudo leer."
@@ -61,7 +63,8 @@ enum LectorOpenFoodFacts {
         let n = (p["nutriments"] as? [String: Any]) ?? [:]
         let kcal = LectorIA.numero(n["energy-kcal_100g"])
             ?? LectorIA.numero(n["energy_100g"]).map { $0 / 4.184 }   // kJ → kcal
-        guard let kcal else { throw ErrorOpenFoodFacts.sinDatosNutricionales }
+        // Valores imposibles (más de 900 kcal por 100 g) se tratan como faltantes.
+        guard let kcal, (0...900).contains(kcal) else { throw ErrorOpenFoodFacts.sinDatosNutricionales }
         let prot = LectorIA.numero(n["proteins_100g"])
         let carb = LectorIA.numero(n["carbohydrates_100g"])
         let gras = LectorIA.numero(n["fat_100g"])

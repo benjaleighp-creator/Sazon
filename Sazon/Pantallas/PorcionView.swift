@@ -136,6 +136,7 @@ struct PorcionView: View {
             .disabled(!puedeGuardar(gramos: gramos))
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
+            .barraInferior()
         }
         .onAppear(perform: preparar)
     }
@@ -179,7 +180,8 @@ struct PorcionView: View {
         medida = nueva
         // Se mantiene la misma cantidad en gramos al cambiar de unidad.
         if let nueva {
-            cantidad = max(1, (gramos / nueva.gramos).rounded())
+            // A la media unidad más cercana (150 g en rebanadas de 100 g = 1,5).
+            cantidad = max(0.5, (gramos / nueva.gramos * 2).rounded() / 2)
         } else {
             cantidad = (Porciones.desdeGramos(gramos, a: unidad) * 10).rounded() / 10
         }

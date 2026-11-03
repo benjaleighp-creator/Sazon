@@ -67,6 +67,10 @@ struct PantallaRecordatorios: View {
                     permiso = await Recordatorios.pedirPermiso()
                 }
                 Recordatorios.reprogramar(nueva)
+                // El aviso de fin de ayuno va aparte: se ajusta si cambió.
+                if anterior.ayunoActivo != nueva.ayunoActivo, let s = almacen.ayunoActivo {
+                    Recordatorios.programarFinAyuno(s, activo: nueva.ayunoActivo)
+                }
             }
         }
     }

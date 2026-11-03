@@ -108,7 +108,7 @@ struct RevisionIAView: View {
             .disabled(items.isEmpty || items.contains { !$0.esValido })
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
-            .background(paleta.fondo.opacity(0.92))
+            .barraInferior()
         }
         .sheet(item: Binding(get: { buscandoPara.map { IdentificadorHoja(id: $0) } },
                              set: { buscandoPara = $0?.id })) { hoja in

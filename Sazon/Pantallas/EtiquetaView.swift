@@ -84,6 +84,7 @@ struct EtiquetaView: View {
                 .disabled(imagen == nil || estado == .analizando)
                 .padding(.horizontal, Espacio.margen)
                 .padding(.bottom, Espacio.xs)
+                .barraInferior()
         }
         .fullScreenCover(isPresented: $mostrarCamara) {
             Camara { foto in

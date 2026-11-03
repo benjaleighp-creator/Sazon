@@ -235,7 +235,7 @@ private struct CabeceraSemana: View {
                 Text(Formato.diaRelativo(almacen.diaVisible))
                     .font(Tipo.cuerpoFuerte)
                     .foregroundStyle(paleta.texto)
-                Text("Semana del \(Formato.numeroDia(lunes)) " + mesCorto(lunes))
+                Text("Semana del \(Formato.numeroDia(lunes)) de " + mesCorto(lunes))
                     .font(Tipo.micro)
                     .foregroundStyle(paleta.textoSecundario)
             }
@@ -334,7 +334,7 @@ private struct HeroResumen: View {
         return ZStack {
             AnilloHero(valor: kcal.fraccion, grosor: Medida.grosorAnillo)
             VStack(spacing: 0) {
-                Text(Formato.entero(kcal.fraccion * 100) + "%")
+                Text(Formato.entero(kcal.porcentaje) + "%")
                     .font(Tipo.subtitulo.monospacedDigit())
                     .foregroundStyle(paleta.textoHero)
                     .lineLimit(1)
@@ -350,7 +350,7 @@ private struct HeroResumen: View {
         .frame(width: lado, height: lado)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Progreso de calorías")
-        .accessibilityValue("\(est ? "aproximadamente " : "")\(Formato.entero(kcal.consumido)) de \(Formato.entero(kcal.meta)), \(Formato.entero(kcal.fraccion * 100)) por ciento")
+        .accessibilityValue("\(est ? "aproximadamente " : "")\(Formato.entero(kcal.consumido)) de \(Formato.entero(kcal.meta)), \(Formato.entero(kcal.porcentaje)) por ciento")
     }
 }
 
@@ -391,14 +391,14 @@ private struct TarjetaComida: View {
                 if let meta = metaComida, !registros.isEmpty {
                     ZStack {
                         AnilloProgreso(valor: Progreso(consumido: total.kcal, meta: meta).fraccion, grosor: 5, color: color)
-                        Text(Formato.entero(Progreso(consumido: total.kcal, meta: meta).fraccion * 100) + "%")
+                        Text(Formato.entero(Progreso(consumido: total.kcal, meta: meta).porcentaje) + "%")
                             .font(Tipo.micro.monospacedDigit())
                             .foregroundStyle(paleta.texto)
                             .minimumScaleFactor(0.6)
                     }
                     .frame(width: Medida.anilloComida, height: Medida.anilloComida)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("\(Formato.entero(Progreso(consumido: total.kcal, meta: meta).fraccion * 100)) por ciento de lo sugerido para \(comida.nombre.lowercased())")
+                    .accessibilityLabel("\(Formato.entero(Progreso(consumido: total.kcal, meta: meta).porcentaje)) por ciento de lo sugerido para \(comida.nombre.lowercased())")
                 }
                 if !registros.isEmpty {
                     MenuCopiar(titulo: nil, extra: {
@@ -482,7 +482,9 @@ struct MenuCopiar<Extra: View>: View {
                 if !almacen.esHoy {
                     Button { alElegir(hoy) } label: { Label("Copiar a hoy", systemImage: "arrow.uturn.forward") }
                 }
-                Button { alElegir(manana) } label: { Label("Copiar a mañana", systemImage: "calendar.badge.plus") }
+                if !Calendar.current.isDate(almacen.diaVisible, inSameDayAs: manana) {
+                    Button { alElegir(manana) } label: { Label("Copiar a mañana", systemImage: "calendar.badge.plus") }
+                }
                 Button { fecha = Date(); eligiendo = true } label: { Label("Copiar a otro día…", systemImage: "calendar") }
             }
             extra()

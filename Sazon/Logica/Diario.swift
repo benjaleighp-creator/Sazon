@@ -24,6 +24,12 @@ struct Progreso: Equatable {
         return min(max(consumido / meta, 0), 1)
     }
 
+    /// Porcentaje real frente a la meta (puede pasar de 100).
+    var porcentaje: Double {
+        guard meta > 0, consumido.isFinite else { return 0 }
+        return max(consumido / meta, 0) * 100
+    }
+
     /// Lo que falta (negativo si te pasaste).
     var restante: Double { meta - consumido }
     var excedido: Bool { meta > 0 && consumido > meta }

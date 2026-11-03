@@ -19,8 +19,14 @@ enum ServicioOpenFoodFacts {
         do {
             resultado = try await sesion.data(for: peticion)
         } catch let error as URLError {
-            if error.code == .cancelled { throw CancellationError() }
-            throw ErrorOpenFoodFacts.sinInternet
+            switch error.code {
+            case .cancelled: throw CancellationError()
+            case .notConnectedToInternet, .dataNotAllowed, .internationalRoamingOff:
+                throw ErrorOpenFoodFacts.sinInternet
+            default:
+                // Hay red, pero el servidor tardó o cortó la conexión.
+                throw ErrorOpenFoodFacts.lento
+            }
         }
         let (datos, respuesta) = resultado
         if let http = respuesta as? HTTPURLResponse {

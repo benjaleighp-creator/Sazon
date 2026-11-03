@@ -118,10 +118,26 @@ private struct FondoPantalla: ViewModifier {
     }
 }
 
+private struct BarraInferior: ViewModifier {
+    @Environment(\.paleta) private var paleta
+    func body(content: Content) -> some View {
+        content
+            .padding(.top, Espacio.s)
+            .frame(maxWidth: .infinity)
+            .background(paleta.fondo.opacity(0.96).ignoresSafeArea(edges: .bottom))
+    }
+}
+
 extension View {
     /// Envuelve el contenido en una tarjeta del tema.
     func tarjeta(relleno: CGFloat = Espacio.m) -> some View {
         modifier(ModificadorTarjeta(relleno: relleno))
+    }
+
+    /// Fondo para los botones fijos al pie de la pantalla: así el texto que
+    /// se desplaza por debajo no se ve detrás ni debajo del botón.
+    func barraInferior() -> some View {
+        modifier(BarraInferior())
     }
 
     /// Fondo de pantalla del tema.
@@ -480,7 +496,11 @@ struct CampoNumero: View {
                 .font(Tipo.cuerpo.monospacedDigit())
                 .foregroundStyle(paleta.texto)
                 .onChange(of: texto) { _, nuevo in
-                    if let numero = Double(nuevo.replacingOccurrences(of: ",", with: ".")), numero.isFinite {
+                    let limpio = nuevo.trimmingCharacters(in: .whitespaces)
+                    if limpio.isEmpty {
+                        // Borrar el campo deja el valor en 0 (antes quedaba el anterior).
+                        valor = 0
+                    } else if let numero = Double(limpio.replacingOccurrences(of: ",", with: ".")), numero.isFinite {
                         valor = numero
                     }
                 }
