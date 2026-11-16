@@ -103,7 +103,6 @@ struct IndiceBusqueda {
         self.palabras = alimentos.map { Busqueda.palabras($0.nombre) }
     }
 
-    static let vacio = IndiceBusqueda([])
 }
 
 /// Archivo de la tabla que va dentro de la app (Sazon/Datos/alimentos-ins.json).
