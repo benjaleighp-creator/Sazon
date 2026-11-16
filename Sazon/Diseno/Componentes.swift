@@ -557,3 +557,46 @@ struct FilaValor: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+// MARK: - Acción flotante (Liquid Glass)
+
+/// Fondo del botón flotante «+», la acción principal de la app. En iOS 26
+/// usa Liquid Glass teñido con el acento (el único vidrio de la app junto
+/// con la barra de pestañas, que el sistema ya dibuja así). En iOS 17-25
+/// queda el círculo con el degradado del tema.
+private struct FondoAccionFlotante: ViewModifier {
+    @Environment(\.paleta) private var paleta
+    @Environment(\.colorScheme) private var esquema
+
+    func body(content: Content) -> some View {
+        #if compiler(>=6.2)
+        if #available(iOS 26, *) {
+            // Sobre el vidrio teñido de acento, el color de texto sobre acento
+            // (blanco en claro, casi negro en oscuro: contraste verificado).
+            content
+                .foregroundStyle(paleta.textoSobreAcento)
+                .glassEffect(.regular.tint(paleta.acento).interactive(true), in: Circle())
+        } else {
+            clasico(content)
+        }
+        #else
+        clasico(content)
+        #endif
+    }
+
+    private func clasico(_ content: Content) -> some View {
+        let sombra = Sombra.elevada(esquema)
+        return content
+            .foregroundStyle(paleta.textoHero)
+            .background(Circle().fill(paleta.degradadoHero))
+            .overlay(Circle().strokeBorder(paleta.textoHero.opacity(0.25), lineWidth: 1))
+            .shadow(color: paleta.heroFin.opacity(0.45), radius: sombra.radio, x: 0, y: sombra.y)
+    }
+}
+
+extension View {
+    /// Fondo de la acción principal flotante (Liquid Glass en iOS 26).
+    func fondoAccionFlotante() -> some View {
+        modifier(FondoAccionFlotante())
+    }
+}

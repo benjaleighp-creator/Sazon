@@ -594,12 +594,10 @@ struct FilaRegistro: View {
 private struct BotonFlotante: View {
     let alElegir: (DestinoRegistro?) -> Void
     @Environment(\.paleta) private var paleta
-    @Environment(\.colorScheme) private var esquema
     @ScaledMetric(relativeTo: .title) private var lado: CGFloat = 64
 
     var body: some View {
         let l = min(lado, 84)
-        let sombra = Sombra.elevada(esquema)
         Menu {
             Button { alElegir(.foto) } label: { Label("Foto del plato", systemImage: "camera") }
             Button { alElegir(.texto) } label: { Label("Escribir o dictar", systemImage: "text.bubble") }
@@ -609,11 +607,8 @@ private struct BotonFlotante: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: l * 0.4, weight: .bold))
-                .foregroundStyle(paleta.textoHero)
                 .frame(width: l, height: l)
-                .background(Circle().fill(paleta.degradadoHero))
-                .overlay(Circle().strokeBorder(paleta.textoHero.opacity(0.25), lineWidth: 1))
-                .shadow(color: paleta.heroFin.opacity(0.45), radius: sombra.radio, x: 0, y: sombra.y)
+                .fondoAccionFlotante()
         } primaryAction: {
             alElegir(nil)
         }
