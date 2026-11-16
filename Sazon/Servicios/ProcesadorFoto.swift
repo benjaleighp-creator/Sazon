@@ -21,4 +21,12 @@ enum ProcesadorFoto {
         }
         return reducida.jpegData(compressionQuality: calidad)
     }
+
+    /// Lo mismo, fuera del hilo principal (para no congelar la pantalla).
+    static func prepararEnSegundoPlano(_ imagen: UIImage, ladoMaximo: CGFloat = Medida.ladoFotoIA,
+                                       calidad: CGFloat = 0.6) async -> Data? {
+        await Task.detached(priority: .userInitiated) {
+            prepararParaIA(imagen, ladoMaximo: ladoMaximo, calidad: calidad)
+        }.value
+    }
 }

@@ -25,7 +25,9 @@ struct EstadoIAVista: View {
         case .inactivo:
             EmptyView()
         case .analizando:
-            TarjetaEsperaIA(titulo: texto, inicio: tarea.inicio, paso: tarea.paso, alCancelar: alCancelar)
+            TarjetaEsperaIA(titulo: texto, inicio: tarea.inicio, paso: tarea.paso, alCancelar: alCancelar,
+                            alBuscarTabla: alSalir.map { salir in { salir(.buscar) } },
+                            alAgregarAMano: alSalir.map { salir in { salir(destinoManual) } })
         case .error(let e):
             if let alSalir {
                 TarjetaErrorIA(error: e,
@@ -85,9 +87,9 @@ struct RegistroTextoView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está identificando los alimentos…", tarea: tarea,
+                EstadoIAVista(estado: estado, texto: "Identificando los alimentos…", tarea: tarea,
                               alCancelar: cancelar, alSalir: alSalir)
-                Text("Solo se envía este texto a Google Gemini. Después revisas y corriges antes de guardar.")
+                Text("Solo se envía este texto a Google Gemini (o a Groq, si pusiste su clave de respaldo). Si ya lo analizaste en las últimas 24 h, la respuesta sale de la memoria del iPhone. Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -119,7 +121,8 @@ struct RegistroTextoView: View {
             .barraInferior()
         }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida,
+                           capa: analisis.capa, segundos: analisis.segundos, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
@@ -201,9 +204,9 @@ struct RegistroFotoView: View {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está mirando la foto…", tarea: tarea,
+                EstadoIAVista(estado: estado, texto: "Mirando la foto…", tarea: tarea,
                               alCancelar: cancelar, alSalir: alSalir)
-                Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini. Después revisas y corriges antes de guardar.")
+                Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini (o a Groq, si pusiste su clave de respaldo). Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -227,7 +230,8 @@ struct RegistroFotoView: View {
             .barraInferior()
         }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida,
+                           capa: analisis.capa, segundos: analisis.segundos, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.selection, trigger: visibles)
@@ -277,18 +281,23 @@ struct RegistroFotoView: View {
 
     private func analizar() {
         guard let imagen else { return }
-        guard let jpeg = ProcesadorFoto.prepararParaIA(imagen) else {
-            errorFoto = "No se pudo preparar la foto."
-            return
-        }
         envios += 1
         estado = .analizando
         visibles = 0
+        errorFoto = nil
         analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
         let inicio = Date()
         fase = .esperando(inicio: inicio)
         tarea.iniciar { alAvanzar in
             do {
+                // La foto se reduce fuera del hilo principal (con fotos de
+                // 12-48 MP podía congelar la pantalla).
+                guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen) else {
+                    errorFoto = "No se pudo preparar la foto."
+                    estado = .inactivo
+                    fase = .inactiva
+                    return
+                }
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 analisis = try await proveedor.analizar(fotoJPEG: jpeg)
                 try Task.checkCancellation()

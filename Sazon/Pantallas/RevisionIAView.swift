@@ -6,6 +6,9 @@ struct RevisionIAView: View {
     let identificados: [AlimentoIdentificado]
     var posiblesOcultos: [String] = []
     @Binding var comida: TipoComida
+    /// Quién respondió y en cuánto tiempo (se muestra discreto).
+    var capa: CapaIA? = nil
+    var segundos: Double? = nil
     let alGuardar: ([Registro]) -> Void
 
     @Environment(Almacen.self) private var almacen
@@ -58,6 +61,9 @@ struct RevisionIAView: View {
                          : "\(delINS) con valores del INS · \(items.count - delINS) estimados por la IA (≈)")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoHeroSecundario)
+                    if let capa {
+                        EtiquetaCapaIA(capa: capa, segundos: segundos, color: paleta.textoHeroSecundario)
+                    }
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .hero(relleno: Espacio.m)

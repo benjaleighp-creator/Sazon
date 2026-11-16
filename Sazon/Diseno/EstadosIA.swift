@@ -67,6 +67,10 @@ struct TarjetaEsperaIA: View {
     let inicio: Date?
     let paso: PasoIA?
     let alCancelar: () -> Void
+    /// Salidas al modo manual que aparecen a los 20 s (sin cancelar la
+    /// petición: si llega antes de que elijas, se usa).
+    var alBuscarTabla: (() -> Void)? = nil
+    var alAgregarAMano: (() -> Void)? = nil
     @Environment(\.paleta) private var paleta
 
     var body: some View {
@@ -90,8 +94,9 @@ struct TarjetaEsperaIA: View {
                                 .font(Tipo.nota)
                                 .foregroundStyle(paleta.textoSecundario)
                                 .fixedSize(horizontal: false, vertical: true)
-                        } else if transcurrido >= 20 {
-                            Text("Si Gemini está saturado puede tardar hasta un par de minutos.")
+                        }
+                        if transcurrido >= PoliticaIA.avisoSalida {
+                            Text("Está tardando. Si no responde en \(Int(PoliticaIA.tiempoTotal)) s se cancela sola, para no gastar tu cuota.")
                                 .font(Tipo.nota)
                                 .foregroundStyle(paleta.textoSecundario)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -101,14 +106,51 @@ struct TarjetaEsperaIA: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(titulo + ". Lleva " + Formato.duracionHablada(transcurrido)
                                     + (paso.map { ". " + $0.mensaje } ?? ""))
+                if transcurrido >= PoliticaIA.avisoSalida, alBuscarTabla != nil || alAgregarAMano != nil {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: Espacio.s) { salidas }
+                        VStack(spacing: Espacio.s) { salidas }
+                    }
+                }
             }
             Button(role: .cancel, action: alCancelar) {
                 Label("Cancelar", systemImage: "xmark")
             }
             .buttonStyle(.secundario)
-            .accessibilityHint("Detiene la petición a Gemini")
+            .accessibilityHint("Detiene la petición a la IA")
         }
         .tarjeta()
+    }
+
+    @ViewBuilder
+    private var salidas: some View {
+        if let alBuscarTabla {
+            Button(action: alBuscarTabla) { Label("Buscar en la tabla", systemImage: "magnifyingglass") }
+                .buttonStyle(.secundario)
+                .accessibilityHint("Busca el alimento en la tabla del INS, sin internet")
+        }
+        if let alAgregarAMano {
+            Button(action: alAgregarAMano) { Label("Agregar a mano", systemImage: "square.and.pencil") }
+                .buttonStyle(.secundario)
+        }
+    }
+}
+
+// MARK: - Quién respondió
+
+/// Línea discreta con la capa que respondió y cuánto tardó
+/// («Gemini · gemini-3.8-flash · 6,2 s»). Sirve para medir el tiempo.
+struct EtiquetaCapaIA: View {
+    let capa: CapaIA
+    var segundos: Double? = nil
+    var color: Color? = nil
+    @Environment(\.paleta) private var paleta
+
+    var body: some View {
+        Label(capa.descripcion(segundos: segundos), systemImage: capa.simbolo)
+            .font(Tipo.micro)
+            .foregroundStyle(color ?? paleta.textoSecundario)
+            .accessibilityLabel("Respondió: " + capa.descripcion(segundos: segundos))
     }
 }
 
