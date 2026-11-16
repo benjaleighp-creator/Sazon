@@ -23,9 +23,7 @@ struct AjustesView: View {
                     GrupoAjustes(titulo: "Perfil") {
                         HStack(spacing: Espacio.s) {
                             AzulejoIcono(simbolo: "person", tamano: 34)
-                            TextField("Tu nombre (para el saludo)", text: $a.datos.nombre)
-                                .font(Tipo.cuerpo)
-                                .foregroundStyle(paleta.texto)
+                            CampoAjusteTexto(titulo: "Tu nombre (para el saludo)", valor: $a.datos.nombre, conFondo: false)
                                 .textContentType(.givenName)
                         }
                         .padding(.vertical, Espacio.xs)
@@ -351,6 +349,51 @@ private struct PantallaAcercaDe: View {
     }
 }
 
+// MARK: - Campo de texto con estado local
+
+/// Campo de texto de Ajustes que no escribe en los datos con cada letra:
+/// guarda al tocar «Intro», al dejar de escribir 1 s o al salir.
+private struct CampoAjusteTexto: View {
+    let titulo: String
+    @Binding var valor: String
+    var conFondo = true
+    @Environment(\.paleta) private var paleta
+    @State private var texto = ""
+    @State private var listo = false
+
+    var body: some View {
+        Group {
+            if conFondo {
+                CampoTexto(titulo: titulo, texto: $texto)
+            } else {
+                TextField(titulo, text: $texto)
+                    .font(Tipo.cuerpo)
+                    .foregroundStyle(paleta.texto)
+            }
+        }
+        .onAppear {
+            texto = valor
+            listo = true
+        }
+        .onChange(of: valor) { _, nuevo in
+            // Si el valor cambió por fuera (por ejemplo, «Volver a…»).
+            if nuevo != texto { texto = nuevo }
+        }
+        .onSubmit(confirmar)
+        .onDisappear(perform: confirmar)
+        .task(id: texto) {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            confirmar()
+        }
+    }
+
+    private func confirmar() {
+        guard listo, texto != valor else { return }
+        valor = texto
+    }
+}
+
 // MARK: - Inteligencia artificial
 
 private struct SeccionIA: View {
@@ -390,7 +433,7 @@ private struct SeccionIA: View {
 
                 VStack(alignment: .leading, spacing: Espacio.xxs) {
                     Text("Modelo").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                    CampoTexto(titulo: DatosApp.modeloPorDefecto, texto: $a.datos.modeloIA)
+                    CampoAjusteTexto(titulo: DatosApp.modeloPorDefecto, valor: $a.datos.modeloIA)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                     Text("Por defecto \(DatosApp.modeloPorDefecto), que en noviembre de 2026 figuraba como gratuito en la página de precios de Gemini. Si Google lo cambia, escribe aquí el nombre nuevo.")
