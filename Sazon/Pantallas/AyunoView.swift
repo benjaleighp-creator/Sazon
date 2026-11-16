@@ -178,8 +178,10 @@ struct AyunoView: View {
                             Button("Borrar", role: .destructive) { almacen.eliminarAyuno(s) }
                         } label: {
                             Image(systemName: "ellipsis").foregroundStyle(paleta.textoSecundario)
-                                .frame(width: 32, height: 32)
+                                .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
+                                .contentShape(Rectangle())
                         }
+                        .accessibilityLabel("Más opciones de este ayuno")
                     }
                     BarraProgreso(valor: estado.fraccion, color: estado.completado ? paleta.exito : paleta.aviso, alto: 4)
                 }

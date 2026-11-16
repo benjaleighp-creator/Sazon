@@ -164,7 +164,7 @@ struct Chip: View {
             }
             .padding(.horizontal, Espacio.s)
             .padding(.vertical, Espacio.xs)
-            .frame(minHeight: 36)
+            .frame(minHeight: Medida.toqueMinimo)
             .foregroundStyle(seleccionado ? paleta.textoSobreAcento : paleta.texto)
             .background(Capsule().fill(seleccionado ? paleta.acento : paleta.superficieAlta))
             .overlay(Capsule().strokeBorder(seleccionado ? Color.clear : paleta.borde, lineWidth: 1))

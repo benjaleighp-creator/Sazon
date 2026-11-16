@@ -264,8 +264,9 @@ private struct CabeceraSemana: View {
             Image(systemName: simbolo)
                 .font(Tipo.iconoChico)
                 .foregroundStyle(paleta.acento)
-                .frame(width: 40, height: 40)
+                .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
                 .background(Circle().fill(paleta.acentoSuave))
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(etiqueta)
@@ -644,8 +645,9 @@ private struct TarjetaAgua: View {
                     animar(.enfasis) { almacen.quitarAgua() }
                 } label: {
                     Image(systemName: "minus")
-                        .frame(width: 40, height: 40)
+                        .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
                         .background(Circle().fill(paleta.superficieAlta))
+                        .contentShape(Circle())
                 }
                 .disabled(ml <= 0)
                 .accessibilityLabel("Quitar un vaso")
@@ -655,8 +657,9 @@ private struct TarjetaAgua: View {
                     Label("\(Formato.entero(almacen.datos.vasoMl)) ml", systemImage: "plus")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoSobreAcento)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: Medida.toqueMinimo)
                         .background(Capsule().fill(paleta.acento))
+                        .contentShape(Capsule())
                 }
                 .accessibilityLabel("Sumar un vaso de \(Formato.entero(almacen.datos.vasoMl)) mililitros")
             }

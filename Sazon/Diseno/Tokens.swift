@@ -76,6 +76,8 @@ enum Sombra {
 enum Medida {
     /// Alto mínimo de botones (Apple recomienda al menos 44 pt).
     static let toque: CGFloat = 48
+    /// Zona de toque mínima de cualquier control (Apple: 44 × 44 pt).
+    static let toqueMinimo: CGFloat = 44
     /// Diámetro base del anillo de calorías.
     static let anillo: CGFloat = 168
     /// Grosor del anillo de calorías.

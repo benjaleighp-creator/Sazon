@@ -186,9 +186,11 @@ private struct TarjetaItem: View {
                         .foregroundStyle(paleta.textoSecundario)
                         .frame(width: 36, height: 36)
                         .background(Circle().fill(paleta.superficieAlta))
+                        // El círculo se ve de 36 pt, pero se puede tocar en 48 × 48.
+                        .frame(minWidth: Medida.toque, minHeight: Medida.toque)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .frame(minWidth: Medida.toque, minHeight: Medida.toque)
                 .accessibilityLabel("Quitar \(item.nombre)")
             }
 
