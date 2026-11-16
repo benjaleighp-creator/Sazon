@@ -10,6 +10,13 @@ struct MetaView: View {
     @State private var usarManual = false
     @State private var manual = Nutrientes(kcal: 2000, proteina: 120, carbohidratos: 230, grasas: 65)
     @State private var listo = false
+    @State private var ajustesPorDia: [String: Double] = [:]
+
+    /// Días en orden de lunes a domingo (clave del calendario: 2…7, 1).
+    private static let diasSemana: [(clave: String, nombre: String)] = [
+        ("2", "Lunes"), ("3", "Martes"), ("4", "Miércoles"), ("5", "Jueves"),
+        ("6", "Viernes"), ("7", "Sábado"), ("1", "Domingo")
+    ]
 
     var body: some View {
         let extra = CalculoMeta.extraKcal(almacen.datos, actividadSalud: almacen.actividadSalud)
@@ -162,6 +169,29 @@ struct MetaView: View {
                     }
                 }
                 .tarjeta()
+
+                // Meta por día de la semana
+                VStack(alignment: .leading, spacing: Espacio.s) {
+                    TituloSeccion("Según el día de la semana")
+                    Text("Suma o resta calorías algunos días (por ejemplo, más el sábado o los días que entrenas). Se aplica sobre la meta de arriba.")
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ForEach(Self.diasSemana, id: \.clave) { dia in
+                        let valor = ajustesPorDia[dia.clave] ?? 0
+                        Stepper(value: Binding(get: { valor }, set: { ajustesPorDia[dia.clave] = $0 == 0 ? nil : $0 }),
+                                in: -500...800, step: 50) {
+                            HStack {
+                                Text(dia.nombre).font(Tipo.cuerpo).foregroundStyle(paleta.texto)
+                                Spacer()
+                                Text(valor == 0 ? "igual" : (valor > 0 ? "+" : "−") + Formato.entero(abs(valor)) + " kcal")
+                                    .font(Tipo.cuerpo.monospacedDigit())
+                                    .foregroundStyle(valor == 0 ? paleta.textoSecundario : paleta.texto)
+                            }
+                        }
+                        .accessibilityValue(valor == 0 ? "sin cambio" : "\(valor > 0 ? "más" : "menos") \(Formato.entero(abs(valor))) kilocalorías")
+                    }
+                }
+                .tarjeta()
             }
             .padding(.horizontal, Espacio.margen)
             .padding(.vertical, Espacio.m)
@@ -179,6 +209,7 @@ struct MetaView: View {
             guard !listo else { return }
             listo = true
             if let p = almacen.datos.perfil { perfil = p }
+            ajustesPorDia = almacen.datos.ajustesPorDia
             if let m = almacen.datos.metaManual {
                 manual = m
                 usarManual = true
@@ -197,6 +228,7 @@ struct MetaView: View {
         var d = almacen.datos
         d.perfil = perfil
         d.metaManual = usarManual ? manual : nil
+        d.ajustesPorDia = ajustesPorDia
         almacen.datos = d
         cerrar()
     }

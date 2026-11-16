@@ -418,3 +418,57 @@ final class PruebasSemanaYSaludo: XCTestCase {
         XCTAssertEqual(Formato.numeroDia(fecha(2026, 11, 1), calendario: calendarioPrueba), "1")
     }
 }
+
+final class PruebasFase2Funciones: XCTestCase {
+
+    func testMetaPorDiaDeLaSemana() throws {
+        var d = DatosApp()
+        d.perfil = Perfil(sexo: .masculino, edad: 30, pesoKg: 70, tallaCm: 175, actividad: .ligero, objetivo: .mantener)
+        let base = try XCTUnwrap(CalculoMeta.metaVigente(d))
+        d.ajustesPorDia = ["7": 300]   // sábado
+        let sabado = fecha(2026, 11, 21)   // sábado
+        let lunes = fecha(2026, 11, 16)
+        XCTAssertEqual(CalculoMeta.claveDia(sabado, calendario: calendarioPrueba), "7")
+        let metaSabado = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: sabado, calendario: calendarioPrueba))
+        XCTAssertEqual(metaSabado.kcal, base.kcal + 300, accuracy: 10)
+        let metaLunes = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: lunes, calendario: calendarioPrueba))
+        XCTAssertEqual(metaLunes.kcal, base.kcal)
+        // Meta manual: el ajuste va a los carbohidratos.
+        d.metaManual = Nutrientes(kcal: 2000, proteina: 120, carbohidratos: 200, grasas: 70)
+        let manualSabado = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: sabado, calendario: calendarioPrueba))
+        XCTAssertEqual(manualSabado.kcal, 2300)
+        XCTAssertEqual(manualSabado.carbohidratos, 275)
+        XCTAssertEqual(CalculoMeta.ajusteDelDia(["7": 99999], dia: sabado, calendario: calendarioPrueba), 1000, "Con tope")
+    }
+
+    func testPorcionesAprendidas() {
+        var a: [String: Double] = [:]
+        a = PorcionesAprendidas.aprender(a, nombre: "Arroz blanco cocido", gramosIA: 150, gramosFinal: 200)
+        XCTAssertEqual(PorcionesAprendidas.sugerida(a, nombre: "arroz blanco cocido"), 200)
+        // Un cambio mínimo no se aprende.
+        let b = PorcionesAprendidas.aprender([:], nombre: "Pan", gramosIA: 60, gramosFinal: 62)
+        XCTAssertTrue(b.isEmpty)
+        // Volver a lo que dijo la IA olvida la porción.
+        a = PorcionesAprendidas.aprender(a, nombre: "Arroz blanco cocido", gramosIA: 150, gramosFinal: 150)
+        XCTAssertNil(PorcionesAprendidas.sugerida(a, nombre: "Arroz blanco cocido"))
+    }
+
+    func testRevisionUsaLaPorcionAprendida() {
+        let ia = AlimentoIdentificado(nombre: "Arroz", gramos: 150, confianza: 0.9, medida: nil, cantidadMedida: nil,
+                                      por100g: Nutrientes(kcal: 130, proteina: 2, carbohidratos: 28, grasas: 0))
+        let item = ItemRevision(identificado: ia, coincidencia: nil, aprendida: 210)
+        XCTAssertEqual(item.gramos, 210)
+        XCTAssertEqual(item.gramosIA, 150)
+        XCTAssertTrue(item.porcionAprendida)
+        XCTAssertFalse(ItemRevision(identificado: ia, coincidencia: nil).porcionAprendida)
+    }
+
+    func testColaSinConexionSeLeeConValoresPorDefecto() throws {
+        let json = #"{"version": 1, "colaIA": [{"tipo": "foto", "archivoFoto": "a.jpg", "comida": "cena"}, {"tipo": "otro"}]}"#
+        let d = try DatosApp.decodificadorPrueba.decode(DatosApp.self, from: Data(json.utf8))
+        XCTAssertEqual(d.colaIA.count, 2)
+        XCTAssertEqual(d.colaIA[0].estado, .esperando)
+        XCTAssertEqual(d.colaIA[0].comida, .cena)
+        XCTAssertEqual(d.colaIA[1].tipo, .texto)
+    }
+}
