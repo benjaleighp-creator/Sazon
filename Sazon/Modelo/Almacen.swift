@@ -9,12 +9,16 @@ final class Almacen {
 
     static let compartido = Almacen()
 
-    /// Cada cambio se guarda en disco automáticamente.
+    /// Cada cambio se guarda en disco automáticamente: se espera
+    /// `Almacen.esperaGuardado` desde el último cambio (así escribir un
+    /// nombre letra por letra no reescribe el archivo con cada letra) y se
+    /// escribe fuera del hilo principal. Al pasar a segundo plano se guarda
+    /// enseguida (`guardarYa`), para no perder nada si iOS cierra la app.
     var datos: DatosApp {
         didSet {
-            guardar()
             EstiloActivo.actual = tema.estilo
-            avisarCambios()
+            hayCambiosSinGuardar = true
+            programarGuardado()
         }
     }
 
@@ -34,6 +38,14 @@ final class Almacen {
     /// con el iPhone bloqueado). Mientras sea true no se escribe encima,
     /// para no reemplazar tus datos por unos vacíos.
     private var protegerArchivo = false
+
+    /// Segundos que se espera desde el último cambio antes de guardar.
+    static let esperaGuardado: TimeInterval = 0.7
+    @ObservationIgnored private var hayCambiosSinGuardar = false
+    @ObservationIgnored private var tareaGuardado: Task<Void, Never>?
+    /// Cola de escritura: una sola, en orden, para que la última versión
+    /// de los datos siempre sea la que queda en disco.
+    private static let colaDisco = DispatchQueue(label: "pe.benjamin.sazon.guardado", qos: .utility)
 
     /// Calorías activas de hoy según Apple Salud (0 si no está conectado).
     var actividadSalud: Double = 0
@@ -145,17 +157,49 @@ final class Almacen {
         protegerArchivo = false
     }
 
-    private func guardar() {
+    /// Programa el guardado (y el aviso a los widgets) para dentro de
+    /// `esperaGuardado`; un cambio nuevo reinicia la espera.
+    private func programarGuardado() {
+        tareaGuardado?.cancel()
+        tareaGuardado = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Almacen.esperaGuardado * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            self?.guardarYa()
+        }
+    }
+
+    /// Guarda ahora lo pendiente y avisa a los widgets una sola vez.
+    /// - esperar: true al pasar a segundo plano: espera a que el archivo
+    ///   quede escrito antes de devolver el control a iOS.
+    func guardarYa(esperar: Bool = false) {
+        tareaGuardado?.cancel()
+        tareaGuardado = nil
+        guard hayCambiosSinGuardar else { return }
+        hayCambiosSinGuardar = false
+        avisarCambios()
         guard !protegerArchivo else {
             errorGuardado = "No se guardó el último cambio para no reemplazar tus datos anteriores, que no se pudieron abrir."
             return
         }
-        do {
-            let contenido = try DatosApp.codificador.encode(datos)
-            try contenido.write(to: Self.urlArchivo, options: [.atomic, .completeFileProtection])
-            errorGuardado = nil
-        } catch {
-            errorGuardado = "No se pudo guardar: \(error.localizedDescription)"
+        // Copia de los datos (es un valor): se codifica fuera del hilo principal.
+        let copia = datos
+        let url = Self.urlArchivo
+        let trabajo = { [weak self] in
+            var problema: String?
+            do {
+                let contenido = try DatosApp.codificador.encode(copia)
+                try contenido.write(to: url, options: [.atomic, .completeFileProtection])
+            } catch {
+                problema = "No se pudo guardar: \(error.localizedDescription)"
+            }
+            Task { @MainActor in
+                if self?.errorGuardado != problema { self?.errorGuardado = problema }
+            }
+        }
+        if esperar {
+            Self.colaDisco.sync(execute: trabajo)
+        } else {
+            Self.colaDisco.async(execute: trabajo)
         }
     }
 }

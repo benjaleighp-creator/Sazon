@@ -12,7 +12,12 @@ struct SazonApp: App {
                 .environment(almacen)
         }
         .onChange(of: fase) { _, nueva in
-            guard nueva == .active else { return }
+            // Al salir de la app se guarda enseguida (sin esperar), para no
+            // perder el último cambio si iOS la cierra.
+            if nueva != .active {
+                almacen.guardarYa(esperar: true)
+                return
+            }
             // Al volver a la app: datos de Salud, recordatorios y widgets al día.
             Task { await Salud.compartido.actualizarHoy(en: almacen) }
             Recordatorios.reprogramar(almacen.datos.recordatorios)

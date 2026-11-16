@@ -13,14 +13,12 @@ extension Almacen {
 
     func agregarAgua(_ ml: Double) {
         datos.agua.append(RegistroAgua(fecha: Diario.fechaParaRegistrar(enDia: diaVisible), ml: ml))
-        avisarCambios()
     }
 
     /// Quita el último vaso del día visible.
     func quitarAgua() {
         guard let i = datos.agua.lastIndex(where: { Calendar.current.isDate($0.fecha, inSameDayAs: diaVisible) }) else { return }
         datos.agua.remove(at: i)
-        avisarCambios()
     }
 
     // MARK: Peso, medidas y fotos
@@ -119,7 +117,6 @@ extension Almacen {
         datos.ayunos.append(s)
         Recordatorios.programarFinAyuno(s, activo: datos.recordatorios.ayunoActivo)
         ActividadAyuno.iniciar(s, tema: tema)
-        avisarCambios()
     }
 
     func terminarAyuno(_ fin: Date = Date()) {
@@ -127,7 +124,6 @@ extension Almacen {
         datos.ayunos[i].finReal = max(fin, datos.ayunos[i].inicio)
         Recordatorios.cancelarFinAyuno()
         ActividadAyuno.terminar()
-        avisarCambios()
     }
 
     func eliminarAyuno(_ s: SesionAyuno) {
@@ -269,6 +265,8 @@ extension Almacen {
     // MARK: Widgets
 
     /// Escribe el resumen que leen los widgets y les pide actualizarse.
+    /// Lo llama el guardado (una vez por grupo de cambios) y la app al
+    /// volver a primer plano.
     func avisarCambios() {
         ResumenWidget.desde(self).guardarYRecargar()
     }

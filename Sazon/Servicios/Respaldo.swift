@@ -52,5 +52,7 @@ extension Almacen {
         permitirGuardar()
         datos = respaldo
         avisoCarga = nil
+        // Un respaldo restaurado se escribe enseguida, sin esperar.
+        guardarYa()
     }
 }
