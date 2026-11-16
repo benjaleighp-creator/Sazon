@@ -190,6 +190,34 @@ def macros(valores):
     return kcal, prot, cho, grasa
 
 
+# Micronutrientes (PENDIENTE). La app ya sabe leer un objeto «micros» por
+# alimento (Micronutrientes en Sazon/Logica/TablaAlimentos.swift: calcio,
+# fosforo, zinc, hierro, vitaminaA, tiamina, riboflavina, niacina,
+# vitaminaC, potasio) y lo muestra en la pantalla de porción, pero el
+# archivo de la app todavía no los trae.
+# Para regenerarlo hay que confirmar, contra el ENCABEZADO DEL PDF oficial
+# del INS (misma edición que FUENTE), en qué columna está cada nutriente y
+# su unidad, y escribirlo aquí. Ejemplo de forma (los índices de abajo NO
+# están verificados; por eso el diccionario está vacío):
+#     COLUMNAS_MICROS = {"calcio": 9, "hierro": 12, ...}
+# Mientras esté vacío, el script no escribe micronutrientes: nunca se
+# inventan valores. En el grupo S (21 columnas, sin β-caroteno) los índices
+# pueden cambiar: verifícalos aparte (COLUMNAS_MICROS_PREPARADOS).
+COLUMNAS_MICROS = {}
+COLUMNAS_MICROS_PREPARADOS = {}
+
+
+def micros(valores, preparados=False):
+    """Micronutrientes por 100 g según COLUMNAS_MICROS (vacío: ninguno)."""
+    columnas = COLUMNAS_MICROS_PREPARADOS if preparados else COLUMNAS_MICROS
+    salida = {}
+    for nombre, i in columnas.items():
+        v = numero(valores[i]) if i < len(valores) else None
+        if v is not None and v >= 0:
+            salida[nombre] = v
+    return salida
+
+
 def extras(valores):
     """Fibra dietaria (g, columna 8) y sodio (mg, columna 14)."""
     return numero(valores[7]), numero(valores[13])

@@ -9,15 +9,20 @@ struct AlimentoBase: Codable, Identifiable, Equatable, Hashable {
     let por100g: Nutrientes
     /// Medidas caseras conocidas para este alimento (puede estar vacía).
     let medidas: [MedidaCasera]
+    /// Micronutrientes por 100 g (solo si la tabla los trae; hoy el
+    /// archivo de la app aún no los incluye: ver herramientas/convertir_ins.py).
+    let micros: Micronutrientes?
 
     var id: String { codigo }
 
-    init(codigo: String, nombre: String, grupo: String, por100g: Nutrientes, medidas: [MedidaCasera] = []) {
+    init(codigo: String, nombre: String, grupo: String, por100g: Nutrientes, medidas: [MedidaCasera] = [],
+         micros: Micronutrientes? = nil) {
         self.codigo = codigo
         self.nombre = nombre
         self.grupo = grupo
         self.por100g = por100g
         self.medidas = medidas
+        self.micros = micros
     }
 
     init(from decoder: Decoder) throws {
@@ -27,6 +32,57 @@ struct AlimentoBase: Codable, Identifiable, Equatable, Hashable {
         grupo = try c.decodeIfPresent(String.self, forKey: .grupo) ?? ""
         por100g = try c.decode(Nutrientes.self, forKey: .por100g)
         medidas = try c.decodeIfPresent([MedidaCasera].self, forKey: .medidas) ?? []
+        micros = c.tolerante(Micronutrientes.self, .micros)
+    }
+}
+
+/// Micronutrientes por 100 g de las Tablas Peruanas (INS). Todos son
+/// opcionales: un valor que la tabla no informa queda en nil (nunca se
+/// inventa). Unidades: mg, salvo la vitamina A (µg de equivalentes de retinol).
+struct Micronutrientes: Codable, Equatable, Hashable {
+    var calcio: Double?
+    var fosforo: Double?
+    var zinc: Double?
+    var hierro: Double?
+    var vitaminaA: Double?
+    var tiamina: Double?
+    var riboflavina: Double?
+    var niacina: Double?
+    var vitaminaC: Double?
+    var potasio: Double?
+
+    init(calcio: Double? = nil, fosforo: Double? = nil, zinc: Double? = nil, hierro: Double? = nil,
+         vitaminaA: Double? = nil, tiamina: Double? = nil, riboflavina: Double? = nil, niacina: Double? = nil,
+         vitaminaC: Double? = nil, potasio: Double? = nil) {
+        self.calcio = calcio; self.fosforo = fosforo; self.zinc = zinc; self.hierro = hierro
+        self.vitaminaA = vitaminaA; self.tiamina = tiamina; self.riboflavina = riboflavina
+        self.niacina = niacina; self.vitaminaC = vitaminaC; self.potasio = potasio
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        calcio = c.tolerante(Double.self, .calcio)
+        fosforo = c.tolerante(Double.self, .fosforo)
+        zinc = c.tolerante(Double.self, .zinc)
+        hierro = c.tolerante(Double.self, .hierro)
+        vitaminaA = c.tolerante(Double.self, .vitaminaA)
+        tiamina = c.tolerante(Double.self, .tiamina)
+        riboflavina = c.tolerante(Double.self, .riboflavina)
+        niacina = c.tolerante(Double.self, .niacina)
+        vitaminaC = c.tolerante(Double.self, .vitaminaC)
+        potasio = c.tolerante(Double.self, .potasio)
+    }
+
+    /// Filas para mostrar (nombre, valor para `gramos`, unidad), solo las que existen.
+    func filas(gramos: Double) -> [(nombre: String, valor: Double, unidad: String)] {
+        let f = gramos / 100
+        let todas: [(String, Double?, String)] = [
+            ("Hierro", hierro, "mg"), ("Calcio", calcio, "mg"), ("Zinc", zinc, "mg"),
+            ("Vitamina C", vitaminaC, "mg"), ("Vitamina A", vitaminaA, "µg"), ("Fósforo", fosforo, "mg"),
+            ("Potasio", potasio, "mg"), ("Tiamina (B1)", tiamina, "mg"), ("Riboflavina (B2)", riboflavina, "mg"),
+            ("Niacina (B3)", niacina, "mg")
+        ]
+        return todas.compactMap { n, v, u in v.map { (n, $0 * f, u) } }
     }
 }
 

@@ -121,6 +121,17 @@ struct PorcionView: View {
                 }
                 .tarjeta()
 
+                // Micronutrientes (solo si la tabla del INS los trae).
+                if let micros = candidato.micros, !micros.filas(gramos: gramos).isEmpty {
+                    VStack(alignment: .leading, spacing: Espacio.xs) {
+                        TituloSeccion("Micronutrientes (INS)")
+                        ForEach(micros.filas(gramos: gramos), id: \.nombre) { fila in
+                            FilaValor(titulo: fila.nombre, valor: Formato.numero(fila.valor, decimales: fila.valor < 10 ? 1 : 0) + " " + fila.unidad)
+                        }
+                    }
+                    .tarjeta()
+                }
+
                 SelectorComida(comida: $comida)
             }
             .padding(.horizontal, Espacio.margen)

@@ -463,6 +463,17 @@ final class PruebasFase2Funciones: XCTestCase {
         XCTAssertFalse(ItemRevision(identificado: ia, coincidencia: nil).porcionAprendida)
     }
 
+    func testMicronutrientesOpcionales() throws {
+        let json = #"{"fuente": "x", "alimentos": [{"codigo": "A1", "nombre": "Kiwicha", "por100g": {"kcal": 351}, "micros": {"hierro": 7.5, "calcio": "mucho"}}, {"codigo": "A2", "nombre": "Arroz", "por100g": {"kcal": 115}}]}"#
+        let t = try ArchivoTabla.leer(Data(json.utf8))
+        let m = try XCTUnwrap(t.alimentos[0].micros)
+        XCTAssertEqual(m.hierro, 7.5)
+        XCTAssertNil(m.calcio, "Un valor que no es número no se inventa")
+        XCTAssertEqual(m.filas(gramos: 50).map(\.nombre), ["Hierro"])
+        XCTAssertEqual(m.filas(gramos: 50).first?.valor, 3.75)
+        XCTAssertNil(t.alimentos[1].micros)
+    }
+
     func testColaSinConexionSeLeeConValoresPorDefecto() throws {
         let json = #"{"version": 1, "colaIA": [{"tipo": "foto", "archivoFoto": "a.jpg", "comida": "cena"}, {"tipo": "otro"}]}"#
         let d = try DatosApp.decodificadorPrueba.decode(DatosApp.self, from: Data(json.utf8))

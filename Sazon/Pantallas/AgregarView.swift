@@ -17,6 +17,8 @@ struct Candidato: Hashable {
     var datosIncompletos: Bool = false
     /// Quién leyó la etiqueta (iPhone, memoria, Gemini o Groq), si aplica.
     var leidoPor: String? = nil
+    /// Micronutrientes del INS por 100 g, si la tabla los trae.
+    var micros: Micronutrientes? = nil
 
     init(alimento: AlimentoBase) {
         nombre = alimento.nombre
@@ -26,6 +28,7 @@ struct Candidato: Hashable {
         origen = propio ? .manual : .ins
         codigoINS = propio ? nil : alimento.codigo
         medidas = alimento.medidas
+        micros = alimento.micros
         if propio, let porcion = alimento.medidas.first, alimento.codigo.hasPrefix("R:") {
             gramos = porcion.gramos
             medida = porcion
