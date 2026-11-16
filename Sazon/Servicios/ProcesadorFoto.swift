@@ -26,7 +26,7 @@ enum ProcesadorFoto {
     static func prepararEnSegundoPlano(_ imagen: UIImage, ladoMaximo: CGFloat = Medida.ladoFotoIA,
                                        calidad: CGFloat = 0.6) async -> Data? {
         await Task.detached(priority: .userInitiated) {
-            prepararParaIA(imagen, ladoMaximo: ladoMaximo, calidad: calidad)
+            ProcesadorFoto.prepararParaIA(imagen, ladoMaximo: ladoMaximo, calidad: calidad)
         }.value
     }
 }

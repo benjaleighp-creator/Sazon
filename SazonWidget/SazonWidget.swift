@@ -1,6 +1,7 @@
 import WidgetKit
 import SwiftUI
 import ActivityKit
+import AppIntents
 
 // Widgets de Sazón: calorías y macros, agua, ayuno y la Actividad en vivo
 // del ayuno. Leen el resumen que escribe la app en el App Group. Si no hay

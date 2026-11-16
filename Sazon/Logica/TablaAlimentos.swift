@@ -73,8 +73,15 @@ struct Micronutrientes: Codable, Equatable, Hashable {
         potasio = c.tolerante(Double.self, .potasio)
     }
 
-    /// Filas para mostrar (nombre, valor para `gramos`, unidad), solo las que existen.
-    func filas(gramos: Double) -> [(nombre: String, valor: Double, unidad: String)] {
+    /// Una fila para mostrar: nombre, valor para la porción y unidad.
+    struct Fila: Equatable {
+        let nombre: String
+        let valor: Double
+        let unidad: String
+    }
+
+    /// Filas para mostrar (valor para `gramos`), solo las que existen.
+    func filas(gramos: Double) -> [Fila] {
         let f = gramos / 100
         let todas: [(String, Double?, String)] = [
             ("Hierro", hierro, "mg"), ("Calcio", calcio, "mg"), ("Zinc", zinc, "mg"),
@@ -82,7 +89,7 @@ struct Micronutrientes: Codable, Equatable, Hashable {
             ("Potasio", potasio, "mg"), ("Tiamina (B1)", tiamina, "mg"), ("Riboflavina (B2)", riboflavina, "mg"),
             ("Niacina (B3)", niacina, "mg")
         ]
-        return todas.compactMap { n, v, u in v.map { (n, $0 * f, u) } }
+        return todas.compactMap { n, v, u in v.map { Fila(nombre: n, valor: $0 * f, unidad: u) } }
     }
 }
 

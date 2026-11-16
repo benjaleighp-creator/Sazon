@@ -579,7 +579,11 @@ extension LectorIA {
         if let propiedades = e["properties"] as? [String: Any] {
             var nuevas: [String: Any] = [:]
             for (k, v) in propiedades {
-                nuevas[k] = (v as? [String: Any]).map(esquemaEstricto) ?? v
+                if let sub = v as? [String: Any] {
+                    nuevas[k] = esquemaEstricto(sub)
+                } else {
+                    nuevas[k] = v
+                }
             }
             e["properties"] = nuevas
             e["required"] = nuevas.keys.sorted()
