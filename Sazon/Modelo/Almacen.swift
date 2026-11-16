@@ -44,6 +44,9 @@ final class Almacen {
     static let esperaGuardado: TimeInterval = 0.7
     @ObservationIgnored private var hayCambiosSinGuardar = false
     @ObservationIgnored private var tareaGuardado: Task<Void, Never>?
+    /// Registros tal como se enviaron a Apple Salud la última vez (solo si
+    /// escribes tus comidas en Salud), para mandar únicamente lo que cambió.
+    @ObservationIgnored private var registrosEnSalud: [UUID: Registro]?
     /// Cola de escritura: una sola, en orden, para que la última versión
     /// de los datos siempre sea la que queda en disco.
     private static let colaDisco = DispatchQueue(label: "pe.benjamin.sazon.guardado", qos: .utility)
@@ -71,11 +74,41 @@ final class Almacen {
         tabla = t
     }
 
+    /// Envía a Apple Salud las comidas nuevas, editadas o borradas desde la
+    /// última vez. Al activar la opción se parte de lo que hay (no se manda
+    /// todo el historial).
+    private func sincronizarSalud() {
+        guard datos.saludEscribirComidas, datos.saludActiva else {
+            registrosEnSalud = nil
+            return
+        }
+        let actuales = Dictionary(datos.registros.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        guard let anteriores = registrosEnSalud else {
+            registrosEnSalud = actuales
+            return
+        }
+        let cambiados = actuales.values.filter { anteriores[$0.id] != $0 }
+        let borrados = anteriores.keys.filter { actuales[$0] == nil }
+        registrosEnSalud = actuales
+        Salud.compartido.sincronizarComidas(cambiados: Array(cambiados), borrados: Array(borrados))
+    }
+
+    /// Punto de partida para escribir comidas en Salud (al activar la opción).
+    func empezarSincronizacionSalud() {
+        registrosEnSalud = Dictionary(datos.registros.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+    }
+
     // MARK: - Lectura rápida
 
     var tema: Tema { CatalogoTemas.tema(id: datos.temaID) }
 
-    var meta: Nutrientes? { CalculoMeta.metaVigente(datos, actividadSalud: actividadSalud) }
+    /// Meta del día que muestra el diario (con el ajuste de su día de la semana).
+    var meta: Nutrientes? { metaDe(diaVisible) }
+
+    /// Meta de un día cualquiera (con el ajuste de su día de la semana).
+    func metaDe(_ dia: Date) -> Nutrientes? {
+        CalculoMeta.metaVigente(datos, actividadSalud: actividadSalud, dia: dia)
+    }
 
     var resumenVisible: ResumenDia { Diario.resumen(de: diaVisible, en: datos.registros) }
 
@@ -200,6 +233,7 @@ final class Almacen {
         guard hayCambiosSinGuardar else { return }
         hayCambiosSinGuardar = false
         avisarCambios()
+        sincronizarSalud()
         guard !protegerArchivo else {
             errorGuardado = "No se guardó el último cambio para no reemplazar tus datos anteriores, que no se pudieron abrir."
             return

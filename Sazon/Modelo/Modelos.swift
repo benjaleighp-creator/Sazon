@@ -523,6 +523,19 @@ struct DatosApp: Codable, Equatable {
     /// Muestra «Media mañana» y «Media tarde» en el diario.
     var comidasExtra: Bool
 
+    // Fase 2
+    /// Escribe en Apple Salud las calorías y macros de lo que registras.
+    var saludEscribirComidas: Bool
+    /// Porciones que corregiste a la IA (nombre normalizado → gramos), para
+    /// proponerlas la próxima vez.
+    var porcionesAprendidas: [String: Double]
+    /// Ajuste de la meta por día de la semana (clave "1" = domingo … "7" =
+    /// sábado; valor en kcal, puede ser negativo).
+    var ajustesPorDia: [String: Double]
+    /// Fotos y textos guardados sin conexión para analizarlos con la IA
+    /// cuando vuelva internet.
+    var colaIA: [PendienteIA]
+
     static let modeloPorDefecto = "gemini-3.8-flash"
 
     init() {
@@ -562,6 +575,10 @@ struct DatosApp: Codable, Equatable {
         sumarActividad = false
         favoritos = []
         comidasExtra = false
+        saludEscribirComidas = false
+        porcionesAprendidas = [:]
+        ajustesPorDia = [:]
+        colaIA = []
     }
 
     init(from decoder: Decoder) throws {
@@ -603,5 +620,9 @@ struct DatosApp: Codable, Equatable {
         sumarActividad = c.tolerante(Bool.self, .sumarActividad) ?? false
         favoritos = c.listaTolerante(ComidaFavorita.self, .favoritos) ?? []
         comidasExtra = c.tolerante(Bool.self, .comidasExtra) ?? false
+        saludEscribirComidas = c.tolerante(Bool.self, .saludEscribirComidas) ?? false
+        porcionesAprendidas = c.diccionarioTolerante(Double.self, .porcionesAprendidas) ?? [:]
+        ajustesPorDia = c.diccionarioTolerante(Double.self, .ajustesPorDia) ?? [:]
+        colaIA = c.listaTolerante(PendienteIA.self, .colaIA) ?? []
     }
 }

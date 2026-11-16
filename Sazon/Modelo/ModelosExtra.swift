@@ -372,3 +372,58 @@ struct ComidaFavorita: Codable, Identifiable, Equatable {
 
     var total: Nutrientes { registros.reduce(Nutrientes.cero) { $0 + $1.total } }
 }
+
+// MARK: - Cola sin conexión
+
+/// Foto o texto guardado sin internet para analizarlo con la IA cuando
+/// vuelva la red. El resultado nunca se guarda solo: queda «listo para
+/// revisar» y tú lo confirmas.
+struct PendienteIA: Codable, Identifiable, Equatable {
+    enum Tipo: String, Codable { case foto, texto }
+    enum Estado: String, Codable {
+        /// Esperando internet.
+        case esperando
+        /// La IA respondió: falta que lo revises.
+        case listo
+        /// La IA no pudo (se muestra el motivo y puedes reintentar).
+        case fallo
+    }
+
+    var id: UUID
+    var creado: Date
+    var comida: TipoComida
+    var tipo: Tipo
+    /// Texto escrito (vacío si es foto).
+    var texto: String
+    /// Nombre del archivo de la foto reducida (en la carpeta de la app).
+    var archivoFoto: String?
+    var estado: Estado
+    /// Respuesta JSON de la IA (cuando está lista).
+    var respuesta: String?
+    /// Quién respondió (clave de CapaIA).
+    var capa: String?
+    /// Motivo del fallo, para mostrarlo.
+    var error: String?
+    var intentos: Int
+
+    init(id: UUID = UUID(), creado: Date = Date(), comida: TipoComida, tipo: Tipo, texto: String = "",
+         archivoFoto: String? = nil) {
+        self.id = id; self.creado = creado; self.comida = comida; self.tipo = tipo; self.texto = texto
+        self.archivoFoto = archivoFoto; estado = .esperando; respuesta = nil; capa = nil; error = nil; intentos = 0
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        creado = c.tolerante(Date.self, .creado) ?? Date()
+        comida = c.enumTolerante(TipoComida.self, .comida) ?? .snacks
+        tipo = c.enumTolerante(Tipo.self, .tipo) ?? .texto
+        texto = c.tolerante(String.self, .texto) ?? ""
+        archivoFoto = c.tolerante(String.self, .archivoFoto)
+        estado = c.enumTolerante(Estado.self, .estado) ?? .esperando
+        respuesta = c.tolerante(String.self, .respuesta)
+        capa = c.tolerante(String.self, .capa)
+        error = c.tolerante(String.self, .error)
+        intentos = c.tolerante(Int.self, .intentos) ?? 0
+    }
+}

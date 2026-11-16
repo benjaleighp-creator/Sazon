@@ -119,6 +119,11 @@ struct PantallaSalud: View {
                         .disabled(cargando)
                 }
                 Section {
+                    Toggle("Guardar mis comidas en Salud", isOn: $a.datos.saludEscribirComidas)
+                } footer: {
+                    Text("Escribe en Apple Salud las calorías, proteína, carbohidratos y grasas de cada comida que registres desde ahora (si editas o borras una, se actualiza). Necesita el permiso de escritura que te pedirá Salud.")
+                }
+                Section {
                     Toggle("Sumar calorías activas a mi meta", isOn: $a.datos.sumarActividad)
                 } footer: {
                     Text("Si lo activas, la meta del día sube con lo que gastas haciendo ejercicio según Salud. Úsalo solo si elegiste «Sedentario» o «Ligera» en tu actividad, para no contar el ejercicio dos veces. Los relojes y teléfonos estiman ese gasto, y puede no ser exacto.")
@@ -140,6 +145,17 @@ struct PantallaSalud: View {
             Task {
                 error = await Salud.compartido.pedirPermiso()
                 if error != nil { almacen.datos.saludActiva = false } else { actualizar() }
+            }
+        }
+        .onChange(of: almacen.datos.saludEscribirComidas) { _, escribir in
+            guard escribir else { return }
+            Task {
+                error = await Salud.compartido.pedirPermiso(escribirComidas: true)
+                if error != nil {
+                    almacen.datos.saludEscribirComidas = false
+                } else {
+                    almacen.empezarSincronizacionSalud()
+                }
             }
         }
         .task { if almacen.datos.saludActiva { actualizar() } }

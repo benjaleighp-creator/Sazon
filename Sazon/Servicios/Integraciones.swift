@@ -34,7 +34,7 @@ extension ResumenWidget {
     static func desde(_ a: Almacen) -> ResumenWidget {
         let hoy = Date()
         let consumido = Diario.resumen(de: hoy, en: a.datos.registros).total
-        let meta = a.meta ?? .cero
+        let meta = a.metaDe(hoy) ?? .cero
         let ayuno = a.ayunoActivo
         let hex = a.tema.claro.hexHero
         return ResumenWidget(
@@ -168,20 +168,34 @@ final class Salud {
         return s
     }
 
-    private var tiposEscritura: Set<HKSampleType> {
+    /// Lo que se escribe por cada comida: energía y macros consumidos.
+    private static let tiposComida: [(id: HKQuantityTypeIdentifier, unidad: HKUnit, valor: KeyPath<Nutrientes, Double>, sufijo: String)] = [
+        (.dietaryEnergyConsumed, .kilocalorie(), \Nutrientes.kcal, "kcal"),
+        (.dietaryProtein, .gram(), \Nutrientes.proteina, "proteina"),
+        (.dietaryCarbohydrates, .gram(), \Nutrientes.carbohidratos, "carbohidratos"),
+        (.dietaryFatTotal, .gram(), \Nutrientes.grasas, "grasas")
+    ]
+
+    private func tiposEscritura(comidas: Bool) -> Set<HKSampleType> {
         var s = Set<HKSampleType>()
         if let t = HKObjectType.quantityType(forIdentifier: .bodyMass) { s.insert(t) }
+        if comidas {
+            for c in Salud.tiposComida {
+                if let t = HKObjectType.quantityType(forIdentifier: c.id) { s.insert(t) }
+            }
+        }
         return s
     }
 
     /// Pide permiso. Devuelve nil si todo fue bien o un texto con el problema.
-    func pedirPermiso() async -> String? {
+    /// - escribirComidas: pide también escribir calorías y macros consumidos.
+    func pedirPermiso(escribirComidas: Bool = false) async -> String? {
         guard HKHealthStore.isHealthDataAvailable() else { return "Apple Salud no está disponible en este dispositivo." }
         guard Firma.salud else {
             return "La firma de esta instalación no incluye el permiso de Apple Salud. Instala la versión «completa» del .ipa; si Sideloadly no lo conserva, esta función no está disponible con tu cuenta gratuita."
         }
         do {
-            try await tienda.requestAuthorization(toShare: tiposEscritura, read: tiposLectura)
+            try await tienda.requestAuthorization(toShare: tiposEscritura(comidas: escribirComidas), read: tiposLectura)
             return nil
         } catch {
             return "No se pudo conectar con Apple Salud (\(error.localizedDescription)). Es posible que la firma de la app no incluya el permiso de HealthKit."
@@ -224,6 +238,41 @@ final class Salud {
         let muestra = HKQuantitySample(type: tipo, quantity: HKQuantity(unit: .gramUnit(with: .kilo), doubleValue: kg),
                                        start: fecha, end: fecha)
         tienda.save(muestra) { _, _ in }
+    }
+
+    /// Escribe (o actualiza) en Salud las calorías y macros de unos
+    /// registros, y borra los de los registros eliminados. Cada muestra lleva
+    /// un identificador de sincronización (`HKMetadataKeySyncIdentifier`)
+    /// con el id del registro: al editarlo, la versión nueva reemplaza a la
+    /// anterior. Sin el permiso de HealthKit en la firma (por ejemplo, el
+    /// .ipa sencillo) o sin autorización, no hace nada.
+    func sincronizarComidas(cambiados: [Registro], borrados: [UUID]) {
+        guard disponible, !(cambiados.isEmpty && borrados.isEmpty) else { return }
+        let version = NSNumber(value: Int(Date().timeIntervalSince1970))
+        var muestras: [HKObject] = []
+        for c in Salud.tiposComida {
+            guard let tipo = HKQuantityType.quantityType(forIdentifier: c.id),
+                  tienda.authorizationStatus(for: tipo) == .sharingAuthorized else { continue }
+            for r in cambiados {
+                let valor = max(0, r.total[keyPath: c.valor])
+                guard valor.isFinite else { continue }
+                let metadatos: [String: Any] = [
+                    HKMetadataKeySyncIdentifier: "sazon.\(r.id.uuidString).\(c.sufijo)",
+                    HKMetadataKeySyncVersion: version,
+                    HKMetadataKeyFoodType: r.nombre
+                ]
+                muestras.append(HKQuantitySample(type: tipo, quantity: HKQuantity(unit: c.unidad, doubleValue: valor),
+                                                 start: r.fecha, end: r.fecha, metadata: metadatos))
+            }
+            if !borrados.isEmpty {
+                let ids = borrados.map { "sazon.\($0.uuidString).\(c.sufijo)" }
+                let filtro = HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeySyncIdentifier, allowedValues: ids)
+                tienda.deleteObjects(of: tipo, predicate: filtro) { _, _, _ in }
+            }
+        }
+        if !muestras.isEmpty {
+            tienda.save(muestras) { _, _ in }
+        }
     }
 
     private func suma(_ id: HKQuantityTypeIdentifier, unidad: HKUnit, desde: Date) async -> Double? {
