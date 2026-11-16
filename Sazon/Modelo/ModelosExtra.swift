@@ -378,7 +378,7 @@ struct ComidaFavorita: Codable, Identifiable, Equatable {
 /// Foto o texto guardado sin internet para analizarlo con la IA cuando
 /// vuelva la red. El resultado nunca se guarda solo: queda «listo para
 /// revisar» y tú lo confirmas.
-struct PendienteIA: Codable, Identifiable, Equatable {
+struct PendienteIA: Codable, Identifiable, Hashable {
     enum Tipo: String, Codable { case foto, texto }
     enum Estado: String, Codable {
         /// Esperando internet.

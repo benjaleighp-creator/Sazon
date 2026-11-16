@@ -501,6 +501,28 @@ enum LectorIA {
     }
 }
 
+// MARK: - Guardar un análisis (cola sin conexión)
+
+extension LectorIA {
+    /// Convierte un análisis al mismo JSON que devuelve la IA (sin cajas),
+    /// para guardarlo y volver a leerlo con `analisis(desde:)`.
+    static func json(de a: AnalisisIA) -> String? {
+        let lista: [[String: Any]] = a.alimentos.map { x in
+            [
+                "nombre": x.nombre, "gramos": x.gramos, "confianza": x.confianza,
+                "medida": x.medida?.nombre ?? "", "cantidad": x.cantidadMedida ?? 0,
+                "gramos_por_medida": x.medida?.gramos ?? 0,
+                "kcal_100g": x.por100g.kcal, "proteina_100g": x.por100g.proteina,
+                "carbohidratos_100g": x.por100g.carbohidratos, "grasas_100g": x.por100g.grasas,
+                "gramos_min": x.gramosMin ?? 0, "gramos_max": x.gramosMax ?? 0
+            ]
+        }
+        let raiz: [String: Any] = ["alimentos": lista, "posibles_ocultos": a.posiblesOcultos]
+        guard let datos = try? JSONSerialization.data(withJSONObject: raiz, options: [.sortedKeys]) else { return nil }
+        return String(data: datos, encoding: .utf8)
+    }
+}
+
 // MARK: - Límites (429)
 
 /// Lo que dice un 429 de Gemini sobre el límite alcanzado.

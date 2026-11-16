@@ -19,6 +19,8 @@ struct EstadoIAVista: View {
     var alSalir: ((DestinoRegistro) -> Void)? = nil
     /// A dónde lleva «Agregar a mano».
     var destinoManual: DestinoRegistro = .manual
+    /// Sin internet: guardar para analizar después (nil: no se ofrece).
+    var alGuardarParaDespues: (() -> Void)? = nil
 
     var body: some View {
         switch estado {
@@ -32,9 +34,10 @@ struct EstadoIAVista: View {
             if let alSalir {
                 TarjetaErrorIA(error: e,
                                alBuscarTabla: { alSalir(.buscar) },
-                               alAgregarAMano: { alSalir(destinoManual) })
+                               alAgregarAMano: { alSalir(destinoManual) },
+                               alGuardarParaDespues: alGuardarParaDespues)
             } else {
-                TarjetaErrorIA(error: e)
+                TarjetaErrorIA(error: e, alGuardarParaDespues: alGuardarParaDespues)
             }
         }
     }
@@ -58,6 +61,7 @@ struct RegistroTextoView: View {
     @State private var revisar = false
     @State private var envios = 0
     @State private var dictado = Dictado()
+    @State private var guardadoEnCola = false
 
     var body: some View {
         ScrollView {
@@ -88,7 +92,12 @@ struct RegistroTextoView: View {
                 }
                 FormularioClaveSiFalta()
                 EstadoIAVista(estado: estado, texto: "Identificando los alimentos…", tarea: tarea,
-                              alCancelar: cancelar, alSalir: alSalir)
+                              alCancelar: cancelar, alSalir: alSalir, alGuardarParaDespues: guardarParaDespues)
+                if guardadoEnCola {
+                    Aviso(icono: "tray.and.arrow.down", titulo: "Guardado para después",
+                          texto: "Se analizará solo cuando vuelva internet. Lo verás en el Diario, listo para revisar.",
+                          color: paleta.exito)
+                }
                 Text("Solo se envía este texto a Google Gemini (o a Groq, si pusiste su clave de respaldo). Si ya lo analizaste en las últimas 24 h, la respuesta sale de la memoria del iPhone. Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
@@ -130,8 +139,16 @@ struct RegistroTextoView: View {
         }
     }
 
+    private func guardarParaDespues() {
+        guard ColaIA.compartida.guardar(foto: nil, texto: texto, comida: comida, en: almacen) else { return }
+        estado = .inactivo
+        guardadoEnCola = true
+        texto = ""
+    }
+
     private func analizar() {
         dictado.detener()
+        guardadoEnCola = false
         envios += 1
         estado = .analizando
         let pedido = texto
@@ -177,6 +194,7 @@ struct RegistroFotoView: View {
     @State private var fase: FaseDeteccion = .inactiva
     @State private var visibles = 0
     @State private var exitos = 0
+    @State private var guardadoEnCola = false
     @Environment(\.accessibilityReduceMotion) private var reducir
 
     var body: some View {
@@ -205,7 +223,12 @@ struct RegistroFotoView: View {
                 }
                 FormularioClaveSiFalta()
                 EstadoIAVista(estado: estado, texto: "Mirando la foto…", tarea: tarea,
-                              alCancelar: cancelar, alSalir: alSalir)
+                              alCancelar: cancelar, alSalir: alSalir, alGuardarParaDespues: guardarParaDespues)
+                if guardadoEnCola {
+                    Aviso(icono: "tray.and.arrow.down", titulo: "Foto guardada para después",
+                          texto: "Se analizará solo cuando vuelva internet. La verás en el Diario, lista para revisar.",
+                          color: paleta.exito)
+                }
                 Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini (o a Groq, si pusiste su clave de respaldo). Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
@@ -270,8 +293,24 @@ struct RegistroFotoView: View {
         revisar = true
     }
 
+    /// Sin internet: guarda la foto reducida para analizarla después.
+    private func guardarParaDespues() {
+        guard let imagen else { return }
+        Task {
+            guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen),
+                  ColaIA.compartida.guardar(foto: jpeg, texto: "", comida: comida, en: almacen) else {
+                errorFoto = "No se pudo guardar la foto."
+                return
+            }
+            estado = .inactivo
+            fase = .inactiva
+            guardadoEnCola = true
+        }
+    }
+
     /// Foto nueva (cámara o galería): la petición anterior ya no sirve.
     private func usarFoto(_ foto: UIImage) {
+        guardadoEnCola = false
         cancelar()
         imagen = foto
         errorFoto = nil

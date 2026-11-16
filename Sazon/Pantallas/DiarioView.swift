@@ -17,6 +17,7 @@ struct DiarioView: View {
     @State private var editando: Registro?
     @State private var mostrarMeta = false
     @State private var mostrarCoach = false
+    @State private var mostrarCola = false
     @State private var guardados = 0
 
     var body: some View {
@@ -26,6 +27,10 @@ struct DiarioView: View {
             ScrollView {
                 VStack(spacing: Espacio.l) {
                     Saludo()
+
+                    if !almacen.datos.colaIA.isEmpty {
+                        AvisoColaIA(cola: almacen.datos.colaIA) { mostrarCola = true }
+                    }
 
                     // 1. Lo más importante: cuánto te queda hoy.
                     if let meta = almacen.meta {
@@ -126,6 +131,9 @@ struct DiarioView: View {
             .sheet(item: $editando) { registro in
                 EditarRegistroView(original: registro)
                     .entornoSazon(almacen)
+            }
+            .sheet(isPresented: $mostrarCola) {
+                ColaIAView().entornoSazon(almacen)
             }
             .sheet(isPresented: $mostrarCoach) {
                 CoachView().entornoSazon(almacen)

@@ -161,6 +161,8 @@ struct TarjetaErrorIA: View {
     let error: ErrorIA
     var alBuscarTabla: (() -> Void)? = nil
     var alAgregarAMano: (() -> Void)? = nil
+    /// Sin internet: guardar la foto o el texto para analizarlo después.
+    var alGuardarParaDespues: (() -> Void)? = nil
     @Environment(\.paleta) private var paleta
 
     var body: some View {
@@ -183,6 +185,13 @@ struct TarjetaErrorIA: View {
             }
             .accessibilityElement(children: .combine)
 
+            if error == .sinInternet, let alGuardarParaDespues {
+                Button(action: alGuardarParaDespues) {
+                    Label("Analizar cuando vuelva internet", systemImage: "tray.and.arrow.down")
+                }
+                .buttonStyle(.secundario)
+                .accessibilityHint("Lo guarda en este iPhone y lo analiza solo cuando haya conexión; luego lo revisas")
+            }
             if alBuscarTabla != nil || alAgregarAMano != nil {
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: Espacio.s) { salidas }

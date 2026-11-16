@@ -486,3 +486,16 @@ final class PruebasEtiquetaLocal: XCTestCase {
         XCTAssertEqual(ParserEtiqueta.filas(piezas), ["Proteínas 8 g", "Grasa total 10 g"])
     }
 }
+
+final class PruebasColaSinConexion: XCTestCase {
+    func testAnalisisSeGuardaYSeVuelveALeer() throws {
+        let original = try LectorIA.analisis(desde: #"{"alimentos": [{"nombre": "Pan", "gramos": 60, "confianza": 0.9, "medida": "unidad", "cantidad": 2, "gramos_por_medida": 30, "kcal_100g": 280, "proteina_100g": 8, "carbohidratos_100g": 57, "grasas_100g": 2, "gramos_min": 50, "gramos_max": 70}], "posibles_ocultos": ["mantequilla"]}"#)
+        let json = try XCTUnwrap(LectorIA.json(de: original))
+        let vuelta = try LectorIA.analisis(desde: json)
+        XCTAssertEqual(vuelta.alimentos.map(\.nombre), ["Pan"])
+        XCTAssertEqual(vuelta.alimentos[0].gramos, 60)
+        XCTAssertEqual(vuelta.alimentos[0].medida, original.alimentos[0].medida)
+        XCTAssertEqual(vuelta.alimentos[0].gramosMax, 70)
+        XCTAssertEqual(vuelta.posiblesOcultos, ["mantequilla"])
+    }
+}
