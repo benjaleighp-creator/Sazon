@@ -21,7 +21,10 @@ struct CapaDeteccion: View {
     @Environment(\.paleta) private var paleta
     @Environment(\.accessibilityReduceMotion) private var reducir
     @Environment(\.ahorroActivo) private var ahorro
+    @Environment(\.scenePhase) private var escena
     @State private var fundido = false
+    /// La animación solo corre mientras la capa está en pantalla y la app activa.
+    @State private var enPantalla = false
 
     var body: some View {
         GeometryReader { geo in
@@ -45,7 +48,11 @@ struct CapaDeteccion: View {
             }
         }
         .allowsHitTesting(false)
+        // Decorativa: VoiceOver recibe un anuncio con los alimentos detectados
+        // (RegistroFotoView) y la lista de abajo.
         .accessibilityHidden(true)
+        .onAppear { enPantalla = true }
+        .onDisappear { enPantalla = false }
     }
 
     // MARK: Puntos
@@ -53,8 +60,10 @@ struct CapaDeteccion: View {
     private func puntos(_ tam: CGSize) -> some View {
         let n = Deteccion.cantidadPuntos(ahorro: ahorro)
         let cajas = alimentos.map(\.caja)
-        // Con ahorro de batería: unos 15 cuadros por segundo.
-        return TimelineView(.animation(minimumInterval: ahorro ? 1.0 / 15 : nil, paused: false)) { contexto in
+        // Unos 30 cuadros por segundo (15 con ahorro de batería) y en pausa
+        // fuera de pantalla o con la app en segundo plano.
+        let pausada = !enPantalla || escena != .active
+        return TimelineView(.animation(minimumInterval: Deteccion.intervaloCuadro(ahorro: ahorro), paused: pausada)) { contexto in
             Canvas { ctx, size in
                 for i in 0..<n {
                     let p: (x: Double, y: Double)

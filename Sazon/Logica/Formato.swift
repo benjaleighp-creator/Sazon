@@ -93,3 +93,27 @@ extension Formato {
         String(calendario.component(.day, from: fecha))
     }
 }
+
+extension Formato {
+    /// Tiempo de espera corto: "8 s", "1 min 05 s". Negativos o no finitos: "0 s".
+    static func duracionCorta(_ segundos: TimeInterval) -> String {
+        guard segundos.isFinite, segundos > 0 else { return "0 s" }
+        let total = Int(segundos)
+        let minutos = total / 60
+        let resto = total % 60
+        if minutos == 0 { return "\(resto) s" }
+        return "\(minutos) min " + (resto < 10 ? "0\(resto)" : "\(resto)") + " s"
+    }
+
+    /// Lo mismo, dicho en palabras para VoiceOver: "8 segundos", "1 minuto y 5 segundos".
+    static func duracionHablada(_ segundos: TimeInterval) -> String {
+        guard segundos.isFinite, segundos > 0 else { return "0 segundos" }
+        let total = Int(segundos)
+        let minutos = total / 60
+        let resto = total % 60
+        let textoSeg = resto == 1 ? "1 segundo" : "\(resto) segundos"
+        if minutos == 0 { return textoSeg }
+        let textoMin = minutos == 1 ? "1 minuto" : "\(minutos) minutos"
+        return resto == 0 ? textoMin : "\(textoMin) y \(textoSeg)"
+    }
+}

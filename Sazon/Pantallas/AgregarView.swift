@@ -223,9 +223,9 @@ struct AgregarView: View {
             .navigationDestination(for: DestinoRegistro.self) { destino in
                 switch destino {
                 case .foto:
-                    RegistroFotoView(comida: $comida, alGuardar: guardar)
+                    RegistroFotoView(comida: $comida, alGuardar: guardar, alSalir: cambiarA)
                 case .texto:
-                    RegistroTextoView(comida: $comida, alGuardar: guardar)
+                    RegistroTextoView(comida: $comida, alGuardar: guardar, alSalir: cambiarA)
                 case .escanear:
                     EscanerView(
                         alResolver: { candidato in ruta.append(.porcion(candidato)) },
@@ -233,7 +233,7 @@ struct AgregarView: View {
                         alBuscarTabla: { ruta.append(.buscar) }
                     )
                 case .etiqueta(let codigo):
-                    EtiquetaView(codigo: codigo) { candidato in ruta.append(.porcion(candidato)) }
+                    EtiquetaView(codigo: codigo, alLeer: { candidato in ruta.append(.porcion(candidato)) }, alSalir: cambiarA)
                 case .buscar:
                     BuscarView { alimento in ruta.append(.porcion(Candidato(alimento: alimento))) }
                 case .manual:
@@ -272,6 +272,13 @@ struct AgregarView: View {
         } else {
             pedirAviso = destino
         }
+    }
+
+    /// Cambia la pantalla actual por otra (por ejemplo, del error de la IA
+    /// a la tabla): al volver atrás se llega al menú, no al error.
+    private func cambiarA(_ destino: DestinoRegistro) {
+        if !ruta.isEmpty { ruta.removeLast() }
+        ruta.append(destino)
     }
 
     private func guardar(_ registros: [Registro]) {

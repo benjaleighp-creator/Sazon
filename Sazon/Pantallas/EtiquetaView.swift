@@ -7,6 +7,8 @@ import SwiftUI
 struct EtiquetaView: View {
     let codigo: String?
     let alLeer: (Candidato) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
@@ -14,6 +16,7 @@ struct EtiquetaView: View {
     @State private var seleccion: PhotosPickerItem?
     @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
+    @State private var tarea = TareaIA()
     @State private var errorFoto: String?
     @State private var envios = 0
 
@@ -56,17 +59,9 @@ struct EtiquetaView: View {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                switch estado {
-                case .inactivo:
-                    EmptyView()
-                case .analizando:
-                    HStack(spacing: Espacio.s) {
-                        ProgressView()
-                        Text("Gemini está leyendo la etiqueta…").font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
-                    }
-                case .error(let e):
-                    Aviso(icono: "exclamationmark.triangle", titulo: e.titulo, texto: e.mensaje, color: paleta.aviso)
-                }
+                EstadoIAVista(estado: estado, texto: "Gemini está leyendo la etiqueta…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir,
+                              destinoManual: .porcion(Candidato(manual: "", codigoBarras: codigo)))
                 Text("Solo se envía la foto de la etiqueta, reducida y sin ubicación. Después revisas y corriges los números antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
@@ -88,6 +83,7 @@ struct EtiquetaView: View {
         }
         .fullScreenCover(isPresented: $mostrarCamara) {
             Camara { foto in
+                cancelar()
                 imagen = foto
                 estado = .inactivo
             }
@@ -97,6 +93,7 @@ struct EtiquetaView: View {
             guard let nueva else { return }
             Task {
                 if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
+                    cancelar()
                     imagen = foto
                     errorFoto = nil
                     estado = .inactivo
@@ -106,6 +103,13 @@ struct EtiquetaView: View {
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
+        .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
+            if case .error = nuevo { return true } else { return false }
+        }
+        .onDisappear {
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
+        }
     }
 
     @ViewBuilder
@@ -129,19 +133,23 @@ struct EtiquetaView: View {
         }
         envios += 1
         estado = .analizando
-        Task {
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 let leida = try await proveedor.leerEtiqueta(fotoJPEG: jpeg)
+                try Task.checkCancellation()
                 estado = .inactivo
                 alLeer(Candidato(etiqueta: leida, codigoBarras: codigo))
-            } catch let e as ErrorIA {
-                estado = .error(e)
-            } catch is CancellationError {
-                estado = .inactivo
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
             }
         }
+    }
+
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
     }
 }

@@ -16,14 +16,36 @@ protocol ProveedorIA {
     func conversar(mensajes: [MensajeCoach], contexto: String?) async throws -> String
 }
 
+/// Lo que pasa durante la espera, para contárselo a la persona (así una
+/// espera larga no parece un cuelgue).
+enum PasoIA: Equatable {
+    /// El modelo elegido está saturado: se vuelve a intentar.
+    case reintentando
+    /// Se prueba un modelo de respaldo.
+    case otroModelo(String)
+
+    var mensaje: String {
+        switch self {
+        case .reintentando: return "Gemini está saturado. Lo intento de nuevo…"
+        case .otroModelo(let nombre): return "Probando otro modelo (\(nombre))…"
+        }
+    }
+}
+
+/// Aviso de progreso. Puede llegar desde cualquier hilo.
+typealias AvisoPasoIA = @Sendable (PasoIA) -> Void
+
 enum ServicioIA {
     /// Proveedor que usan las pantallas. Lee la clave del Llavero y el modelo
-    /// de los ajustes en el momento de cada petición.
+    /// de los ajustes en el momento de cada petición. `alAvanzar` recibe los
+    /// reintentos y cambios de modelo (para mostrarlos mientras se espera).
     @MainActor
-    static func proveedorActual(_ datos: DatosApp) throws -> ProveedorIA {
+    static func proveedorActual(_ datos: DatosApp, alAvanzar: AvisoPasoIA? = nil) throws -> ProveedorIA {
         guard datos.avisoIAAceptado else { throw ErrorIA.avisoNoAceptado }
         guard let clave = Llavero.leerClave() else { throw ErrorIA.sinClave }
-        return ProveedorGemini(clave: clave, modelo: datos.modeloIA, formato: datos.formatoPeticionIA)
+        var proveedor = ProveedorGemini(clave: clave, modelo: datos.modeloIA, formato: datos.formatoPeticionIA)
+        proveedor.alAvanzar = alAvanzar
+        return proveedor
     }
 }
 
@@ -40,6 +62,8 @@ struct ProveedorGemini: ProveedorIA {
     let modelo: String
     let formato: FormatoPeticionIA
     var sesion: URLSession = .shared
+    /// Avisa de reintentos y cambios de modelo (no cambia cuándo se reintenta).
+    var alAvanzar: AvisoPasoIA? = nil
 
     static let base = "https://generativelanguage.googleapis.com/v1beta/models/"
 
@@ -94,6 +118,11 @@ struct ProveedorGemini: ProveedorIA {
                 try Task.checkCancellation()
                 if (indice > 0 || intento > 1), Date().timeIntervalSince(inicio) > Self.esperaMaxima {
                     break recorrido
+                }
+                if intento > 1 {
+                    alAvanzar?(.reintentando)
+                } else if indice > 0 {
+                    alAvanzar?(.otroModelo(nombre))
                 }
                 do {
                     return try await pedirTexto(cuerpo, modelo: nombre)

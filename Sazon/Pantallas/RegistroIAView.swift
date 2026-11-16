@@ -9,24 +9,32 @@ enum EstadoIA: Equatable {
     case error(ErrorIA)
 }
 
-/// Bloque que muestra el estado de la IA (cargando o error con salida).
-private struct EstadoIAVista: View {
+/// Bloque que muestra el estado de la IA: espera (con tiempo, avisos y
+/// Cancelar) o error (con salidas al modo manual).
+struct EstadoIAVista: View {
     let estado: EstadoIA
     let texto: String
-    @Environment(\.paleta) private var paleta
+    let tarea: TareaIA
+    let alCancelar: () -> Void
+    /// Salida al modo manual (nil: el error no ofrece salidas).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
+    /// A dónde lleva «Agregar a mano».
+    var destinoManual: DestinoRegistro = .manual
 
     var body: some View {
         switch estado {
         case .inactivo:
             EmptyView()
         case .analizando:
-            HStack(spacing: Espacio.s) {
-                ProgressView()
-                Text(texto).font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
-            }
-            .accessibilityElement(children: .combine)
+            TarjetaEsperaIA(titulo: texto, inicio: tarea.inicio, paso: tarea.paso, alCancelar: alCancelar)
         case .error(let e):
-            Aviso(icono: "exclamationmark.triangle", titulo: e.titulo, texto: e.mensaje, color: paleta.aviso)
+            if let alSalir {
+                TarjetaErrorIA(error: e,
+                               alBuscarTabla: { alSalir(.buscar) },
+                               alAgregarAMano: { alSalir(destinoManual) })
+            } else {
+                TarjetaErrorIA(error: e)
+            }
         }
     }
 }
@@ -37,11 +45,14 @@ private struct EstadoIAVista: View {
 struct RegistroTextoView: View {
     @Binding var comida: TipoComida
     let alGuardar: ([Registro]) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @State private var texto = ""
     @State private var estado: EstadoIA = .inactivo
+    @State private var tarea = TareaIA()
     @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
     @State private var envios = 0
@@ -75,7 +86,8 @@ struct RegistroTextoView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está identificando los alimentos…")
+                EstadoIAVista(estado: estado, texto: "Gemini está identificando los alimentos…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir)
                 Text("Solo se envía este texto a Google Gemini. Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
@@ -88,7 +100,11 @@ struct RegistroTextoView: View {
         .onChange(of: dictado.texto) { _, nuevo in
             if dictado.escuchando { texto = nuevo }
         }
-        .onDisappear { dictado.detener() }
+        .onDisappear {
+            dictado.detener()
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
+        }
         .navigationTitle("Escribir o dictar")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -117,20 +133,24 @@ struct RegistroTextoView: View {
         envios += 1
         estado = .analizando
         let pedido = texto
-        Task {
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 analisis = try await proveedor.analizar(texto: pedido)
+                try Task.checkCancellation()
                 estado = .inactivo
                 revisar = true
-            } catch let e as ErrorIA {
-                estado = .error(e)
-            } catch is CancellationError {
-                estado = .inactivo
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
             }
         }
+    }
+
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
     }
 }
 
@@ -140,9 +160,12 @@ struct RegistroTextoView: View {
 struct RegistroFotoView: View {
     @Binding var comida: TipoComida
     let alGuardar: ([Registro]) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @State private var tarea = TareaIA()
     @State private var imagen: UIImage?
     @State private var seleccion: PhotosPickerItem?
     @State private var mostrarCamara = false
@@ -186,7 +209,8 @@ struct RegistroFotoView: View {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está mirando la foto…")
+                EstadoIAVista(estado: estado, texto: "Gemini está mirando la foto…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir)
                 Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini. Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
@@ -212,6 +236,7 @@ struct RegistroFotoView: View {
         }
         .fullScreenCover(isPresented: $mostrarCamara) {
             Camara { foto in
+                cancelar()
                 imagen = foto
                 estado = .inactivo
                 fase = .inactiva
@@ -222,6 +247,8 @@ struct RegistroFotoView: View {
             guard let nueva else { return }
             Task {
                 if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
+                    // Foto nueva: la petición anterior ya no sirve.
+                    cancelar()
                     imagen = foto
                     errorFoto = nil
                     estado = .inactivo
@@ -244,6 +271,10 @@ struct RegistroFotoView: View {
             // Al volver de la revisión, la foto queda limpia.
             if !abierto { fase = .inactiva; visibles = 0 }
         }
+        .onDisappear {
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
+        }
     }
 
     private var esDetectando: Bool {
@@ -262,6 +293,7 @@ struct RegistroFotoView: View {
             try? await Task.sleep(nanoseconds: UInt64(paso * 1e9))
         }
         try? await Task.sleep(nanoseconds: 350_000_000)
+        guard !Task.isCancelled else { return }
         exitos += 1
         revisar = true
     }
@@ -290,24 +322,31 @@ struct RegistroFotoView: View {
         analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
         let inicio = Date()
         fase = .esperando(inicio: inicio)
-        Task {
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 analisis = try await proveedor.analizar(fotoJPEG: jpeg)
+                try Task.checkCancellation()
                 estado = .inactivo
                 fase = .detectando(inicio: Date(), desdeEspera: Date().timeIntervalSince(inicio))
+                // VoiceOver lee todos los alimentos detectados (la capa de
+                // puntos y cajas es solo decorativa).
+                UIAccessibility.post(notification: .announcement,
+                                     argument: Deteccion.anuncio(analisis.alimentos.map { (nombre: $0.nombre, gramos: $0.gramos) }))
                 await revelar()
-            } catch let e as ErrorIA {
-                estado = .error(e)
-                fase = .detenida
-            } catch is CancellationError {
-                estado = .inactivo
-                fase = .inactiva
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
                 fase = .detenida
             }
         }
+    }
+
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
+        if case .esperando = fase { fase = .inactiva }
     }
 }
 

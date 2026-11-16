@@ -245,6 +245,17 @@ final class PruebasFormato: XCTestCase {
         XCTAssertEqual(Formato.entero(1834.6), "1835")
     }
 
+    func testDuracionCorta() {
+        XCTAssertEqual(Formato.duracionCorta(0), "0 s")
+        XCTAssertEqual(Formato.duracionCorta(-3), "0 s")
+        XCTAssertEqual(Formato.duracionCorta(8.9), "8 s")
+        XCTAssertEqual(Formato.duracionCorta(65), "1 min 05 s")
+        XCTAssertEqual(Formato.duracionCorta(.infinity), "0 s")
+        XCTAssertEqual(Formato.duracionHablada(1), "1 segundo")
+        XCTAssertEqual(Formato.duracionHablada(65), "1 minuto y 5 segundos")
+        XCTAssertEqual(Formato.duracionHablada(120), "2 minutos")
+    }
+
     func testPrimeraMayuscula() {
         XCTAssertEqual(Formato.primeraMayuscula("domingo, 1 de noviembre"), "Domingo, 1 de noviembre")
         XCTAssertEqual(Formato.primeraMayuscula(""), "")
