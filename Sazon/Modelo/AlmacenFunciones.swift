@@ -156,9 +156,9 @@ extension Almacen {
         datos.recetas.removeAll { $0.id == r.id }
     }
 
-    /// Todo lo que se puede buscar: tabla del INS, tus alimentos y tus recetas.
-    /// Los tuyos llevan código "P:" (propio) o "R:" (receta).
-    var alimentosBuscables: [AlimentoBase] {
+    /// Tus alimentos y tus recetas como alimentos buscables.
+    /// Llevan código "P:" (propio) o "R:" (receta).
+    var alimentosPropiosYRecetas: [AlimentoBase] {
         let propios = datos.alimentosPropios.map {
             AlimentoBase(codigo: "P:\($0.id.uuidString)", nombre: $0.nombre, grupo: "Mis alimentos", por100g: $0.por100g, medidas: $0.medidas)
         }
@@ -166,11 +166,15 @@ extension Almacen {
             AlimentoBase(codigo: "R:\(r.id.uuidString)", nombre: r.nombre, grupo: "Mis recetas", por100g: Recetas.por100g(r),
                          medidas: [MedidaCasera(nombre: "porción", gramos: Recetas.gramosPorPorcion(r), estimada: false)])
         }
-        return propios + recetas + tabla.alimentos
+        return propios + recetas
     }
 
     func buscarTodo(_ texto: String, limite: Int = 50) -> [Coincidencia] {
-        Busqueda.buscar(texto, en: alimentosBuscables, limite: limite)
+        // Tus alimentos y recetas son pocos: se buscan directo. La tabla del
+        // INS usa su índice ya normalizado.
+        let tuyos = Busqueda.buscar(texto, en: alimentosPropiosYRecetas, limite: limite)
+        let tabla = Busqueda.buscar(texto, en: self.tabla.indice, limite: limite)
+        return Busqueda.ordenar(tuyos + tabla, limite: limite)
     }
 
     // MARK: Plan de comidas

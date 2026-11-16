@@ -25,8 +25,9 @@ final class Almacen {
     /// Día que muestra el diario (las flechas lo cambian).
     var diaVisible: Date = Calendar.current.startOfDay(for: Date())
 
-    /// Tabla del INS (se carga una vez desde el archivo de la app).
-    let tabla: TablaINS
+    /// Tabla del INS. Se lee en segundo plano al abrir la app (así no
+    /// retrasa el arranque); mientras tanto está vacía (`cargada == false`).
+    private(set) var tabla: TablaINS = .cargando
 
     /// Último error al guardar (se muestra en Ajustes si ocurre).
     var errorGuardado: String?
@@ -55,12 +56,19 @@ final class Almacen {
     private static let nombreArchivo = "datos-sazon.json"
 
     private init() {
-        self.tabla = TablaINS.cargar()
         let carga = Almacen.cargarDesdeDisco()
         self.datos = carga.datos ?? DatosApp()
         self.avisoCarga = carga.aviso
         self.protegerArchivo = carga.proteger
         EstiloActivo.actual = CatalogoTemas.tema(id: datos.temaID).estilo
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let tabla = TablaINS.cargar()
+            await self?.ponerTabla(tabla)
+        }
+    }
+
+    private func ponerTabla(_ t: TablaINS) {
+        tabla = t
     }
 
     // MARK: - Lectura rápida

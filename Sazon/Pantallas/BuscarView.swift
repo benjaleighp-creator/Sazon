@@ -14,6 +14,10 @@ struct BuscarView: View {
                 Aviso(icono: "exclamationmark.triangle", titulo: "Tabla no disponible", texto: error, color: paleta.peligro)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
+            } else if !almacen.tabla.cargada {
+                ProgressView("Cargando la tabla del INS…")
+                    .frame(maxWidth: .infinity)
+                    .listRowBackground(Color.clear)
             } else if consulta.trimmingCharacters(in: .whitespaces).isEmpty {
                 EstadoVacio(icono: "magnifyingglass", titulo: "Busca un alimento",
                             texto: "\(almacen.tabla.alimentos.count) alimentos y platos de las Tablas Peruanas de Composición de Alimentos (INS), más tus alimentos y recetas. Prueba «palta», «pan francés» o «ají de gallina».")
@@ -54,7 +58,7 @@ struct BuscarView: View {
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $consulta, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar alimento o plato")
         .autocorrectionDisabled()
-        .task(id: consulta) {
+        .task(id: "\(consulta)|\(almacen.tabla.alimentos.count)") {
             // Pequeña espera para no buscar en cada letra.
             try? await Task.sleep(nanoseconds: 150_000_000)
             guard !Task.isCancelled else { return }

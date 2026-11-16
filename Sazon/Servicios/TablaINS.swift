@@ -2,22 +2,33 @@ import Foundation
 
 /// Tabla del INS que viene dentro de la app (Sazon/Datos/alimentos-ins.json).
 /// Funciona sin internet. La generó herramientas/convertir_ins.py.
+/// Se carga en segundo plano al abrir la app (`Almacen`), con los nombres
+/// ya normalizados para buscar rápido.
 struct TablaINS {
     let fuente: String
     let alimentos: [AlimentoBase]
     /// Si el archivo no se pudo leer, explica por qué (se muestra en la búsqueda).
     let error: String?
+    /// False mientras se lee el archivo al abrir la app.
+    let cargada: Bool
+    /// Nombres normalizados, para buscar sin recalcularlos.
+    let indice: IndiceBusqueda
 
     private let porCodigo: [String: AlimentoBase]
 
-    init(fuente: String, alimentos: [AlimentoBase], error: String?) {
+    init(fuente: String, alimentos: [AlimentoBase], error: String?, cargada: Bool = true) {
         self.fuente = fuente
         self.alimentos = alimentos
         self.error = error
-        var indice: [String: AlimentoBase] = [:]
-        for a in alimentos { indice[a.codigo] = a }
-        self.porCodigo = indice
+        self.cargada = cargada
+        self.indice = IndiceBusqueda(alimentos)
+        var porCodigo: [String: AlimentoBase] = [:]
+        for a in alimentos { porCodigo[a.codigo] = a }
+        self.porCodigo = porCodigo
     }
+
+    /// Tabla vacía mientras se carga la de verdad.
+    static let cargando = TablaINS(fuente: "", alimentos: [], error: nil, cargada: false)
 
     static func cargar(bundle: Bundle = .main) -> TablaINS {
         guard let url = bundle.url(forResource: "alimentos-ins", withExtension: "json") else {
@@ -33,11 +44,7 @@ struct TablaINS {
 
     func alimento(codigo: String) -> AlimentoBase? { porCodigo[codigo] }
 
-    func buscar(_ texto: String, limite: Int = 40) -> [Coincidencia] {
-        Busqueda.buscar(texto, en: alimentos, limite: limite)
-    }
-
     func emparejar(_ nombreIA: String) -> Coincidencia? {
-        Busqueda.emparejar(nombreIA, en: alimentos)
+        Busqueda.emparejar(nombreIA, en: indice)
     }
 }
