@@ -139,15 +139,6 @@ final class Almacen {
         datos.registros.removeAll { $0.id == registro.id }
     }
 
-    /// Copia un registro anterior al día visible (acceso rápido "Recientes").
-    func repetir(_ registro: Registro, en comida: TipoComida) {
-        var copia = registro
-        copia.id = UUID()
-        copia.fecha = Diario.fechaParaRegistrar(enDia: diaVisible)
-        copia.comida = comida
-        agregar([copia])
-    }
-
     func moverDia(_ dias: Int) {
         diaVisible = Diario.moverDia(diaVisible, dias: dias)
     }
