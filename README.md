@@ -22,7 +22,12 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 - Media mañana y media tarde opcionales (Ajustes › Comidas del día).
 - Animación al analizar la foto: puntos sobre la foto mientras la IA
   trabaja; luego se juntan sobre cada alimento (cajas «box_2d» de Gemini,
-  validadas) o en la lista debajo si no hay caja.
+  validadas) o en la lista debajo si no hay caja. Con VoiceOver se anuncian
+  los alimentos detectados; con «Reducir movimiento» solo hay un fundido.
+- Mientras la IA trabaja se ve cuánto tiempo lleva, un aviso si se prueba
+  otro modelo y un botón **Cancelar** (salir de la pantalla también corta
+  la petición). Si la IA falla, el aviso trae botones para **Buscar en la
+  tabla** o **Agregar a mano**.
 
 **Meta**
 - Mifflin-St Jeor con fórmula visible, tipo de dieta (equilibrada, alta en
@@ -50,7 +55,8 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 **Más**
 - Coach con IA (solo envía lo que escribes; el resumen del día es opcional).
 - Recordatorios locales de comidas, agua, peso y ayuno.
-- Widgets de calorías y macros, agua, ayuno y pantalla bloqueada.
+- Widgets de calorías y macros, agua, ayuno y pantalla bloqueada (su letra
+  sigue el tamaño de texto del iPhone, con un tope para que quepa).
 - Exportar comidas y pesos a CSV; respaldo completo.
 
 Cada registro muestra su origen: INS, Open Food Facts, etiqueta del envase,
@@ -90,8 +96,9 @@ INS, Open Food Facts y tus propias recetas.
   de Gemini al 1 de noviembre de 2026). Se puede cambiar en Ajustes.
 - La clave de API se pega una vez en Ajustes y se guarda en el **Llavero**
   del iPhone. Nunca va en este repositorio ni en el código.
-- Una sola llamada por registro, sin reintentos automáticos. Las fotos se
-  reducen a 1024 px y se envían sin metadatos.
+- Si Gemini está saturado, la app reintenta una vez y luego prueba modelos
+  gratuitos de respaldo (lo avisa en pantalla y se puede cancelar). Las
+  fotos se reducen a 1024 px y se envían sin metadatos.
 - En el plan gratuito, Google puede usar lo enviado para mejorar sus
   productos. La app lo avisa la primera vez.
 - Toda la conexión con la IA está en `Sazon/Servicios/ServicioIA.swift`.
