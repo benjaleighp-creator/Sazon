@@ -41,7 +41,7 @@ struct ProveedorGroq: ProveedorIA {
 
     func conversar(mensajes: [MensajeCoach], contexto: String?) async throws -> String {
         let cuerpo = try LectorIA.cuerpoGroqCoach(modelo: modelo, mensajes: mensajes, contexto: contexto)
-        return try await pedir(cuerpo, tope: PoliticaIA.tiempoTotal).trimmingCharacters(in: .whitespacesAndNewlines)
+        return LectorIA.respuestaCoach(try await pedir(cuerpo, tope: PoliticaIA.tiempoTotal))
     }
 
     private func analisis(_ tipo: LectorIA.TipoAnalisis, texto: String?, imagen: String?) async throws -> AnalisisIA {

@@ -65,21 +65,22 @@ enum LectorOpenFoodFacts {
             ?? LectorIA.numero(n["energy_100g"]).map { $0 / 4.184 }   // kJ → kcal
         // Valores imposibles (más de 900 kcal por 100 g) se tratan como faltantes.
         guard let kcal, (0...900).contains(kcal) else { throw ErrorOpenFoodFacts.sinDatosNutricionales }
-        let prot = LectorIA.numero(n["proteins_100g"])
-        let carb = LectorIA.numero(n["carbohydrates_100g"])
-        let gras = LectorIA.numero(n["fat_100g"])
+        // Valores fuera de rango (negativos o imposibles) se tratan como faltantes.
+        let prot = enRango(n["proteins_100g"], 0...100)
+        let carb = enRango(n["carbohydrates_100g"], 0...100)
+        let gras = enRango(n["fat_100g"], 0...100)
 
-        let nombreES = (p["product_name_es"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let nombreGeneral = (p["product_name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let nombreES = LectorIA.textoLimpio(p["product_name_es"], maximo: LectorIA.maxLargoNombre)
+        let nombreGeneral = LectorIA.textoLimpio(p["product_name"], maximo: LectorIA.maxLargoNombre)
         let nombre = !nombreES.isEmpty ? nombreES : (!nombreGeneral.isEmpty ? nombreGeneral : "Producto \(codigo)")
         let marca = (p["brands"] as? String)?
             .split(separator: ",").first
-            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .map { LectorIA.textoLimpio(String($0), maximo: 60) }
             .flatMap { $0.isEmpty ? nil : $0 }
 
         var porcion: MedidaCasera?
         if let gramos = LectorIA.numero(p["serving_quantity"]), Porciones.esValido(gramos) {
-            let texto = (p["serving_size"] as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
+            let texto = LectorIA.textoLimpio(p["serving_size"], maximo: 30)
             porcion = MedidaCasera(nombre: texto.isEmpty ? "porción del envase" : "porción (\(texto))",
                                    gramos: gramos, estimada: false)
         }
@@ -89,12 +90,19 @@ enum LectorOpenFoodFacts {
             nombre: Formato.primeraMayuscula(nombre),
             marca: marca,
             por100g: Nutrientes(kcal: kcal, proteina: prot ?? 0, carbohidratos: carb ?? 0, grasas: gras ?? 0,
-                                fibra: LectorIA.numero(n["fiber_100g"]) ?? 0,
-                                // Open Food Facts da el sodio en gramos; aquí va en miligramos.
-                                sodio: (LectorIA.numero(n["sodium_100g"]) ?? 0) * 1000,
-                                azucar: LectorIA.numero(n["sugars_100g"]) ?? 0),
+                                fibra: enRango(n["fiber_100g"], 0...100) ?? 0,
+                                // Open Food Facts da el sodio en gramos; aquí va en miligramos
+                                // (como máximo 40 g por 100 g, la sal pura).
+                                sodio: (enRango(n["sodium_100g"], 0...40) ?? 0) * 1000,
+                                azucar: enRango(n["sugars_100g"], 0...100) ?? 0),
             datosIncompletos: prot == nil || carb == nil || gras == nil,
             porcion: porcion
         )
+    }
+
+    /// Número dentro del rango, o nil si falta o no tiene sentido.
+    static func enRango(_ valor: Any?, _ rango: ClosedRange<Double>) -> Double? {
+        guard let v = LectorIA.numero(valor), rango.contains(v) else { return nil }
+        return v
     }
 }

@@ -402,9 +402,10 @@ enum LectorIA {
         if lista.isEmpty { throw ErrorIA.sinAlimentos }
 
         var resultado: [AlimentoIdentificado] = []
-        for (i, item) in lista.enumerated() {
+        // Tope de alimentos por respuesta (un plato real no trae más).
+        for (i, item) in lista.prefix(maxAlimentos).enumerated() {
             let n = i + 1
-            let nombre = (item["nombre"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let nombre = textoLimpio(item["nombre"], maximo: maxLargoNombre)
             guard !nombre.isEmpty else { throw ErrorIA.jsonInvalido("el alimento \(n) no tiene nombre") }
             guard let gramos = numero(item["gramos"]), Porciones.esValido(gramos) else {
                 throw ErrorIA.jsonInvalido("la porción de «\(nombre)» no es válida")
@@ -418,9 +419,9 @@ enum LectorIA {
             }
             var medida: MedidaCasera?
             var cantidad: Double?
-            let nombreMedida = (item["medida"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let nombreMedida = textoLimpio(item["medida"], maximo: 40)
             if !nombreMedida.isEmpty,
-               let cant = numero(item["cantidad"]), cant > 0,
+               let cant = numero(item["cantidad"]), cant > 0, cant <= 100,
                let porMedida = numero(item["gramos_por_medida"]), Porciones.esValido(porMedida) {
                 medida = MedidaCasera(nombre: nombreMedida.lowercased(), gramos: porMedida, estimada: true)
                 cantidad = cant
@@ -472,10 +473,27 @@ enum LectorIA {
             let d = n.doubleValue
             return d.isFinite ? d : nil
         }
-        if let s = valor as? String {
-            return Double(s.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: .whitespaces))
+        if let s = valor as? String, s.count <= 32,
+           let d = Double(s.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: .whitespaces)) {
+            // «inf» o «nan» en texto también se rechazan.
+            return d.isFinite ? d : nil
         }
         return nil
+    }
+
+    /// Máximo de alimentos que se aceptan de una respuesta.
+    static let maxAlimentos = 20
+    /// Largo máximo de un nombre que llega de la IA o de Open Food Facts.
+    static let maxLargoNombre = 80
+    /// Largo máximo de una respuesta del coach que se muestra y se guarda.
+    static let maxLargoCoach = 4000
+
+    /// Texto sin espacios de sobra, sin caracteres de control y recortado.
+    static func textoLimpio(_ valor: Any?, maximo: Int) -> String {
+        guard let s = valor as? String else { return "" }
+        let limpio = String(s.unicodeScalars.filter { !CharacterSet.controlCharacters.contains($0) || $0 == " " })
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return String(limpio.prefix(maximo)).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// Convierte un error HTTP de Gemini en un `ErrorIA`.
@@ -754,7 +772,7 @@ extension LectorIA {
               let g = numero(raiz["grasas_100g"]), (0...100).contains(g) else {
             throw ErrorIA.jsonInvalido("los valores de la etiqueta no son válidos")
         }
-        let nombre = (raiz["nombre"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let nombre = textoLimpio(raiz["nombre"], maximo: maxLargoNombre)
         let porcion = numero(raiz["porcion_g"]).flatMap { Porciones.esValido($0) ? $0 : nil }
         return EtiquetaLeida(
             nombre: nombre.isEmpty ? "" : Formato.primeraMayuscula(nombre),
@@ -794,6 +812,13 @@ extension LectorIA {
         if let objetivo { lineas.append("- Objetivo: \(objetivo.nombre.lowercased()).") }
         if let dieta { lineas.append("- Tipo de dieta: \(dieta.nombre.lowercased()).") }
         return lineas.joined(separator: "\n")
+    }
+
+    /// Respuesta del coach limpia y con tope de largo.
+    static func respuestaCoach(_ texto: String) -> String {
+        let limpio = texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard limpio.count > maxLargoCoach else { return limpio }
+        return String(limpio.prefix(maxLargoCoach)) + "…"
     }
 
     /// Tope de la respuesta del coach. Es amplio a propósito: la guía de

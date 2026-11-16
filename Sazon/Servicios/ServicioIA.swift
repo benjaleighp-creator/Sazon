@@ -155,7 +155,7 @@ struct ProveedorGemini: ProveedorIA {
                                          nivelRazonamiento: LectorIA.nivelRazonamiento(modelo: m))
             }
         }
-        return r.texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        return LectorIA.respuestaCoach(r.texto)
     }
 
     private func analisis(_ tipo: LectorIA.TipoAnalisis, texto: String?, imagen: String?) async throws -> AnalisisIA {
@@ -364,7 +364,7 @@ struct ProveedorEnCapas: ProveedorIA {
                                          nivelRazonamiento: LectorIA.nivelRazonamiento(modelo: m))
             },
             groq: { try LectorIA.cuerpoGroqCoach(modelo: PoliticaIA.modeloGroq, mensajes: mensajes, contexto: contexto) })
-        return r.texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        return LectorIA.respuestaCoach(r.texto)
     }
 
     private func analisis(_ tipo: LectorIA.TipoAnalisis, texto: String?, foto: Data?, clave: String) async throws -> AnalisisIA {
