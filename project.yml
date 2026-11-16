@@ -71,6 +71,8 @@ targets:
       - path: Sazon/Modelo/Modelos.swift
       - path: Sazon/Modelo/ModelosExtra.swift
       - path: Sazon/Logica
+      - path: Sazon/Servicios/ServicioIA.swift
+      - path: Sazon/Servicios/Llavero.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pe.benjamin.sazon.pruebas

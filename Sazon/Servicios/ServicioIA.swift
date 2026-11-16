@@ -32,6 +32,18 @@ enum PasoIA: Equatable {
     }
 }
 
+/// Lo único que la IA necesita de la red. `URLSession` lo cumple; las
+/// pruebas usan una sesión falsa que responde lo que se le pida.
+protocol SesionRed {
+    func respuesta(a peticion: URLRequest) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: SesionRed {
+    func respuesta(a peticion: URLRequest) async throws -> (Data, URLResponse) {
+        try await data(for: peticion)
+    }
+}
+
 /// Aviso de progreso. Puede llegar desde cualquier hilo.
 typealias AvisoPasoIA = @Sendable (PasoIA) -> Void
 
@@ -61,7 +73,7 @@ struct ProveedorGemini: ProveedorIA {
     let clave: String
     let modelo: String
     let formato: FormatoPeticionIA
-    var sesion: URLSession = .shared
+    var sesion: SesionRed = URLSession.shared
     /// Avisa de reintentos y cambios de modelo (no cambia cuándo se reintenta).
     var alAvanzar: AvisoPasoIA? = nil
 
@@ -167,7 +179,7 @@ struct ProveedorGemini: ProveedorIA {
 
         let resultado: (Data, URLResponse)
         do {
-            resultado = try await sesion.data(for: peticion)
+            resultado = try await sesion.respuesta(a: peticion)
         } catch let error as URLError {
             switch error.code {
             case .notConnectedToInternet, .dataNotAllowed, .internationalRoamingOff:
