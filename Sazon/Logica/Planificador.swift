@@ -275,10 +275,14 @@ enum Exportar {
         return texto
     }
 
-    static func iso(_ fecha: Date) -> String {
+    private static let formateadorISO: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
-        return f.string(from: fecha)
+        return f
+    }()
+
+    static func iso(_ fecha: Date) -> String {
+        formateadorISO.string(from: fecha)
     }
 
     /// Historial de comidas en CSV (se abre en Excel o Google Sheets).

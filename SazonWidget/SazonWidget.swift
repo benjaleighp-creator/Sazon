@@ -65,12 +65,16 @@ func colorHex(_ hex: String) -> Color {
                  blue: Double(v & 0xFF) / 255, opacity: 1)
 }
 
-func entero(_ v: Double) -> String {
+private let formateadorEntero: NumberFormatter = {
     let f = NumberFormatter()
     f.locale = Locale(identifier: "es_PE")
     f.maximumFractionDigits = 0
     f.numberStyle = .decimal
-    return f.string(from: NSNumber(value: v.rounded())) ?? "\(Int(v.rounded()))"
+    return f
+}()
+
+func entero(_ v: Double) -> String {
+    formateadorEntero.string(from: NSNumber(value: v.rounded())) ?? "\(Int(v.rounded()))"
 }
 
 /// Tipografía de los widgets: estilos de texto del sistema (respetan el

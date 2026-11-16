@@ -144,9 +144,11 @@ enum Series {
     /// Totales por día de los últimos `dias` días (incluye hoy), en orden.
     static func nutrientesPorDia(_ registros: [Registro], hasta: Date, dias: Int, calendario: Calendar = .current) -> [(fecha: Date, total: Nutrientes)] {
         let hoy = calendario.startOfDay(for: hasta)
+        let desde = calendario.date(byAdding: .day, value: -(dias - 1), to: hoy) ?? hoy
+        let grupos = Diario.porDia(registros.filter { $0.fecha >= desde }, calendario: calendario)
         return (0..<dias).reversed().map { (i: Int) -> (fecha: Date, total: Nutrientes) in
             let fecha = calendario.date(byAdding: .day, value: -i, to: hoy) ?? hoy
-            return (fecha, Diario.suma(Diario.registros(de: fecha, en: registros, calendario: calendario)))
+            return (fecha, Diario.suma(grupos[calendario.startOfDay(for: fecha)] ?? []))
         }
     }
 
@@ -160,12 +162,15 @@ enum Series {
     /// Días seguidos con al menos un registro, contando hacia atrás desde hoy
     /// (si hoy aún no hay registros, cuenta desde ayer).
     static func racha(_ registros: [Registro], hoy: Date, calendario: Calendar = .current) -> Int {
+        // Días con registros, calculados una sola vez (antes se filtraba
+        // todo el historial para cada día de la racha).
+        let conRegistros = Set(registros.map { calendario.startOfDay(for: $0.fecha) })
         var dia = calendario.startOfDay(for: hoy)
-        if Diario.registros(de: dia, en: registros, calendario: calendario).isEmpty {
+        if !conRegistros.contains(dia) {
             dia = calendario.date(byAdding: .day, value: -1, to: dia) ?? dia
         }
         var cuenta = 0
-        while !Diario.registros(de: dia, en: registros, calendario: calendario).isEmpty {
+        while conRegistros.contains(calendario.startOfDay(for: dia)) {
             cuenta += 1
             guard let anterior = calendario.date(byAdding: .day, value: -1, to: dia) else { break }
             dia = anterior

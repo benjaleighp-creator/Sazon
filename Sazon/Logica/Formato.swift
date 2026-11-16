@@ -8,13 +8,42 @@ enum Formato {
 
     /// Número con hasta `decimales` decimales, sin ceros sobrantes: 2,5 · 70 · 1,375.
     static func numero(_ valor: Double, decimales: Int = 1) -> String {
+        let d = max(0, decimales)
+        let f = d < formateadoresNumero.count ? formateadoresNumero[d] : nuevoFormateadorNumero(d)
+        return f.string(from: NSNumber(value: valor)) ?? String(valor)
+    }
+
+    // Los formateadores cuestan crearlos: se crean una vez y se reutilizan
+    // (formatear con ellos es seguro desde cualquier hilo; no se modifican).
+    private static let formateadoresNumero: [NumberFormatter] = (0...4).map(nuevoFormateadorNumero)
+
+    private static func nuevoFormateadorNumero(_ decimales: Int) -> NumberFormatter {
         let f = NumberFormatter()
         f.locale = Locale(identifier: "es_ES")   // coma decimal, sin separador raro
         f.numberStyle = .decimal
         f.usesGroupingSeparator = false
         f.minimumFractionDigits = 0
         f.maximumFractionDigits = decimales
-        return f.string(from: NSNumber(value: valor)) ?? String(valor)
+        return f
+    }
+
+    private static let candadoFechas = NSLock()
+    private static var formateadoresFecha: [String: DateFormatter] = [:]
+
+    /// Formateador de fechas en español de Perú para un formato y un
+    /// calendario (se guarda por formato, calendario y zona horaria).
+    static func formateadorFecha(_ formato: String, calendario: Calendar = .current) -> DateFormatter {
+        let clave = "\(formato)|\(calendario.identifier)|\(calendario.timeZone.identifier)"
+        candadoFechas.lock()
+        defer { candadoFechas.unlock() }
+        if let f = formateadoresFecha[clave] { return f }
+        let f = DateFormatter()
+        f.locale = locale
+        f.calendar = calendario
+        f.timeZone = calendario.timeZone
+        f.dateFormat = formato
+        formateadoresFecha[clave] = f
+        return f
     }
 
     /// Entero redondeado: 1834.
@@ -31,12 +60,7 @@ enum Formato {
 
     /// "Domingo, 1 de noviembre".
     static func diaLargo(_ fecha: Date, calendario: Calendar = .current) -> String {
-        let f = DateFormatter()
-        f.locale = locale
-        f.calendar = calendario
-        f.timeZone = calendario.timeZone
-        f.dateFormat = "EEEE, d 'de' MMMM"
-        return primeraMayuscula(f.string(from: fecha))
+        primeraMayuscula(formateadorFecha("EEEE, d 'de' MMMM", calendario: calendario).string(from: fecha))
     }
 
     /// "Hoy", "Ayer", "Mañana" o el día largo.
@@ -54,11 +78,7 @@ enum Formato {
 
     /// "14:05".
     static func hora(_ fecha: Date, calendario: Calendar = .current) -> String {
-        let f = DateFormatter()
-        f.locale = locale
-        f.timeZone = calendario.timeZone
-        f.dateFormat = "HH:mm"
-        return f.string(from: fecha)
+        formateadorFecha("HH:mm", calendario: calendario).string(from: fecha)
     }
 
     /// "1834 kcal" o "≈ 1834 kcal" si es estimado.

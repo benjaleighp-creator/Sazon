@@ -257,10 +257,7 @@ private struct CabeceraSemana: View {
     }
 
     private func mesCorto(_ fecha: Date) -> String {
-        let f = DateFormatter()
-        f.locale = Formato.locale
-        f.dateFormat = "MMMM"
-        return f.string(from: fecha)
+        Formato.formateadorFecha("MMMM").string(from: fecha)
     }
 
     private func flecha(_ simbolo: String, _ etiqueta: String, _ dias: Int) -> some View {
