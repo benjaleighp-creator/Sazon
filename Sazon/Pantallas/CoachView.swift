@@ -131,8 +131,8 @@ struct CoachView: View {
             VStack(alignment: .leading, spacing: Espacio.xxxs) {
                 Text("Coach Sazón").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
                 Text(almacen.datos.coachCompartirResumen
-                     ? "Se envía a Gemini lo que escribes y un resumen de tus números de hoy (sin tu nombre)."
-                     : "Se envía a Gemini solo lo que escribes. Puedes compartir tu resumen del día en el menú ⋯.")
+                     ? "Se envía a Gemini (o a Groq, si es el respaldo) lo que escribes y un resumen de tus números de hoy (sin tu nombre)."
+                     : "Se envía a Gemini (o a Groq, si es el respaldo) solo lo que escribes. Puedes compartir tu resumen del día en el menú ⋯.")
                     .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
                 Text("No es un profesional de salud: sus respuestas son orientativas y pueden equivocarse.")

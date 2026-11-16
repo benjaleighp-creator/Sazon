@@ -272,7 +272,10 @@ enum PDFPlan {
             contexto.closePDF()
             ok = true
         }
-        return ok ? url : nil
+        guard ok else { return nil }
+        // Protección completa: cifrado mientras el iPhone está bloqueado.
+        try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: url.path)
+        return url
     }
 }
 

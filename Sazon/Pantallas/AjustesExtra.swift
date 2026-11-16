@@ -237,12 +237,21 @@ struct PantallaExportar: View {
             archivoComidas = escribir("Sazón comidas.csv", Exportar.csvRegistros(almacen.datos.registros))
             archivoPesos = escribir("Sazón pesos.csv", Exportar.csvPesos(almacen.datos.pesos))
         }
+        // Los CSV traen tus comidas y pesos: al salir de la pantalla se
+        // borran de la carpeta temporal (la copia que compartiste queda donde la mandaste).
+        .onDisappear {
+            for url in [archivoComidas, archivoPesos].compactMap({ $0 }) {
+                try? FileManager.default.removeItem(at: url)
+            }
+            archivoComidas = nil
+            archivoPesos = nil
+        }
     }
 
     private func escribir(_ nombre: String, _ texto: String) -> URL? {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(nombre)
         do {
-            try Data(texto.utf8).write(to: url, options: .atomic)
+            try Data(texto.utf8).write(to: url, options: [.atomic, .completeFileProtection])
             return url
         } catch {
             return nil
