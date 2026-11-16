@@ -315,6 +315,66 @@ final class PruebasDatosGuardados: XCTestCase {
     }
 }
 
+final class PruebasLecturaTolerante: XCTestCase {
+
+    private func leer(_ json: String) throws -> DatosApp {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return try d.decode(DatosApp.self, from: Data(json.utf8))
+    }
+
+    func testValoresDesconocidosNoBorranLosDatos() throws {
+        // Valores de una versión futura: comida, origen, apariencia y formato que esta versión no conoce.
+        let json = #"{"version": 2, "apariencia": "sepia", "formatoPeticionIA": "futuro", "registros": [{"nombre": "Pan", "gramos": 50, "comida": "brunch", "origen": "satelite"}, {"nombre": "Palta", "gramos": 80, "comida": "cena", "origen": "ins"}]}"#
+        let d = try leer(json)
+        XCTAssertEqual(d.registros.count, 2, "Un valor desconocido no debe hacer perder los registros")
+        XCTAssertEqual(d.registros[0].comida, .snacks)
+        XCTAssertEqual(d.registros[0].origen, .manual)
+        XCTAssertEqual(d.registros[1].comida, .cena)
+        XCTAssertEqual(d.apariencia, .sistema)
+        XCTAssertEqual(d.formatoPeticionIA, .actual)
+    }
+
+    func testElementoDanadoSoloSeDescartaEse() throws {
+        let json = #"{"version": 1, "registros": [{"nombre": "Pan", "gramos": 50}, 42, {"nombre": "Palta", "gramos": "mucho"}], "agua": [{"ml": 250}, "x"]}"#
+        let d = try leer(json)
+        XCTAssertEqual(d.registros.map(\.nombre), ["Pan", "Palta"])
+        XCTAssertEqual(d.registros[1].gramos, 100, "Un campo con otro tipo usa su valor por defecto")
+        XCTAssertEqual(d.agua.count, 1)
+    }
+
+    func testCampoDeOtroTipoEnLaRaiz() throws {
+        let d = try leer(#"{"version": "uno", "nombre": 5, "vasoMl": "grande", "favoritos": {}}"#)
+        XCTAssertEqual(d.version, 1)
+        XCTAssertEqual(d.nombre, "")
+        XCTAssertEqual(d.vasoMl, 250)
+        XCTAssertTrue(d.favoritos.isEmpty)
+    }
+
+    func testMensajeCoachConCamposFaltantes() throws {
+        let d = try leer(#"{"version": 1, "coach": [{"texto": "Hola"}, {"autor": "usuario"}, {"autor": "robot", "texto": "?"}]}"#)
+        XCTAssertEqual(d.coach.count, 3)
+        XCTAssertEqual(d.coach[0].texto, "Hola")
+        XCTAssertEqual(d.coach[0].autor, .coach)
+        XCTAssertEqual(d.coach[1].autor, .usuario)
+        XCTAssertEqual(d.coach[1].texto, "")
+        XCTAssertEqual(d.coach[2].autor, .coach)
+    }
+
+    func testPerfilConEnumDesconocido() throws {
+        let d = try leer(#"{"version": 1, "perfil": {"sexo": "otro", "edad": 30, "objetivo": "volar", "dieta": "carnivora"}}"#)
+        XCTAssertEqual(d.perfil?.edad, 30)
+        XCTAssertEqual(d.perfil?.sexo, .masculino)
+        XCTAssertEqual(d.perfil?.objetivo, .mantener)
+        XCTAssertEqual(d.perfil?.dieta, .equilibrada)
+    }
+
+    func testRaizQueNoEsObjetoSigueFallando() {
+        // Así el almacén sabe que el archivo no es de Sazón y no lo reemplaza.
+        XCTAssertThrowsError(try leer("[1, 2, 3]"))
+    }
+}
+
 final class PruebasSemanaYSaludo: XCTestCase {
 
     func testInicioDeSemanaEsLunes() {

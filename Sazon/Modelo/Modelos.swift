@@ -3,9 +3,48 @@ import Foundation
 // Modelos de datos de Sazón. Solo Foundation: este archivo también lo
 // compilan las pruebas automáticas, sin interfaz.
 //
-// Regla de compatibilidad: cada `init(from:)` usa `decodeIfPresent` con un
-// valor por defecto, así una versión nueva de la app lee los datos de la
-// anterior sin perder nada.
+// Regla de compatibilidad: cada `init(from:)` lee cada campo con las
+// funciones tolerantes de abajo y un valor por defecto, así una versión
+// nueva de la app lee los datos de la anterior sin perder nada, y un valor
+// desconocido (por ejemplo, de una versión futura) no tumba todo el archivo.
+
+// MARK: - Lectura tolerante
+
+/// Envoltura que intenta leer un elemento y, si falla, queda vacía (así un
+/// elemento dañado de una lista no impide leer los demás).
+struct Tolerante<T: Decodable>: Decodable {
+    let valor: T?
+    init(from decoder: Decoder) throws {
+        valor = try? T(from: decoder)
+    }
+}
+
+extension KeyedDecodingContainer {
+    /// El valor si existe y se puede leer; nil si falta o viene con otro tipo.
+    func tolerante<T: Decodable>(_ tipo: T.Type, _ clave: Key) -> T? {
+        guard let valor = try? decodeIfPresent(tipo, forKey: clave) else { return nil }
+        return valor
+    }
+
+    /// Enumeración guardada como texto: nil si falta o si el valor no se
+    /// conoce (en vez de lanzar un error que haría fallar todo el archivo).
+    func enumTolerante<T: RawRepresentable>(_ tipo: T.Type, _ clave: Key) -> T? where T.RawValue == String {
+        guard let crudo = tolerante(String.self, clave) else { return nil }
+        return T(rawValue: crudo)
+    }
+
+    /// Lista en la que se descartan solo los elementos que no se pueden leer.
+    func listaTolerante<T: Decodable>(_ tipo: T.Type, _ clave: Key) -> [T]? {
+        guard let envueltos = tolerante([Tolerante<T>].self, clave) else { return nil }
+        return envueltos.compactMap(\.valor)
+    }
+
+    /// Diccionario en el que se descartan solo los valores que no se pueden leer.
+    func diccionarioTolerante<T: Decodable>(_ tipo: T.Type, _ clave: Key) -> [String: T]? {
+        guard let envueltos = tolerante([String: Tolerante<T>].self, clave) else { return nil }
+        return envueltos.compactMapValues(\.valor)
+    }
+}
 
 // MARK: - Nutrientes
 
@@ -38,13 +77,13 @@ struct Nutrientes: Codable, Equatable, Hashable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        kcal = try c.decodeIfPresent(Double.self, forKey: .kcal) ?? 0
-        proteina = try c.decodeIfPresent(Double.self, forKey: .proteina) ?? 0
-        carbohidratos = try c.decodeIfPresent(Double.self, forKey: .carbohidratos) ?? 0
-        grasas = try c.decodeIfPresent(Double.self, forKey: .grasas) ?? 0
-        fibra = try c.decodeIfPresent(Double.self, forKey: .fibra) ?? 0
-        sodio = try c.decodeIfPresent(Double.self, forKey: .sodio) ?? 0
-        azucar = try c.decodeIfPresent(Double.self, forKey: .azucar) ?? 0
+        kcal = c.tolerante(Double.self, .kcal) ?? 0
+        proteina = c.tolerante(Double.self, .proteina) ?? 0
+        carbohidratos = c.tolerante(Double.self, .carbohidratos) ?? 0
+        grasas = c.tolerante(Double.self, .grasas) ?? 0
+        fibra = c.tolerante(Double.self, .fibra) ?? 0
+        sodio = c.tolerante(Double.self, .sodio) ?? 0
+        azucar = c.tolerante(Double.self, .azucar) ?? 0
     }
 
     static func + (a: Nutrientes, b: Nutrientes) -> Nutrientes {
@@ -170,12 +209,12 @@ struct ProductoGuardado: Codable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        codigo = try c.decodeIfPresent(String.self, forKey: .codigo) ?? ""
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Producto"
-        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
-        origen = try c.decodeIfPresent(OrigenDato.self, forKey: .origen) ?? .manual
-        porcion = try c.decodeIfPresent(MedidaCasera.self, forKey: .porcion)
-        actualizado = try c.decodeIfPresent(Date.self, forKey: .actualizado) ?? Date()
+        codigo = c.tolerante(String.self, .codigo) ?? ""
+        nombre = c.tolerante(String.self, .nombre) ?? "Producto"
+        por100g = c.tolerante(Nutrientes.self, .por100g) ?? .cero
+        origen = c.enumTolerante(OrigenDato.self, .origen) ?? .manual
+        porcion = c.tolerante(MedidaCasera.self, .porcion)
+        actualizado = c.tolerante(Date.self, .actualizado) ?? Date()
     }
 }
 
@@ -198,9 +237,9 @@ struct MedidaCasera: Codable, Equatable, Hashable, Identifiable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "porción"
-        gramos = try c.decodeIfPresent(Double.self, forKey: .gramos) ?? 100
-        estimada = try c.decodeIfPresent(Bool.self, forKey: .estimada) ?? false
+        nombre = c.tolerante(String.self, .nombre) ?? "porción"
+        gramos = c.tolerante(Double.self, .gramos) ?? 100
+        estimada = c.tolerante(Bool.self, .estimada) ?? false
     }
 }
 
@@ -251,19 +290,19 @@ struct Registro: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        fecha = try c.decodeIfPresent(Date.self, forKey: .fecha) ?? Date()
-        comida = try c.decodeIfPresent(TipoComida.self, forKey: .comida) ?? .snacks
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Alimento"
-        gramos = try c.decodeIfPresent(Double.self, forKey: .gramos) ?? 100
-        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
-        origen = try c.decodeIfPresent(OrigenDato.self, forKey: .origen) ?? .manual
-        codigoINS = try c.decodeIfPresent(String.self, forKey: .codigoINS)
-        codigoBarras = try c.decodeIfPresent(String.self, forKey: .codigoBarras)
-        medida = try c.decodeIfPresent(MedidaCasera.self, forKey: .medida)
-        cantidadMedida = try c.decodeIfPresent(Double.self, forKey: .cantidadMedida)
-        confianzaIA = try c.decodeIfPresent(Double.self, forKey: .confianzaIA)
-        editado = try c.decodeIfPresent(Bool.self, forKey: .editado) ?? false
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
+        comida = c.enumTolerante(TipoComida.self, .comida) ?? .snacks
+        nombre = c.tolerante(String.self, .nombre) ?? "Alimento"
+        gramos = c.tolerante(Double.self, .gramos) ?? 100
+        por100g = c.tolerante(Nutrientes.self, .por100g) ?? .cero
+        origen = c.enumTolerante(OrigenDato.self, .origen) ?? .manual
+        codigoINS = c.tolerante(String.self, .codigoINS)
+        codigoBarras = c.tolerante(String.self, .codigoBarras)
+        medida = c.tolerante(MedidaCasera.self, .medida)
+        cantidadMedida = c.tolerante(Double.self, .cantidadMedida)
+        confianzaIA = c.tolerante(Double.self, .confianzaIA)
+        editado = c.tolerante(Bool.self, .editado) ?? false
     }
 
     /// Nutrientes de la porción comida.
@@ -371,13 +410,13 @@ struct Perfil: Codable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        sexo = try c.decodeIfPresent(Sexo.self, forKey: .sexo) ?? .masculino
-        edad = try c.decodeIfPresent(Int.self, forKey: .edad) ?? 20
-        pesoKg = try c.decodeIfPresent(Double.self, forKey: .pesoKg) ?? 70
-        tallaCm = try c.decodeIfPresent(Double.self, forKey: .tallaCm) ?? 170
-        actividad = try c.decodeIfPresent(NivelActividad.self, forKey: .actividad) ?? .ligero
-        objetivo = try c.decodeIfPresent(Objetivo.self, forKey: .objetivo) ?? .mantener
-        dieta = try c.decodeIfPresent(TipoDieta.self, forKey: .dieta) ?? .equilibrada
+        sexo = c.enumTolerante(Sexo.self, .sexo) ?? .masculino
+        edad = c.tolerante(Int.self, .edad) ?? 20
+        pesoKg = c.tolerante(Double.self, .pesoKg) ?? 70
+        tallaCm = c.tolerante(Double.self, .tallaCm) ?? 170
+        actividad = c.enumTolerante(NivelActividad.self, .actividad) ?? .ligero
+        objetivo = c.enumTolerante(Objetivo.self, .objetivo) ?? .mantener
+        dieta = c.enumTolerante(TipoDieta.self, .dieta) ?? .equilibrada
     }
 }
 
@@ -527,42 +566,42 @@ struct DatosApp: Codable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 1
-        registros = try c.decodeIfPresent([Registro].self, forKey: .registros) ?? []
-        perfil = try c.decodeIfPresent(Perfil.self, forKey: .perfil)
-        metaManual = try c.decodeIfPresent(Nutrientes.self, forKey: .metaManual)
-        temaID = try c.decodeIfPresent(String.self, forKey: .temaID) ?? "mercado"
-        apariencia = try c.decodeIfPresent(Apariencia.self, forKey: .apariencia) ?? .sistema
-        unidad = try c.decodeIfPresent(UnidadPorcion.self, forKey: .unidad) ?? .gramos
-        ahorroBateria = try c.decodeIfPresent(Bool.self, forKey: .ahorroBateria) ?? false
-        avisoIAAceptado = try c.decodeIfPresent(Bool.self, forKey: .avisoIAAceptado) ?? false
-        let modelo = try c.decodeIfPresent(String.self, forKey: .modeloIA) ?? ""
+        version = c.tolerante(Int.self, .version) ?? 1
+        registros = c.listaTolerante(Registro.self, .registros) ?? []
+        perfil = c.tolerante(Perfil.self, .perfil)
+        metaManual = c.tolerante(Nutrientes.self, .metaManual)
+        temaID = c.tolerante(String.self, .temaID) ?? "mercado"
+        apariencia = c.enumTolerante(Apariencia.self, .apariencia) ?? .sistema
+        unidad = c.enumTolerante(UnidadPorcion.self, .unidad) ?? .gramos
+        ahorroBateria = c.tolerante(Bool.self, .ahorroBateria) ?? false
+        avisoIAAceptado = c.tolerante(Bool.self, .avisoIAAceptado) ?? false
+        let modelo = c.tolerante(String.self, .modeloIA) ?? ""
         modeloIA = modelo.isEmpty ? DatosApp.modeloPorDefecto : modelo
-        formatoPeticionIA = try c.decodeIfPresent(FormatoPeticionIA.self, forKey: .formatoPeticionIA) ?? .actual
-        recientes = try c.decodeIfPresent([Registro].self, forKey: .recientes) ?? []
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? ""
-        productos = try c.decodeIfPresent([String: ProductoGuardado].self, forKey: .productos) ?? [:]
-        agua = try c.decodeIfPresent([RegistroAgua].self, forKey: .agua) ?? []
-        metaAguaManual = try c.decodeIfPresent(Double.self, forKey: .metaAguaManual)
-        vasoMl = try c.decodeIfPresent(Double.self, forKey: .vasoMl) ?? 250
-        pesos = try c.decodeIfPresent([RegistroPeso].self, forKey: .pesos) ?? []
-        medidas = try c.decodeIfPresent([RegistroMedidas].self, forKey: .medidas) ?? []
-        fotos = try c.decodeIfPresent([FotoProgreso].self, forKey: .fotos) ?? []
-        ajusteAutomatico = try c.decodeIfPresent(Bool.self, forKey: .ajusteAutomatico) ?? false
-        ajusteKcal = try c.decodeIfPresent(Double.self, forKey: .ajusteKcal) ?? 0
-        ayunos = try c.decodeIfPresent([SesionAyuno].self, forKey: .ayunos) ?? []
-        horasAyuno = try c.decodeIfPresent(Double.self, forKey: .horasAyuno) ?? 16
-        alimentosPropios = try c.decodeIfPresent([AlimentoPropio].self, forKey: .alimentosPropios) ?? []
-        recetas = try c.decodeIfPresent([Receta].self, forKey: .recetas) ?? []
-        plan = try c.decodeIfPresent([PlanDia].self, forKey: .plan) ?? []
-        ajustarPorcionesPlan = try c.decodeIfPresent(Bool.self, forKey: .ajustarPorcionesPlan) ?? true
-        comprasMarcadas = try c.decodeIfPresent([String].self, forKey: .comprasMarcadas) ?? []
-        recordatorios = try c.decodeIfPresent(ConfigRecordatorios.self, forKey: .recordatorios) ?? ConfigRecordatorios()
-        coach = try c.decodeIfPresent([MensajeCoach].self, forKey: .coach) ?? []
-        coachCompartirResumen = try c.decodeIfPresent(Bool.self, forKey: .coachCompartirResumen) ?? false
-        saludActiva = try c.decodeIfPresent(Bool.self, forKey: .saludActiva) ?? false
-        sumarActividad = try c.decodeIfPresent(Bool.self, forKey: .sumarActividad) ?? false
-        favoritos = try c.decodeIfPresent([ComidaFavorita].self, forKey: .favoritos) ?? []
-        comidasExtra = try c.decodeIfPresent(Bool.self, forKey: .comidasExtra) ?? false
+        formatoPeticionIA = c.enumTolerante(FormatoPeticionIA.self, .formatoPeticionIA) ?? .actual
+        recientes = c.listaTolerante(Registro.self, .recientes) ?? []
+        nombre = c.tolerante(String.self, .nombre) ?? ""
+        productos = c.diccionarioTolerante(ProductoGuardado.self, .productos) ?? [:]
+        agua = c.listaTolerante(RegistroAgua.self, .agua) ?? []
+        metaAguaManual = c.tolerante(Double.self, .metaAguaManual)
+        vasoMl = c.tolerante(Double.self, .vasoMl) ?? 250
+        pesos = c.listaTolerante(RegistroPeso.self, .pesos) ?? []
+        medidas = c.listaTolerante(RegistroMedidas.self, .medidas) ?? []
+        fotos = c.listaTolerante(FotoProgreso.self, .fotos) ?? []
+        ajusteAutomatico = c.tolerante(Bool.self, .ajusteAutomatico) ?? false
+        ajusteKcal = c.tolerante(Double.self, .ajusteKcal) ?? 0
+        ayunos = c.listaTolerante(SesionAyuno.self, .ayunos) ?? []
+        horasAyuno = c.tolerante(Double.self, .horasAyuno) ?? 16
+        alimentosPropios = c.listaTolerante(AlimentoPropio.self, .alimentosPropios) ?? []
+        recetas = c.listaTolerante(Receta.self, .recetas) ?? []
+        plan = c.listaTolerante(PlanDia.self, .plan) ?? []
+        ajustarPorcionesPlan = c.tolerante(Bool.self, .ajustarPorcionesPlan) ?? true
+        comprasMarcadas = c.listaTolerante(String.self, .comprasMarcadas) ?? []
+        recordatorios = c.tolerante(ConfigRecordatorios.self, .recordatorios) ?? ConfigRecordatorios()
+        coach = c.listaTolerante(MensajeCoach.self, .coach) ?? []
+        coachCompartirResumen = c.tolerante(Bool.self, .coachCompartirResumen) ?? false
+        saludActiva = c.tolerante(Bool.self, .saludActiva) ?? false
+        sumarActividad = c.tolerante(Bool.self, .sumarActividad) ?? false
+        favoritos = c.listaTolerante(ComidaFavorita.self, .favoritos) ?? []
+        comidasExtra = c.tolerante(Bool.self, .comidasExtra) ?? false
     }
 }

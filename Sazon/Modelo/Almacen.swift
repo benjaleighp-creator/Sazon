@@ -145,8 +145,10 @@ final class Almacen {
             let f = DateFormatter()
             f.dateFormat = "yyyy-MM-dd-HHmmss"
             let copia = url.deletingLastPathComponent().appendingPathComponent("datos-sazon-no-leidos-\(f.string(from: Date())).json")
+            // Nunca se escribe encima del archivo que no se pudo leer: queda
+            // protegido hasta que importes un respaldo o elijas empezar de cero.
             if (try? FileManager.default.copyItem(at: url, to: copia)) != nil {
-                return (nil, "Tus datos guardados no se pudieron leer y la app empezó en blanco. El archivo original quedó copiado como «\(copia.lastPathComponent)». Si tienes un respaldo, impórtalo en Ajustes › Respaldo.", false)
+                return (nil, "Tus datos guardados no se pudieron leer. El archivo original quedó copiado como «\(copia.lastPathComponent)» y no se escribe nada encima. Importa un respaldo en Ajustes › Respaldo o elige «Empezar de cero».", true)
             }
             return (nil, "Tus datos guardados no se pudieron leer y no se pudo hacer una copia; para no perderlos, no se guarda nada nuevo. Si tienes un respaldo, impórtalo en Ajustes › Respaldo.", true)
         }
@@ -155,6 +157,19 @@ final class Almacen {
     /// Lo usa la restauración de un respaldo: ahí sí se quiere escribir encima.
     func permitirGuardar() {
         protegerArchivo = false
+    }
+
+    /// True si el archivo anterior no se pudo leer y quedó protegido.
+    var archivoProtegido: Bool { protegerArchivo }
+
+    /// Decisión explícita de la persona: empezar con datos nuevos. Solo se
+    /// ofrece si el archivo original quedó copiado aparte.
+    func empezarDeCero() {
+        permitirGuardar()
+        avisoCarga = nil
+        errorGuardado = nil
+        hayCambiosSinGuardar = true
+        guardarYa()
     }
 
     /// Programa el guardado (y el aviso a los widgets) para dentro de
