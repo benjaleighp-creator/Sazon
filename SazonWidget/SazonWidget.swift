@@ -11,6 +11,7 @@ struct SazonWidgets: WidgetBundle {
     var body: some Widget {
         WidgetCalorias()
         WidgetAgua()
+        WidgetAccesos()
         WidgetAyuno()
         WidgetBloqueo()
         ActividadAyunoWidget()
@@ -261,7 +262,87 @@ struct VistaAgua: View {
                 }
             }
             .frame(height: 6)
-            if e.esEjemplo { AvisoEjemplo(r: r) }
+            if e.esEjemplo {
+                AvisoEjemplo(r: r)
+            } else {
+                // Botón interactivo (iOS 17): suma un vaso sin abrir la app.
+                Button(intent: SumarAguaWidgetIntent()) {
+                    BotonWidget(texto: "+ \(entero(r.vasoMl ?? 250)) ml", simbolo: "plus", r: r)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .letraWidget()
+        .containerBackground(for: .widget) { FondoSazon(r: r) }
+    }
+}
+
+/// Botón con forma de cápsula para los widgets interactivos.
+struct BotonWidget: View {
+    let texto: String
+    let simbolo: String
+    let r: ResumenWidget
+
+    var body: some View {
+        Label(texto, systemImage: simbolo)
+            .font(.estiloWidget(.caption, .bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(colorHex(r.colorInicio))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(Capsule().fill(colorHex(r.colorTexto)))
+    }
+}
+
+// MARK: - Accesos rápidos (interactivo)
+
+struct WidgetAccesos: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "SazonAccesos", provider: ProveedorSazon()) { e in
+            VistaAccesos(e: e)
+        }
+        .configurationDisplayName("Registro rápido")
+        .description("Suma un vaso de agua o repite tu comida favorita sin abrir la app.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+struct VistaAccesos: View {
+    let e: EntradaSazon
+
+    var body: some View {
+        let r = e.resumen
+        let texto = colorHex(r.colorTexto)
+        let secundario = colorHex(r.colorSecundario)
+        VStack(alignment: .leading, spacing: 6) {
+            Text("\(entero(r.kcal)) kcal · \(String(format: "%.1f L", r.aguaMl / 1000).replacingOccurrences(of: ".", with: ","))")
+                .font(.estiloWidget(.footnote, .semibold))
+                .foregroundStyle(texto)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            if e.esEjemplo {
+                AvisoEjemplo(r: r)
+            } else {
+                Button(intent: SumarAguaWidgetIntent()) {
+                    BotonWidget(texto: "+ \(entero(r.vasoMl ?? 250)) ml de agua", simbolo: "drop.fill", r: r)
+                }
+                .buttonStyle(.plain)
+                if let id = r.favoritoID, let nombre = r.favoritoNombre {
+                    Button(intent: RepetirFavoritoWidgetIntent(favoritoID: id)) {
+                        BotonWidget(texto: "Repetir: \(nombre)", simbolo: "star.fill", r: r)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Text("Guarda un favorito en la app para repetirlo desde aquí.")
+                        .font(.estiloWidget(.caption2, .medium))
+                        .foregroundStyle(secundario)
+                        .lineLimit(2)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .letraWidget()

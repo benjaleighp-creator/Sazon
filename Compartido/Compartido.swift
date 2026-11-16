@@ -65,6 +65,12 @@ struct ResumenWidget: Codable, Equatable {
     var colorFin: String
     var colorTexto: String
     var colorSecundario: String
+    /// Tamaño del vaso (para el botón «+ agua» del widget).
+    var vasoMl: Double? = nil
+    /// Primer favorito (para el botón «repetir favorito» del widget).
+    var favoritoID: String? = nil
+    var favoritoNombre: String? = nil
+    var favoritoKcal: Double? = nil
 
     static let nombreArchivo = "resumen-widget.json"
 
@@ -89,7 +95,10 @@ struct ResumenWidget: Codable, Equatable {
         let c = JSONEncoder()
         c.dateEncodingStrategy = .iso8601
         guard let datos = try? c.encode(self) else { return false }
-        return (try? datos.write(to: carpeta.appendingPathComponent(ResumenWidget.nombreArchivo), options: .atomic)) != nil
+        // Protección explícita: legible por el widget con el iPhone bloqueado
+        // después del primer desbloqueo (el widget de bloqueo lo necesita).
+        return (try? datos.write(to: carpeta.appendingPathComponent(ResumenWidget.nombreArchivo),
+                                 options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])) != nil
     }
 }
 

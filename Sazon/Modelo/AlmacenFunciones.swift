@@ -11,6 +11,37 @@ extension Almacen {
     var metaAgua: Double { Agua.meta(datos) }
     var aguaVisible: Double { Agua.delDia(diaVisible, en: datos.agua) }
 
+    /// Suma agua al día de hoy (Siri, Atajos), sin importar el día que muestra el diario.
+    func agregarAguaHoy(_ ml: Double) {
+        datos.agua.append(RegistroAgua(fecha: Date(), ml: ml))
+    }
+
+    /// Aplica lo que se hizo desde los botones del widget («+ agua» y
+    /// «repetir favorito»). Si los datos no se pudieron abrir, la cola
+    /// espera (no se pierde).
+    func procesarAccionesWidget() {
+        guard !archivoProtegido else { return }
+        let acciones = ColaWidget.tomarTodas()
+        guard !acciones.isEmpty else { return }
+        var d = datos
+        var nuevos: [Registro] = []
+        for a in acciones {
+            switch a.tipo {
+            case .agua:
+                d.agua.append(RegistroAgua(fecha: a.fecha, ml: a.ml ?? d.vasoMl))
+            case .favorito:
+                guard let f = d.favoritos.first(where: { $0.id.uuidString == a.favoritoID }) else { continue }
+                nuevos += Copiado.copiar(f.registros, aDia: a.fecha, comida: f.comidaHabitual).map { r in
+                    var r = r
+                    r.fecha = a.fecha
+                    return r
+                }
+            }
+        }
+        datos = d
+        agregar(nuevos)
+    }
+
     func agregarAgua(_ ml: Double) {
         datos.agua.append(RegistroAgua(fecha: Diario.fechaParaRegistrar(enDia: diaVisible), ml: ml))
     }
@@ -255,6 +286,25 @@ extension Almacen {
 
     func eliminarFavorito(_ f: ComidaFavorita) {
         datos.favoritos.removeAll { $0.id == f.id }
+    }
+
+    /// Lo que se repite para una comida: tu favorito de esa comida o, si no
+    /// tienes, lo que comiste en ella el último día (hasta 14 días atrás).
+    /// Devuelve una descripción («tu favorito «Desayuno de siempre»») y los registros.
+    func ultimaComida(_ comida: TipoComida, hoy: Date = Date()) -> (String, [Registro])? {
+        if let f = datos.favoritos.first(where: { $0.comidaHabitual == comida }), !f.registros.isEmpty {
+            return ("tu favorito «\(f.nombre)»", f.registros)
+        }
+        let cal = Calendar.current
+        let inicioHoy = cal.startOfDay(for: hoy)
+        let grupos = Diario.porDia(datos.registros.filter { $0.comida == comida && $0.fecha < inicioHoy })
+        for atras in 1...14 {
+            guard let dia = cal.date(byAdding: .day, value: -atras, to: inicioHoy),
+                  let lista = grupos[dia], !lista.isEmpty else { continue }
+            return (atras == 1 ? "el \(comida.nombre.lowercased()) de ayer" : "el \(comida.nombre.lowercased()) del \(Formato.diaLargo(dia).lowercased())",
+                    lista.sorted { $0.fecha < $1.fecha })
+        }
+        return nil
     }
 
     /// Registros listos para guardar a partir de un favorito, en el día visible.

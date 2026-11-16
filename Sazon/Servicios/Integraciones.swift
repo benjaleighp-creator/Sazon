@@ -37,6 +37,7 @@ extension ResumenWidget {
         let meta = a.metaDe(hoy) ?? .cero
         let ayuno = a.ayunoActivo
         let hex = a.tema.claro.hexHero
+        let favorito = a.datos.favoritos.first
         return ResumenWidget(
             fecha: hoy, kcal: consumido.kcal, metaKcal: meta.kcal,
             proteina: consumido.proteina, metaProteina: meta.proteina,
@@ -45,7 +46,9 @@ extension ResumenWidget {
             aguaMl: Agua.delDia(hoy, en: a.datos.agua), metaAguaMl: a.metaAgua,
             racha: Series.racha(a.datos.registros, hoy: hoy),
             ayunoInicio: ayuno?.inicio, ayunoHoras: ayuno?.horas,
-            colorInicio: hex[0], colorFin: hex[1], colorTexto: hex[2], colorSecundario: hex[3])
+            colorInicio: hex[0], colorFin: hex[1], colorTexto: hex[2], colorSecundario: hex[3],
+            vasoMl: a.datos.vasoMl,
+            favoritoID: favorito?.id.uuidString, favoritoNombre: favorito?.nombre, favoritoKcal: favorito?.total.kcal)
     }
 
     /// Guarda el resumen solo si cambió y pide a los widgets redibujarse.

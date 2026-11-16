@@ -19,6 +19,8 @@ struct SazonApp: App {
                 return
             }
             // Al volver a la app: datos de Salud, recordatorios y widgets al día.
+            // Lo que hiciste desde los botones del widget pasa a tus datos.
+            almacen.procesarAccionesWidget()
             Task { await Salud.compartido.actualizarHoy(en: almacen) }
             Recordatorios.reprogramar(almacen.datos.recordatorios)
             almacen.avisarCambios()
