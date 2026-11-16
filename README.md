@@ -191,14 +191,43 @@ los registros ni en el respaldo.
    Apple ID, y pulsa Start.
 4. Si Sideloadly da error por los permisos o por el límite de apps o de
    identificadores de la cuenta gratuita, instala `Sazon-sencilla.ipa`.
-5. Deja activada la renovación automática.
-6. En Sazón › Ajustes › Widgets puedes ver qué quedó activo en tu firma.
+5. En Sazón › Ajustes › Widgets puedes ver qué quedó activo en tu firma.
+6. Guarda una copia de los `.ipa` en tu PC: GitHub los borra a los 14 días
+   (`retention-days: 14` en `.github/workflows/compilar.yml`).
 
 Por verificar: con una cuenta gratuita, la extensión de widgets puede
 contar dentro del límite de 3 apps y usar un identificador más; y no está
 confirmado que Sideloadly conserve el permiso de Apple Salud. Tus datos se
 guardan en la app, así que instalar una versión encima de la otra no los
 borra (sí se borran si eliminas la app).
+
+### Renovar cada 7 días (gratis)
+
+Con un Apple ID gratuito, la app deja de abrir a los 7 días de firmarla.
+Pon un recordatorio **cada 6 días** para renovarla a tiempo.
+
+**Opción A (recomendada): repetir Sideloadly.**
+1. Antes, en Sazón › Ajustes › Respaldo, toca «Exportar» y guarda el
+   respaldo en Archivos (por si algo sale mal).
+2. Conecta el iPhone a la PC y abre Sideloadly.
+3. Usa **el mismo `.ipa`** (la copia que guardaste) y **el mismo Apple ID**,
+   y pulsa Start. **No borres la app antes**: se instala encima y tus datos
+   se conservan.
+
+Nota: la FAQ oficial de Sideloadly (https://sideloadly.io/faq.html,
+consultada el 16-nov-2026) describe una renovación automática con
+«Sideloadly Daemon» y la PC encendida, sin mencionar pago; pero, según la
+experiencia del dueño, hoy solo funciona para miembros de Patreon. No se
+pudo confirmar en una fuente oficial, así que esta guía no depende de ella.
+
+**Opción B: AltStore Classic con AltServer.**
+Según su FAQ (https://faq.altstore.io/altstore-classic/altserver,
+consultada el 16-nov-2026), AltStore intenta renovar las apps durante la
+semana si el iPhone está en la misma Wi-Fi que la PC con AltServer abierto
+(o conectado por cable); recomiendan que AltServer se abra al iniciar la PC.
+Ten en cuenta que AltStore ocupa uno de los 3 lugares de apps de la cuenta
+gratuita. Por verificar: que funcione con iOS 26.5 y que conserve el App
+Group (widgets) y el permiso de Apple Salud.
 
 ## Estructura
 
