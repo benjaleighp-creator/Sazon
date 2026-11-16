@@ -75,7 +75,22 @@ extension Almacen {
         UIImage(contentsOfFile: Almacen.carpetaFotos.appendingPathComponent(foto.archivo).path)
     }
 
+    /// Miniatura de una foto de progreso: se genera una sola vez (lado
+    /// mayor de `MiniaturasFotos.lado` px) y queda en memoria. Antes se
+    /// leía el JPEG completo de 1600 px en cada dibujo de la lista.
+    func miniatura(de foto: FotoProgreso) -> UIImage? {
+        let clave = foto.archivo as NSString
+        if let guardada = MiniaturasFotos.cache.object(forKey: clave) { return guardada }
+        guard let completa = imagen(de: foto) else { return nil }
+        let escala = MiniaturasFotos.lado / max(completa.size.width, completa.size.height, 1)
+        let tamano = CGSize(width: completa.size.width * min(escala, 1), height: completa.size.height * min(escala, 1))
+        let mini = completa.preparingThumbnail(of: tamano) ?? completa
+        MiniaturasFotos.cache.setObject(mini, forKey: clave)
+        return mini
+    }
+
     func eliminarFoto(_ foto: FotoProgreso) {
+        MiniaturasFotos.cache.removeObject(forKey: foto.archivo as NSString)
         try? FileManager.default.removeItem(at: Almacen.carpetaFotos.appendingPathComponent(foto.archivo))
         datos.fotos.removeAll { $0.id == foto.id }
     }
@@ -257,4 +272,17 @@ extension Almacen {
     func avisarCambios() {
         ResumenWidget.desde(self).guardarYRecargar()
     }
+}
+
+/// Memoria de miniaturas de las fotos de progreso (iOS la vacía sola si
+/// falta memoria).
+enum MiniaturasFotos {
+    /// Lado mayor en píxeles (la miniatura se ve de 96 × 128 pt; × 3 en
+    /// pantallas Retina).
+    static let lado: CGFloat = 400
+    static let cache: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 120
+        return c
+    }()
 }
