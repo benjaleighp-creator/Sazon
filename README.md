@@ -204,30 +204,79 @@ borra (sí se borran si eliminas la app).
 ### Renovar cada 7 días (gratis)
 
 Con un Apple ID gratuito, la app deja de abrir a los 7 días de firmarla.
-Pon un recordatorio **cada 6 días** para renovarla a tiempo.
+Hay dos formas gratuitas de renovarla. Antes de cualquier cambio, exporta
+un respaldo en Sazón › Ajustes › Respaldo.
 
-**Opción A (recomendada): repetir Sideloadly.**
-1. Antes, en Sazón › Ajustes › Respaldo, toca «Exportar» y guarda el
-   respaldo en Archivos (por si algo sale mal).
-2. Conecta el iPhone a la PC y abre Sideloadly.
-3. Usa **el mismo `.ipa`** (la copia que guardaste) y **el mismo Apple ID**,
-   y pulsa Start. **No borres la app antes**: se instala encima y tus datos
-   se conservan.
+Guía oficial de AltStore Classic (consultada el 16-nov-2026):
+[instalar en Windows](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows),
+[AltServer](https://faq.altstore.io/altstore-classic/altserver),
+[tu AltStore](https://faq.altstore.io/altstore-classic/your-altstore),
+[App IDs](https://faq.altstore.io/altstore-classic/app-ids),
+[solución de problemas](https://faq.altstore.io/altstore-classic/troubleshooting-guide).
+
+#### Opción recomendada: AltStore Classic + AltServer
+
+**Cómo funciona.** AltStore (en el iPhone) le pide a AltServer (en tu PC)
+que vuelva a firmar las apps en segundo plano. Para eso la PC debe estar
+encendida, con AltServer abierto y en la misma Wi-Fi que el iPhone (o
+conectado por cable).
+
+**Instalar AltStore (una sola vez).**
+1. Instala iTunes e iCloud **descargados de la web de Apple**, no de la
+   Microsoft Store.
+2. Descarga AltServer desde la guía oficial, descomprime `AltInstaller.zip`
+   y ejecuta `Setup.exe`.
+3. Abre AltServer con clic derecho › «Ejecutar como administrador» y
+   permite el acceso a redes privadas cuando Windows lo pregunte.
+4. Conecta el iPhone por cable, desbloquéalo y toca «Confiar».
+5. En iTunes, inicia sesión y activa la sincronización por Wi-Fi con
+   ese iPhone.
+6. Haz clic en el ícono de AltServer (junto al reloj de Windows) ›
+   «Install AltStore» › tu iPhone, y escribe tu Apple ID y contraseña
+   (según AltStore, solo se envían a Apple).
+7. En el iPhone: Ajustes › General › VPN y gestión de dispositivos › tu
+   Apple ID › «Confiar». Si iOS lo pide, activa el Modo desarrollador
+   (Ajustes › Privacidad y seguridad).
+
+**Instalar Sazón con AltStore.**
+1. Copia `Sazon-completa.ipa` al iPhone (app Archivos, por ejemplo en
+   iCloud Drive).
+2. En AltStore, pestaña **My Apps**, toca el botón para añadir una app y
+   elige el `.ipa` (por verificar el nombre exacto del botón).
+
+**Dejarlo funcionando.**
+- Haz que AltServer se abra al iniciar la PC.
+- En AltStore, deja activado «Background Refresh».
+- Si quieres renovar ya, toca «Refresh All» en My Apps.
+- Si dice «Could not find AltServer»: revisa que el iPhone y la PC estén
+  en la misma Wi-Fi y permite AltServer en el Firewall de Windows.
+
+**Límites de la cuenta gratuita.**
+- 3 apps a la vez, y AltStore cuenta como una (AltStore + Remanso +
+  Sazón = 3).
+- 10 App IDs por semana, y cada extensión cuenta: Sazón completa usa 2
+  (app + widget); la sencilla usa 1.
+
+**Por verificar.**
+- Que AltStore Classic funcione con iOS 26.5.
+- Que conserve el App Group (widgets) y el permiso de Apple Salud.
+- Al pasar de Sideloadly a AltStore, iOS podría tratar Sazón como otra
+  app y empezar sin datos: **exporta el respaldo antes** y, si hace
+  falta, impórtalo después.
+
+#### Alternativa manual: repetir Sideloadly
+
+1. Pon un recordatorio **cada 6 días**.
+2. Exporta un respaldo (Ajustes › Respaldo).
+3. Conecta el iPhone a la PC, abre Sideloadly y usa **el mismo `.ipa`**
+   que guardaste en tu PC y **el mismo Apple ID**. Pulsa Start. **No
+   borres la app antes**: se instala encima y tus datos se conservan.
 
 Nota: la FAQ oficial de Sideloadly (https://sideloadly.io/faq.html,
 consultada el 16-nov-2026) describe una renovación automática con
 «Sideloadly Daemon» y la PC encendida, sin mencionar pago; pero, según la
 experiencia del dueño, hoy solo funciona para miembros de Patreon. No se
 pudo confirmar en una fuente oficial, así que esta guía no depende de ella.
-
-**Opción B: AltStore Classic con AltServer.**
-Según su FAQ (https://faq.altstore.io/altstore-classic/altserver,
-consultada el 16-nov-2026), AltStore intenta renovar las apps durante la
-semana si el iPhone está en la misma Wi-Fi que la PC con AltServer abierto
-(o conectado por cable); recomiendan que AltServer se abra al iniciar la PC.
-Ten en cuenta que AltStore ocupa uno de los 3 lugares de apps de la cuenta
-gratuita. Por verificar: que funcione con iOS 26.5 y que conserve el App
-Group (widgets) y el permiso de Apple Salud.
 
 ## Estructura
 
