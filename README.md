@@ -11,8 +11,11 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
   fibra, sodio y azúcares; semana con flechas para días anteriores.
 - Foto del plato, texto o **voz** (reconocimiento de voz de Apple) analizados
   con Gemini; siempre revisas antes de guardar.
-- Código de barras (Open Food Facts), lectura de etiquetas con IA y
-  productos recordados.
+- Código de barras (Open Food Facts), lectura de etiquetas (primero en el
+  iPhone, sin internet; si no alcanza, con IA) y productos recordados.
+- Sin internet: la foto o el texto se guarda y se analiza solo cuando
+  vuelve la red; lo revisas desde el Diario antes de guardarlo.
+- Recuerda las porciones que corriges a la IA y las propone la próxima vez.
 - Búsqueda en la tabla del INS sin internet, más tus alimentos y recetas.
 - Mis alimentos (a mano o calculados con IA), recetas con ingredientes y
   peso cocido, comparador de alimentos.
@@ -26,13 +29,16 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
   los alimentos detectados; con «Reducir movimiento» solo hay un fundido.
 - Mientras la IA trabaja se ve cuánto tiempo lleva, un aviso si se prueba
   otro modelo y un botón **Cancelar** (salir de la pantalla también corta
-  la petición). Si la IA falla, el aviso trae botones para **Buscar en la
-  tabla** o **Agregar a mano**.
+  la petición). A los 20 s aparecen **Buscar en la tabla** y **Agregar a
+  mano** (sin cancelar); a los 30 s se cancela sola. Si la IA falla, el
+  aviso trae los mismos botones. La revisión dice quién respondió (memoria,
+  iPhone, Gemini o Groq) y en cuántos segundos.
 
 **Meta**
 - Mifflin-St Jeor con fórmula visible, tipo de dieta (equilibrada, alta en
   proteína, baja en carbohidratos, keto, baja en grasa) o meta a mano.
 - Ajuste dinámico según cómo cambia tu peso (lo apruebas tú).
+- Meta distinta según el día de la semana (por ejemplo, más el sábado).
 - Opcional: sumar calorías activas de Apple Salud.
 
 **Plan**
@@ -57,6 +63,14 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 - Recordatorios locales de comidas, agua, peso y ayuno.
 - Widgets de calorías y macros, agua, ayuno y pantalla bloqueada (su letra
   sigue el tamaño de texto del iPhone, con un tope para que quepa).
+  **Widgets con botones** (iOS 17): «+ agua» y «Repetir favorito» sin abrir
+  la app (necesitan la versión completa del .ipa, con App Group).
+- **Siri y Atajos**: «Oye Siri, agrega un vaso de agua en Sazón» y «Oye
+  Siri, repite mi desayuno en Sazón» (usa tu favorito de esa comida o lo
+  que comiste en ella el último día).
+- **Apple Salud** (opcional, versión completa): lee pasos, calorías activas
+  y peso; guarda tu peso y, si lo activas, las calorías y macros de cada
+  comida.
 - Exportar comidas y pesos a CSV; respaldo completo.
 
 Cada registro muestra su origen: INS, Open Food Facts, etiqueta del envase,
@@ -77,7 +91,13 @@ INS, Open Food Facts y tus propias recetas.
   Alimentación, Nutrición y Vida Saludable. *Tablas peruanas de composición
   de alimentos*, 11.ª edición digital (TPCA 2023), marzo 2025. El documento
   indica: «Se autoriza su reproducción total o parcial, siempre y cuando se
-  cite la fuente». Incluye 1073 alimentos y 567 platos preparados.
+  cite la fuente». La app trae 1692 entradas: 1125 alimentos y 567 platos
+  preparados (contadas en `Sazon/Datos/alimentos-ins.json`).
+- **Micronutrientes (pendiente):** la app ya puede mostrar hierro, calcio,
+  zinc, vitaminas A y C, etc. si la tabla los trae, pero el archivo aún no
+  los incluye. Para agregarlos hay que confirmar en el PDF oficial del INS
+  en qué columna está cada uno y completarlo en `herramientas/convertir_ins.py`
+  (`COLUMNAS_MICROS`). No se inventan valores.
 - El PDF se convierte con `herramientas/convertir_ins.py` en
   `Sazon/Datos/alimentos-ins.json`, que va dentro de la app. El script
   también deja `herramientas/alimentos-ins.csv` (para revisar a mano) y
@@ -90,20 +110,56 @@ INS, Open Food Facts y tus propias recetas.
   los valores salen de la tabla; si no, se usa la estimación de la IA
   marcada con «≈».
 
-## IA: Google Gemini (plan gratuito)
+## IA: capas, tiempos y privacidad
 
-- Modelo por defecto: `gemini-3.8-flash` (gratuito en la página de precios
-  de Gemini al 1 de noviembre de 2026). Se puede cambiar en Ajustes.
-- La clave de API se pega una vez en Ajustes y se guarda en el **Llavero**
-  del iPhone. Nunca va en este repositorio ni en el código.
-- Si Gemini está saturado, la app reintenta una vez y luego prueba modelos
-  gratuitos de respaldo (lo avisa en pantalla y se puede cancelar). Las
-  fotos se reducen a 1024 px y se envían sin metadatos.
-- En el plan gratuito, Google puede usar lo enviado para mejorar sus
-  productos. La app lo avisa la primera vez.
-- Toda la conexión con la IA está en `Sazon/Servicios/ServicioIA.swift`.
+La IA trabaja por capas (de la más rápida y privada a la nube):
 
-### Crear la clave
+1. **Memoria del iPhone**: si analizas la misma foto o el mismo texto en
+   24 h, la respuesta sale de aquí, sin internet ni cuota (se guarda solo
+   la respuesta, con una huella del contenido; máximo 80 respuestas).
+2. **En el iPhone**: las etiquetas nutricionales se leen con Vision de
+   Apple (`VNRecognizeTextRequest`), sin red. Si no se encuentran con
+   seguridad las calorías y los macros, se usa la nube. El dictado se hace
+   en el iPhone cuando el iPhone lo permite (`requiresOnDeviceRecognition`).
+   El modelo de Apple Intelligence no se usa (pide iPhone 15 Pro o posterior).
+3. **Google Gemini** con tu clave. Modelo por defecto `gemini-3.8-flash`;
+   si está saturado o sin cuota se prueban `gemini-3.5-flash-lite`,
+   `gemini-3.6-flash` y `gemini-3.1-flash-lite` (todos gratuitos en
+   <https://ai.google.dev/gemini-api/docs/pricing>, consultada el 16-nov-2026).
+   Cada tarea tiene un prompt corto propio y el razonamiento va al mínimo
+   que admite cada modelo (`low` en 3.8-flash; `minimal` en los demás).
+4. **Groq (opcional)**: si pones una segunda clave, se usa solo cuando
+   Gemini está saturado o sin cuota (modelo `qwen/qwen3.8-27b`, que Groq
+   marca como «Preview»). Sin esa clave, todo funciona igual.
+
+**Reintentos reales** (por cada registro): como máximo **3 llamadas** entre
+todos los modelos y proveedores (con clave de Groq: 2 a Gemini y 1 a Groq),
+espera creciente con algo de azar entre intentos, y **corte total a los
+30 s** (también se corta la petición en curso). Un 429 con cuota diaria
+agotada deja ese modelo sin usar hasta la medianoche hora del Pacífico
+(2:00 o 3:00 a. m. en Lima); un 400 no se reintenta con otros modelos.
+A los 20 s la pantalla ofrece «Buscar en la tabla» y «Agregar a mano».
+
+**Claves**: se pegan en Ajustes › Inteligencia artificial y se guardan en
+el **Llavero** del iPhone (solo con el iPhone desbloqueado y nunca se
+copian a otro dispositivo). Nunca van en este repositorio, en el código, en
+los registros ni en el respaldo.
+
+**Privacidad** (fuentes consultadas el 16-nov-2026):
+- Gemini, plan gratuito: Google usa lo que envías y las respuestas para
+  mejorar sus productos, y **revisores humanos pueden leerlo**; Google pide
+  no enviar información sensible
+  (<https://ai.google.dev/gemini-api/terms>). Por eso solo se envía la foto
+  (reducida y sin ubicación) o el texto; el resumen del día al coach es
+  opcional.
+- Groq: según <https://console.groq.com/docs/your-data>, por defecto no
+  guarda lo que envías para responder (puede guardar registros hasta 30
+  días si hay fallos o abuso).
+- Toda la conexión con la IA está en `Sazon/Servicios/ServicioIA.swift` y
+  `Sazon/Servicios/ProveedorGroq.swift`; las reglas, en
+  `Sazon/Logica/PoliticaIA.swift`.
+
+### Crear la clave de Gemini
 
 1. Entra a <https://aistudio.google.com> con tu cuenta de Google.
 2. Acepta los términos si te los pide.
@@ -111,6 +167,17 @@ INS, Open Food Facts y tus propias recetas.
 4. Copia la clave y pégala en Sazón › Ajustes › Inteligencia artificial.
 5. No configures facturación (así te quedas en el plan gratuito).
 6. Tus límites reales se ven en AI Studio, en la sección de uso y límites.
+
+### Crear la clave de Groq (opcional, respaldo)
+
+1. Entra a <https://console.groq.com> y crea una cuenta gratuita (con tu
+   correo o tu cuenta de Google).
+2. En el menú, abre «API Keys» y toca «Create API Key».
+3. Ponle un nombre (por ejemplo «Sazón») y copia la clave: Groq la muestra
+   una sola vez.
+4. En Sazón › Ajustes › Inteligencia artificial › «Respaldo opcional:
+   Groq», pégala y toca «Guardar clave de Groq».
+5. No agregues tarjeta. Tus límites reales se ven en la consola de Groq.
 
 ## Instalar en el iPhone
 
@@ -140,7 +207,8 @@ Sazon/App          Entrada de la app y vista raíz
 Sazon/Modelo       Datos (Modelos.swift) y almacén JSON local (Almacen.swift)
 Sazon/Logica       Lógica pura con pruebas: metas, sumas del día, porciones,
                    búsqueda en la tabla, lectura del JSON de la IA y de Open Food Facts
-Sazon/Servicios    Gemini, Open Food Facts, Llavero, fotos, tabla del INS, respaldo
+Sazon/Servicios    Gemini y Groq (IA), Open Food Facts, Llavero, fotos, etiquetas con Vision,
+                   cola sin conexión, Siri y Atajos, Apple Salud, tabla del INS, respaldo
 Sazon/Diseno       Sistema de diseño: espaciado, tipografía, movimiento, temas, componentes
 Sazon/Pantallas    Una vista por pantalla
 Compartido         Código que comparten la app y los widgets
