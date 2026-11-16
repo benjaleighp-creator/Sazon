@@ -32,6 +32,60 @@ struct AnalisisIA: Equatable {
     /// Ingredientes que suelen ir en estos platos y no se ven (aceite,
     /// mayonesa…), para preguntártelos antes de guardar.
     var posiblesOcultos: [String]
+    /// Qué capa respondió (memoria, iPhone, Gemini o Groq) y en cuánto tiempo.
+    var capa: CapaIA? = nil
+    var segundos: Double? = nil
+}
+
+/// Quién dio la respuesta. Se muestra de forma discreta en la revisión.
+enum CapaIA: Equatable {
+    /// Memoria local: la misma foto o texto en las últimas 24 h.
+    case memoria
+    /// En el iPhone, sin red (lectura de etiquetas con Vision).
+    case iPhone
+    case gemini(String)
+    case groq
+
+    var nombre: String {
+        switch self {
+        case .memoria: return "Memoria del iPhone (sin red)"
+        case .iPhone: return "Leído en tu iPhone (sin red)"
+        case .gemini(let modelo): return "Gemini · \(modelo)"
+        case .groq: return "Groq (respaldo)"
+        }
+    }
+
+    var simbolo: String {
+        switch self {
+        case .memoria: return "clock.arrow.circlepath"
+        case .iPhone: return "iphone"
+        case .gemini, .groq: return "sparkles"
+        }
+    }
+
+    /// Texto para guardar en la memoria local.
+    var clave: String {
+        switch self {
+        case .memoria: return "memoria"
+        case .iPhone: return "iphone"
+        case .gemini(let m): return "gemini:" + m
+        case .groq: return "groq"
+        }
+    }
+
+    init?(clave: String) {
+        if clave == "memoria" { self = .memoria }
+        else if clave == "iphone" { self = .iPhone }
+        else if clave == "groq" { self = .groq }
+        else if clave.hasPrefix("gemini:") { self = .gemini(String(clave.dropFirst(7))) }
+        else { return nil }
+    }
+
+    /// «Gemini · gemini-3.8-flash · 6,2 s».
+    func descripcion(segundos: Double?) -> String {
+        guard let segundos, segundos.isFinite, self != .memoria else { return nombre }
+        return nombre + " · " + Formato.numero(segundos, decimales: 1) + " s"
+    }
 }
 
 /// Errores de la IA, con un mensaje claro en español.
@@ -51,6 +105,12 @@ enum ErrorIA: Error, Equatable {
     case peticionInvalida(String)
     case servidor(Int)
     case desconocido(String)
+    /// Se acabó la cuota gratuita de hoy de todos los modelos que se probaron.
+    case cuotaDiariaAgotada
+    /// Se llegó al tope total de espera (`PoliticaIA.tiempoTotal`).
+    case tiempoAgotado
+    /// Groq rechazó su clave (la de Gemini puede estar bien).
+    case claveGroqInvalida
 
     var titulo: String {
         switch self {
@@ -68,6 +128,9 @@ enum ErrorIA: Error, Equatable {
         case .peticionInvalida: return "Gemini rechazó la petición"
         case .servidor: return "Gemini tuvo un problema"
         case .desconocido: return "Algo salió mal"
+        case .cuotaDiariaAgotada: return "Se acabó la cuota gratuita de hoy"
+        case .tiempoAgotado: return "La IA tardó demasiado"
+        case .claveGroqInvalida: return "La clave de Groq no funciona"
         }
     }
 
@@ -103,6 +166,12 @@ enum ErrorIA: Error, Equatable {
             return "El servidor de Gemini respondió con el error \(codigo). Inténtalo más tarde o sigue con la búsqueda manual."
         case .desconocido(let detalle):
             return detalle
+        case .cuotaDiariaAgotada:
+            return "Gemini ya no acepta más peticiones gratuitas hoy (se reinicia a medianoche hora del Pacífico, 2:00 o 3:00 a. m. en Lima). Puedes registrar ahora mismo desde la tabla o a mano. Si pones una clave de Groq en Ajustes, se usa como respaldo."
+        case .tiempoAgotado:
+            return "Pasaron \(Int(PoliticaIA.tiempoTotal)) segundos sin respuesta, así que se canceló para no gastar tu cuota. Puedes intentarlo más tarde o registrar desde la tabla o a mano."
+        case .claveGroqInvalida:
+            return "Groq rechazó la clave de respaldo. Revísala en Ajustes › Inteligencia artificial, o bórrala si no la usas."
         }
     }
 }
@@ -114,59 +183,82 @@ enum LectorIA {
 
     // MARK: - Petición
 
-    static let instrucciones = """
-    Eres el asistente de una app personal de registro de comidas en Perú. \
-    Identifica cada alimento o bebida que aparece en la foto o en el texto.
-
-    Para cada alimento da:
-    - "nombre": nombre corto y genérico en español de Perú, como aparecería en una tabla de composición de alimentos (por ejemplo «Pan francés», «Palta», «Arroz blanco cocido», «Café pasado sin azúcar»). Si es un plato peruano típico que no se separa bien (por ejemplo lomo saltado o ají de gallina), dalo como un solo plato.
-    - "gramos": porción total estimada en gramos (en bebidas, mililitros como gramos).
-    - "confianza": de 0 a 1, qué tan seguro estás de haber identificado bien el alimento y la porción.
-    - "medida", "cantidad" y "gramos_por_medida": si es natural contarlo en una medida casera (unidad, taza, vaso, cucharada, cucharadita, rebanada, plato), la medida en singular, cuántas y cuántos gramos pesa una. Si no aplica, usa medida vacía y cantidad 0.
-    - "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g": tu estimación por 100 g.
-
-    - "gramos_min" y "gramos_max": el rango probable de la porción. Una foto no muestra el peso real ni lo que hay dentro \
-    (rellenos, lo que está debajo), así que el rango debe ser realista; "gramos" va dentro del rango.
-    - "caja": si hay foto, la caja delimitadora del alimento como [ymin, xmin, ymax, xmax] normalizada de 0 a 1000. \
-    Si no hay foto o no puedes ubicarlo, lista vacía. No adivines posiciones.
-    Cómo estimar las porciones: razona paso a paso antes de responder. Compara el tamaño con lo que se ve (un plato llano \
-    mide unos 26 cm, una cuchara unos 15 cm) y, si no se puede saber, asume una porción estándar de un restaurante o una casa en Perú. \
-    No subestimes los platos grandes.
-    Además, en "posibles_ocultos" lista en español, en minúsculas y sin repetir, los ingredientes calóricos que este plato \
-    suele llevar y que no se ven o no se mencionan: aceite (frituras, salteados, arroz), mantequilla, mayonesa, azúcar, \
-    queso, crema, salsa de soya u otra salsa. Solo los probables para estos platos; si no aplica, lista vacía. \
-    No los agregues a "alimentos".
-    Reglas: no inventes alimentos que no se ven o no se mencionan. Si el texto da cantidades («2 panes»), respétalas. \
-    Si no hay comida, devuelve la lista vacía. Responde solo con el JSON pedido.
+    /// Reglas comunes a foto, texto y alimento propio (cortas: un prompt
+    /// largo hace más lenta la respuesta).
+    static let instruccionesBase = """
+    App personal de registro de comidas en Perú. Para cada alimento o bebida da:
+    - "nombre": corto y genérico en español de Perú, como en una tabla de composición («Pan francés», «Palta», «Arroz blanco cocido»). Un plato peruano típico que no se separa (lomo saltado, ají de gallina) va como un solo plato.
+    - "gramos": porción total (bebidas: ml como gramos), y "gramos_min"/"gramos_max": rango realista que la incluya.
+    - "confianza": 0 a 1.
+    - "medida", "cantidad", "gramos_por_medida": medida casera en singular (unidad, taza, vaso, cucharada, rebanada, plato) si es natural; si no, medida vacía y 0.
+    - "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g": estimación por 100 g.
+    En "posibles_ocultos": ingredientes calóricos que estos platos suelen llevar y no se ven ni se mencionan (aceite, mantequilla, mayonesa, azúcar, queso, crema, salsa), en minúsculas; si no aplica, lista vacía. No los pongas en "alimentos".
+    No inventes alimentos. Si no hay comida, lista vacía. Responde solo con el JSON.
     """
+
+    static let instruccionesFoto = instruccionesBase + """
+
+    Es una foto. Estima la porción por lo que se ve (un plato llano mide unos 26 cm); si no se puede saber, porción estándar de Perú. No subestimes platos grandes.
+    "caja": caja del alimento [ymin, xmin, ymax, xmax] de 0 a 1000; si no puedes ubicarlo, lista vacía.
+    """
+
+    static let instruccionesTexto = instruccionesBase + """
+
+    Es un texto escrito o dictado. Respeta las cantidades que diga («2 panes»); si no da cantidad, usa una porción estándar de Perú.
+    """
+
+    static let instruccionesAlimentoPropio = """
+    App de registro de comidas en Perú. Te doy el nombre de UN alimento o plato. Devuélvelo como un único elemento de "alimentos" con su porción habitual en Perú ("gramos", "gramos_min", "gramos_max"), "confianza" de 0 a 1, medida casera si aplica (si no, medida vacía y 0) y su estimación por 100 g ("kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g"). "posibles_ocultos" vacía. Responde solo con el JSON.
+    """
+
+    /// Qué se le pide a la IA (cada tarea con su prompt corto).
+    enum TipoAnalisis: String {
+        case foto, texto, alimentoPropio
+
+        var instrucciones: String {
+            switch self {
+            case .foto: return LectorIA.instruccionesFoto
+            case .texto: return LectorIA.instruccionesTexto
+            case .alimentoPropio: return LectorIA.instruccionesAlimentoPropio
+            }
+        }
+
+        /// Las cajas solo tienen sentido con foto.
+        var conCaja: Bool { self == .foto }
+    }
 
     /// Esquema JSON de la respuesta (palabras clave admitidas por Gemini:
     /// type, properties, required, items, minimum, maximum, description).
-    static var esquema: [String: Any] {
+    static var esquema: [String: Any] { esquema(conCaja: true) }
+
+    static func esquema(conCaja: Bool) -> [String: Any] {
         let numero: (String, Double, Double) -> [String: Any] = { descripcion, minimo, maximo in
             ["type": "number", "description": descripcion, "minimum": minimo, "maximum": maximo]
         }
+        var propiedades: [String: Any] = [
+            "nombre": ["type": "string", "description": "Nombre corto en español de Perú"],
+            "gramos": numero("Porción total en gramos", 0, 5000),
+            "confianza": numero("Confianza de 0 a 1", 0, 1),
+            "medida": ["type": "string", "description": "Medida casera en singular o vacío"],
+            "cantidad": numero("Cuántas medidas caseras (0 si no aplica)", 0, 100),
+            "gramos_por_medida": numero("Gramos de una medida casera (0 si no aplica)", 0, 5000),
+            "kcal_100g": numero("kcal por 100 g", 0, 900),
+            "proteina_100g": numero("Proteína por 100 g", 0, 100),
+            "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
+            "grasas_100g": numero("Grasas por 100 g", 0, 100),
+            "gramos_min": numero("Mínimo probable de la porción en gramos", 0, 5000),
+            "gramos_max": numero("Máximo probable de la porción en gramos", 0, 5000)
+        ]
+        if conCaja {
+            propiedades["caja"] = [
+                "type": "array",
+                "description": "[ymin, xmin, ymax, xmax] de 0 a 1000, o vacía",
+                "items": numero("Coordenada de 0 a 1000", 0, 1000)
+            ] as [String: Any]
+        }
         let alimento: [String: Any] = [
             "type": "object",
-            "properties": [
-                "nombre": ["type": "string", "description": "Nombre corto en español de Perú"],
-                "gramos": numero("Porción total en gramos", 0, 5000),
-                "confianza": numero("Confianza de 0 a 1", 0, 1),
-                "medida": ["type": "string", "description": "Medida casera en singular o vacío"],
-                "cantidad": numero("Cuántas medidas caseras (0 si no aplica)", 0, 100),
-                "gramos_por_medida": numero("Gramos de una medida casera (0 si no aplica)", 0, 5000),
-                "kcal_100g": numero("kcal por 100 g", 0, 900),
-                "proteina_100g": numero("Proteína por 100 g", 0, 100),
-                "carbohidratos_100g": numero("Carbohidratos por 100 g", 0, 100),
-                "grasas_100g": numero("Grasas por 100 g", 0, 100),
-                "gramos_min": numero("Mínimo probable de la porción en gramos", 0, 5000),
-                "gramos_max": numero("Máximo probable de la porción en gramos", 0, 5000),
-                "caja": [
-                    "type": "array",
-                    "description": "[ymin, xmin, ymax, xmax] de 0 a 1000, o vacía",
-                    "items": numero("Coordenada de 0 a 1000", 0, 1000)
-                ] as [String: Any]
-            ] as [String: Any],
+            "properties": propiedades,
             "required": ["nombre", "gramos", "confianza", "medida", "cantidad", "gramos_por_medida",
                          "kcal_100g", "proteina_100g", "carbohidratos_100g", "grasas_100g", "gramos_min", "gramos_max"]
         ]
@@ -185,28 +277,55 @@ enum LectorIA {
         ]
     }
 
+    /// Nivel de razonamiento («thinking») más bajo que admite cada modelo,
+    /// según https://ai.google.dev/gemini-api/docs/thinking (consultada el
+    /// 16-nov-2026): `minimal` en 3.6-flash, los flash-lite y 3-flash-preview;
+    /// `low` en 3.8-flash y Gemini 4 (no admiten `minimal`). Para un modelo
+    /// que no se conoce se devuelve nil y no se envía el campo.
+    static func nivelRazonamiento(modelo: String) -> String? {
+        let m = modelo.lowercased()
+        if m.contains("flash-lite") || m.contains("3.6-flash") || m.contains("3-flash-preview") { return "MINIMAL" }
+        if m.contains("3.8-flash") || m.hasPrefix("gemini-4") || m.contains("2.5-flash") || m.contains("2.5-pro") { return "LOW" }
+        return nil
+    }
+
     /// Cuerpo JSON para `models/{modelo}:generateContent`.
     /// - texto: lo que escribiste o dictaste (nil si es solo foto).
     /// - imagenJPEGBase64: la foto ya comprimida, en base64 (nil si es texto).
-    static func cuerpoPeticion(texto: String?, imagenJPEGBase64: String?, formato: FormatoPeticionIA) throws -> Data {
+    /// - tipo: la tarea (por defecto, foto si hay imagen y texto si no).
+    /// - nivelRazonamiento: `thinkingConfig.thinkingLevel` (nil: no se envía).
+    static func cuerpoPeticion(texto: String?, imagenJPEGBase64: String?, formato: FormatoPeticionIA,
+                               tipo: TipoAnalisis? = nil, nivelRazonamiento: String? = nil) throws -> Data {
+        let tarea = tipo ?? (imagenJPEGBase64 != nil ? .foto : .texto)
         var partes: [[String: Any]] = []
         if let imagen = imagenJPEGBase64 {
             let datosImagen: [String: Any] = ["mime_type": "image/jpeg", "data": imagen]
             partes.append(["inline_data": datosImagen])
         }
-        var pedido = instrucciones
-        if let texto, !texto.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            pedido += "\n\nLo que comí: \(texto)"
-        } else {
-            pedido += "\n\nIdentifica los alimentos de la foto."
+        partes.append(["text": pedido(texto: texto, tipo: tarea)])
+        return try cuerpo(partes: partes, esquema: esquema(conCaja: tarea.conCaja), formato: formato,
+                          nivelRazonamiento: nivelRazonamiento)
+    }
+
+    /// Instrucciones de la tarea más lo que escribiste.
+    static func pedido(texto: String?, tipo: TipoAnalisis) -> String {
+        var pedido = tipo.instrucciones
+        let limpio = texto?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        switch tipo {
+        case .foto:
+            pedido += limpio.isEmpty ? "\n\nIdentifica los alimentos de la foto." : "\n\nNota: \(limpio)"
+        case .texto:
+            pedido += "\n\nLo que comí: \(limpio)"
+        case .alimentoPropio:
+            pedido += "\n\nAlimento: \(limpio)"
         }
-        partes.append(["text": pedido])
-        return try cuerpo(partes: partes, esquema: esquema, formato: formato)
+        return pedido
     }
 
     /// Arma el cuerpo de `generateContent` con las partes y el esquema pedido.
-    static func cuerpo(partes: [[String: Any]], esquema: [String: Any], formato: FormatoPeticionIA) throws -> Data {
-        let configuracion: [String: Any]
+    static func cuerpo(partes: [[String: Any]], esquema: [String: Any], formato: FormatoPeticionIA,
+                       nivelRazonamiento: String? = nil) throws -> Data {
+        var configuracion: [String: Any]
         switch formato {
         case .actual:
             // Forma REST de la guía actual de salidas estructuradas.
@@ -215,6 +334,9 @@ enum LectorIA {
             configuracion = ["responseFormat": formatoRespuesta]
         case .clasico:
             configuracion = ["responseMimeType": "application/json", "responseJsonSchema": esquema]
+        }
+        if let nivelRazonamiento {
+            configuracion["thinkingConfig"] = ["thinkingLevel": nivelRazonamiento]
         }
         let contenido: [String: Any] = ["role": "user", "parts": partes]
         let cuerpo: [String: Any] = [
@@ -379,6 +501,148 @@ enum LectorIA {
     }
 }
 
+// MARK: - Límites (429)
+
+/// Lo que dice un 429 de Gemini sobre el límite alcanzado.
+struct InfoLimite: Equatable {
+    /// True si es la cuota diaria (`quotaId` con «PerDay»): no tiene sentido
+    /// reintentar ese modelo hoy.
+    var diario: Bool
+    /// Espera sugerida por Google (`RetryInfo.retryDelay`), en segundos.
+    var espera: TimeInterval?
+}
+
+extension LectorIA {
+    /// Lee `error.details` de un 429: `google.rpc.QuotaFailure` (con
+    /// `violations[].quotaId`) y `google.rpc.RetryInfo` (con `retryDelay`,
+    /// p. ej. "27s"). Tolera un 429 sin detalles (Google a veces no los manda).
+    static func infoLimite(_ cuerpo: Data) -> InfoLimite {
+        let error = (try? JSONSerialization.jsonObject(with: cuerpo) as? [String: Any])?["error"] as? [String: Any]
+        let detalles = (error?["details"] as? [[String: Any]]) ?? []
+        var diario = false
+        var espera: TimeInterval?
+        for d in detalles {
+            let tipo = (d["@type"] as? String) ?? ""
+            if tipo.hasSuffix("RetryInfo"), let texto = d["retryDelay"] as? String {
+                espera = segundos(texto)
+            }
+            if let violaciones = d["violations"] as? [[String: Any]] {
+                for v in violaciones {
+                    let id = ((v["quotaId"] as? String) ?? "") + " " + ((v["quotaMetric"] as? String) ?? "")
+                    if id.lowercased().contains("perday") { diario = true }
+                }
+            }
+        }
+        return InfoLimite(diario: diario, espera: espera)
+    }
+
+    /// "27s" o "1.5s" → segundos.
+    static func segundos(_ duracion: String) -> TimeInterval? {
+        let limpio = duracion.trimmingCharacters(in: .whitespaces)
+        guard limpio.hasSuffix("s"), let n = Double(limpio.dropLast()), n.isFinite, n >= 0 else { return nil }
+        return n
+    }
+}
+
+// MARK: - Groq (respaldo opcional, API compatible con OpenAI)
+
+extension LectorIA {
+    /// Convierte un esquema de Gemini al modo estricto de Groq: todos los
+    /// campos obligatorios, `additionalProperties: false` y sin
+    /// `minimum`/`maximum` (los rangos se validan igual al leer la respuesta).
+    static func esquemaEstricto(_ esquema: [String: Any]) -> [String: Any] {
+        var e = esquema
+        e.removeValue(forKey: "minimum")
+        e.removeValue(forKey: "maximum")
+        if let propiedades = e["properties"] as? [String: Any] {
+            var nuevas: [String: Any] = [:]
+            for (k, v) in propiedades {
+                nuevas[k] = (v as? [String: Any]).map(esquemaEstricto) ?? v
+            }
+            e["properties"] = nuevas
+            e["required"] = nuevas.keys.sorted()
+            e["additionalProperties"] = false
+        }
+        if let items = e["items"] as? [String: Any] {
+            e["items"] = esquemaEstricto(items)
+        }
+        return e
+    }
+
+    /// Cuerpo para `POST https://api.groq.com/openai/v1/chat/completions`
+    /// (https://console.groq.com/docs/vision y /docs/structured-outputs,
+    /// consultadas el 16-nov-2026): imagen en base64 como `data:` URL,
+    /// JSON Schema estricto y sin razonamiento (`reasoning_effort: none`).
+    static func cuerpoGroq(modelo: String, sistema: String, texto: String, imagenJPEGBase64: String?,
+                           esquema: [String: Any]?, nombreEsquema: String = "respuesta") throws -> Data {
+        var contenidoUsuario: [[String: Any]] = [["type": "text", "text": texto]]
+        if let imagen = imagenJPEGBase64 {
+            contenidoUsuario.append(["type": "image_url", "image_url": ["url": "data:image/jpeg;base64," + imagen]])
+        }
+        var cuerpo: [String: Any] = [
+            "model": modelo,
+            "messages": [
+                ["role": "system", "content": sistema],
+                ["role": "user", "content": contenidoUsuario]
+            ] as [[String: Any]],
+            "reasoning_effort": "none",
+            "temperature": 0.2,
+            "max_completion_tokens": 2048,
+            "stream": false
+        ]
+        if let esquema {
+            cuerpo["response_format"] = [
+                "type": "json_schema",
+                "json_schema": ["name": nombreEsquema, "strict": true, "schema": esquemaEstricto(esquema)] as [String: Any]
+            ] as [String: Any]
+        }
+        return try JSONSerialization.data(withJSONObject: cuerpo, options: [])
+    }
+
+    /// Cuerpo de Groq para el coach (texto libre, sin esquema).
+    static func cuerpoGroqCoach(modelo: String, mensajes: [MensajeCoach], contexto: String?) throws -> Data {
+        var lista: [[String: Any]] = [["role": "system", "content": sistemaCoach(contexto: contexto)]]
+        for t in turnosCoach(mensajes) {
+            lista.append(["role": t.rol == "user" ? "user" : "assistant", "content": t.texto])
+        }
+        let cuerpo: [String: Any] = ["model": modelo, "messages": lista, "reasoning_effort": "none",
+                                     "max_completion_tokens": maxTokensCoach, "stream": false]
+        return try JSONSerialization.data(withJSONObject: cuerpo, options: [])
+    }
+
+    /// Texto de `choices[0].message.content` de una respuesta de Groq.
+    static func textoDeRespuestaGroq(_ datos: Data) throws -> String {
+        guard let raiz = try? JSONSerialization.jsonObject(with: datos) as? [String: Any] else {
+            throw ErrorIA.jsonInvalido("la respuesta del servidor no es JSON")
+        }
+        guard let opciones = raiz["choices"] as? [[String: Any]], let primera = opciones.first,
+              let mensaje = primera["message"] as? [String: Any] else {
+            throw ErrorIA.respuestaVacia
+        }
+        let texto = (mensaje["content"] as? String) ?? ""
+        if texto.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if let fin = primera["finish_reason"] as? String, fin != "stop" { throw ErrorIA.bloqueado(fin) }
+            throw ErrorIA.respuestaVacia
+        }
+        return texto
+    }
+
+    /// Error HTTP de Groq. Cuerpo típico: {"error": {"message": "…", "type": "…", "code": "…"}}.
+    static func errorHTTPGroq(codigo: Int, cuerpo: Data) -> ErrorIA {
+        let error = (try? JSONSerialization.jsonObject(with: cuerpo) as? [String: Any])?["error"] as? [String: Any]
+        let mensaje = (error?["message"] as? String) ?? ""
+        switch codigo {
+        case 401, 403: return .claveGroqInvalida
+        case 429: return .limiteAlcanzado
+        case 400, 413, 422:
+            return .peticionInvalida("Groq: " + (mensaje.isEmpty ? "petición no válida" : String(mensaje.prefix(180))))
+        case 404: return .modeloNoDisponible(PoliticaIA.modeloGroq)
+        case 500...: return .servidor(codigo)
+        default: return .desconocido("Error \(codigo) de Groq. \(String(mensaje.prefix(180)))")
+        }
+    }
+}
+
 // MARK: - Etiqueta nutricional del envase
 
 /// Valores leídos por la IA de la tabla nutricional de un envase.
@@ -389,6 +653,8 @@ struct EtiquetaLeida: Equatable {
     /// Tamaño de porción del envase en gramos, si aparece.
     var porcionGramos: Double?
     var confianza: Double
+    /// Quién la leyó (iPhone, memoria, Gemini o Groq).
+    var capa: CapaIA? = nil
 }
 
 extension LectorIA {
@@ -434,10 +700,11 @@ extension LectorIA {
         ]
     }
 
-    static func cuerpoPeticionEtiqueta(imagenJPEGBase64: String, formato: FormatoPeticionIA) throws -> Data {
+    static func cuerpoPeticionEtiqueta(imagenJPEGBase64: String, formato: FormatoPeticionIA,
+                                       nivelRazonamiento: String? = nil) throws -> Data {
         let datosImagen: [String: Any] = ["mime_type": "image/jpeg", "data": imagenJPEGBase64]
         let partes: [[String: Any]] = [["inline_data": datosImagen], ["text": instruccionesEtiqueta]]
-        return try cuerpo(partes: partes, esquema: esquemaEtiqueta, formato: formato)
+        return try cuerpo(partes: partes, esquema: esquemaEtiqueta, formato: formato, nivelRazonamiento: nivelRazonamiento)
     }
 
     /// Número opcional dentro de un rango; 0 si falta o no tiene sentido.
@@ -503,14 +770,16 @@ extension LectorIA {
         return lineas.joined(separator: "\n")
     }
 
-    /// Cuerpo para conversar: instrucciones, contexto opcional y los últimos mensajes.
-    static func cuerpoCoach(mensajes: [MensajeCoach], contexto: String?, limite: Int = 12) throws -> Data {
-        var sistema = instruccionesCoach
-        if let contexto, !contexto.isEmpty { sistema += "\n\n" + contexto }
-        // Gemini espera que la conversación empiece con la persona y que los
-        // turnos se alternen. Si una respuesta falló, quedan dos mensajes
-        // tuyos seguidos: se unen en uno. Si el recorte deja primero al
-        // coach, ese mensaje se omite.
+    /// Tope de la respuesta del coach. Es amplio a propósito: la guía de
+    /// Gemini advierte que un tope pequeño puede cortar la respuesta si el
+    /// modelo razona; el razonamiento se limita aparte (`thinkingLevel`).
+    static let maxTokensCoach = 1024
+
+    /// Turnos de la conversación ya ordenados. Gemini espera que la
+    /// conversación empiece con la persona y que los turnos se alternen. Si
+    /// una respuesta falló, quedan dos mensajes tuyos seguidos: se unen en
+    /// uno. Si el recorte deja primero al coach, ese mensaje se omite.
+    static func turnosCoach(_ mensajes: [MensajeCoach], limite: Int = 12) -> [(rol: String, texto: String)] {
         var turnos: [(rol: String, texto: String)] = []
         for m in mensajes.suffix(limite) {
             let rol = m.autor == .usuario ? "user" : "model"
@@ -521,14 +790,30 @@ extension LectorIA {
                 turnos.append((rol, m.texto))
             }
         }
+        return turnos
+    }
+
+    /// Instrucciones del coach más el resumen opcional del día.
+    static func sistemaCoach(contexto: String?) -> String {
+        var sistema = instruccionesCoach
+        if let contexto, !contexto.isEmpty { sistema += "\n\n" + contexto }
+        return sistema
+    }
+
+    /// Cuerpo para conversar: instrucciones, contexto opcional y los últimos mensajes.
+    static func cuerpoCoach(mensajes: [MensajeCoach], contexto: String?, limite: Int = 12,
+                            nivelRazonamiento: String? = nil) throws -> Data {
         var contenidos: [[String: Any]] = []
-        for t in turnos {
+        for t in turnosCoach(mensajes, limite: limite) {
             let parte: [String: Any] = ["text": t.texto]
             contenidos.append(["role": t.rol, "parts": [parte]])
         }
-        let parteSistema: [String: Any] = ["text": sistema]
+        let parteSistema: [String: Any] = ["text": sistemaCoach(contexto: contexto)]
         let instrucciones: [String: Any] = ["parts": [parteSistema]]
-        let cuerpo: [String: Any] = ["systemInstruction": instrucciones, "contents": contenidos]
+        var configuracion: [String: Any] = ["maxOutputTokens": maxTokensCoach]
+        if let nivelRazonamiento { configuracion["thinkingConfig"] = ["thinkingLevel": nivelRazonamiento] }
+        let cuerpo: [String: Any] = ["systemInstruction": instrucciones, "contents": contenidos,
+                                     "generationConfig": configuracion]
         return try JSONSerialization.data(withJSONObject: cuerpo, options: [])
     }
 }
