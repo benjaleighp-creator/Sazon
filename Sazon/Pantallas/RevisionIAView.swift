@@ -61,10 +61,10 @@ struct RevisionIAView: View {
                          : "\(delINS) con valores del INS · \(items.count - delINS) estimados por la IA (≈)")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoHeroSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
                     if let capa {
                         EtiquetaCapaIA(capa: capa, segundos: segundos, color: paleta.textoHeroSecundario)
                     }
-                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .hero(relleno: Espacio.m)
                 .accessibilityElement(children: .combine)
