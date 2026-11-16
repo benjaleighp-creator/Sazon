@@ -621,6 +621,9 @@ private struct BotonFlotante: View {
 private struct TarjetaAgua: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    /// Sube con cada toque de − o + (no con cada cambio de ml, por ejemplo
+    /// al cambiar de día o al sincronizar con Salud).
+    @State private var toques = 0
 
     var body: some View {
         let ml = almacen.aguaVisible
@@ -643,6 +646,7 @@ private struct TarjetaAgua: View {
             HStack(spacing: Espacio.xs) {
                 Button {
                     animar(.enfasis) { almacen.quitarAgua() }
+                    toques += 1
                 } label: {
                     Image(systemName: "minus")
                         .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
@@ -653,6 +657,7 @@ private struct TarjetaAgua: View {
                 .accessibilityLabel("Quitar un vaso")
                 Button {
                     animar(.enfasis) { almacen.agregarAgua(almacen.datos.vasoMl) }
+                    toques += 1
                 } label: {
                     Label("\(Formato.entero(almacen.datos.vasoMl)) ml", systemImage: "plus")
                         .font(Tipo.pie)
@@ -668,7 +673,7 @@ private struct TarjetaAgua: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .tarjeta()
-        .sensoryFeedback(.impact(weight: .light), trigger: ml)
+        .sensoryFeedback(.impact(weight: .light), trigger: toques)
     }
 }
 

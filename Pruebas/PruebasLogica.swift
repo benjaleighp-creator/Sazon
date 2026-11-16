@@ -245,6 +245,13 @@ final class PruebasFormato: XCTestCase {
         XCTAssertEqual(Formato.entero(1834.6), "1835")
     }
 
+    func testTextoPlano() {
+        XCTAssertEqual(Formato.textoPlano("**Cena:** arroz con pollo"), "Cena: arroz con pollo")
+        XCTAssertEqual(Formato.textoPlano("## Ideas\n* quinua\n- huevo"), "Ideas\n• quinua\n• huevo")
+        XCTAssertEqual(Formato.textoPlano("Mira [esta guía](https://ejemplo.com) al 100 %"), "Mira esta guía al 100 %")
+        XCTAssertEqual(Formato.textoPlano("2 * 3 = 6"), "2 * 3 = 6")
+    }
+
     func testDuracionCorta() {
         XCTAssertEqual(Formato.duracionCorta(0), "0 s")
         XCTAssertEqual(Formato.duracionCorta(-3), "0 s")

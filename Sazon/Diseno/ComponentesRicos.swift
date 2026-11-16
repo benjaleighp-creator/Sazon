@@ -306,6 +306,8 @@ struct SelectorCantidad: View {
     var unidad: String = "g"
     var rango: ClosedRange<Double> = 1...5000
     @Environment(\.paleta) private var paleta
+    /// Sube solo con los botones − y + (escribir en el campo no vibra).
+    @State private var toques = 0
 
     var body: some View {
         HStack(spacing: Espacio.s) {
@@ -318,6 +320,7 @@ struct SelectorCantidad: View {
     private func boton(_ simbolo: String, _ cambio: Double, etiqueta: String) -> some View {
         Button {
             valor = min(max(valor + cambio, rango.lowerBound), rango.upperBound)
+            toques += 1
         } label: {
             Image(systemName: simbolo)
                 .font(Tipo.iconoFila)
@@ -326,7 +329,7 @@ struct SelectorCantidad: View {
                 .background(Circle().fill(paleta.acentoSuave))
         }
         .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: valor)
+        .sensoryFeedback(.selection, trigger: toques)
         .accessibilityLabel(etiqueta)
     }
 }

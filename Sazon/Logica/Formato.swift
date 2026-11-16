@@ -117,3 +117,32 @@ extension Formato {
         return resto == 0 ? textoMin : "\(textoMin) y \(textoSeg)"
     }
 }
+
+extension Formato {
+    /// Convierte el Markdown sencillo que a veces devuelve la IA en texto
+    /// plano: quita negritas, cursivas de guion bajo, código y títulos,
+    /// cambia viñetas por «•» y los enlaces por su texto (sin enlace que se
+    /// pueda tocar). El «%» queda tal cual.
+    static func textoPlano(_ markdown: String) -> String {
+        var lineas: [String] = []
+        for linea in markdown.components(separatedBy: "\n") {
+            var l = linea
+            // Títulos: "## Cena" → "Cena".
+            if let rango = l.range(of: "^\\s{0,3}#{1,6}\\s+", options: .regularExpression) {
+                l.removeSubrange(rango)
+            }
+            // Viñetas: "* arroz" o "- arroz" → "• arroz".
+            if let rango = l.range(of: "^(\\s*)[*+-]\\s+", options: .regularExpression) {
+                let sangria = l[rango].prefix { $0 == " " || $0 == "\t" }
+                l.replaceSubrange(rango, with: String(sangria) + "• ")
+            }
+            // Enlaces: "[texto](https://…)" → "texto".
+            l = l.replacingOccurrences(of: "\\[([^\\]]*)\\]\\([^)]*\\)", with: "$1", options: .regularExpression)
+            for marca in ["**", "__", "`"] {
+                l = l.replacingOccurrences(of: marca, with: "")
+            }
+            lineas.append(l)
+        }
+        return lineas.joined(separator: "\n")
+    }
+}
