@@ -73,6 +73,7 @@ targets:
       - path: Sazon/Logica
       - path: Sazon/Servicios/ServicioIA.swift
       - path: Sazon/Servicios/Llavero.swift
+      - path: Sazon/Servicios/ProveedorGroq.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pe.benjamin.sazon.pruebas
