@@ -137,7 +137,11 @@ struct RevisionIAView: View {
         .onAppear {
             guard !listo else { return }
             listo = true
-            items = identificados.map { ItemRevision(identificado: $0, coincidencia: almacen.tabla.emparejar($0.nombre)?.alimento) }
+            let aprendidas = almacen.datos.porcionesAprendidas
+            items = identificados.map {
+                ItemRevision(identificado: $0, coincidencia: almacen.tabla.emparejar($0.nombre)?.alimento,
+                             aprendida: PorcionesAprendidas.sugerida(aprendidas, nombre: $0.nombre))
+            }
         }
     }
 
@@ -157,6 +161,12 @@ struct RevisionIAView: View {
 
     private func guardar() {
         let fecha = Diario.fechaParaRegistrar(enDia: almacen.diaVisible)
+        // Recuerda las porciones que corregiste para la próxima vez.
+        var aprendidas = almacen.datos.porcionesAprendidas
+        for i in items {
+            aprendidas = PorcionesAprendidas.aprender(aprendidas, nombre: i.nombre, gramosIA: i.gramosIA, gramosFinal: i.gramos)
+        }
+        if aprendidas != almacen.datos.porcionesAprendidas { almacen.datos.porcionesAprendidas = aprendidas }
         alGuardar(items.map { $0.registro(fecha: fecha, comida: comida) })
     }
 }
@@ -202,6 +212,12 @@ private struct TarjetaItem: View {
 
             // Porción
             VStack(alignment: .leading, spacing: Espacio.xxs) {
+                if item.porcionAprendida {
+                    Label("Tu porción habitual (la IA estimó \(Formato.entero(item.gramosIA)) g)", systemImage: "person.crop.circle.badge.checkmark")
+                        .font(Tipo.pie)
+                        .foregroundStyle(paleta.textoSecundario)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 SelectorCantidad(valor: $item.gramos, paso: 10, unidad: "g")
                 if let medida = item.medida, let cantidad = item.cantidadMedida {
                     Label("La IA calculó \(Formato.numero(cantidad)) \(medida.nombre) ≈ \(Formato.numero(medida.gramos * cantidad, decimales: 0)) g",
