@@ -51,10 +51,10 @@ struct EtiquetaView: View {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está leyendo la etiqueta…", tarea: tarea,
+                EstadoIAVista(estado: estado, texto: "Leyendo la etiqueta…", tarea: tarea,
                               alCancelar: cancelar, alSalir: alSalir,
                               destinoManual: .porcion(Candidato(manual: "", codigoBarras: codigo)))
-                Text("Solo se envía la foto de la etiqueta, reducida y sin ubicación. Después revisas y corriges los números antes de guardar.")
+                Text("Primero se intenta leer en tu iPhone, sin internet. Solo si no alcanza, se envía la foto de la etiqueta (reducida y sin ubicación) a la IA. Después revisas y corriges los números antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -92,15 +92,26 @@ struct EtiquetaView: View {
 
     private func analizar() {
         guard let imagen else { return }
-        // La etiqueta necesita más detalle que un plato: lado de 1600 px.
-        guard let jpeg = ProcesadorFoto.prepararParaIA(imagen, ladoMaximo: 1600, calidad: 0.7) else {
-            errorFoto = "No se pudo preparar la foto."
-            return
-        }
         envios += 1
         estado = .analizando
+        errorFoto = nil
         tarea.iniciar { alAvanzar in
             do {
+                // 1. En el iPhone, sin red ni cuota (Vision).
+                if let local = await LectorEtiquetaLocal.leer(imagen) {
+                    try Task.checkCancellation()
+                    estado = .inactivo
+                    alLeer(Candidato(etiqueta: local, codigoBarras: codigo))
+                    return
+                }
+                try Task.checkCancellation()
+                // 2. Si el texto no alcanzó, la IA en la nube. La etiqueta
+                // necesita más detalle que un plato: lado de 1600 px.
+                guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen, ladoMaximo: 1600, calidad: 0.7) else {
+                    errorFoto = "No se pudo preparar la foto."
+                    estado = .inactivo
+                    return
+                }
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 let leida = try await proveedor.leerEtiqueta(fotoJPEG: jpeg)
                 try Task.checkCancellation()

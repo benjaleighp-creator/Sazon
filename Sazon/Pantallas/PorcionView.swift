@@ -44,7 +44,8 @@ struct PorcionView: View {
                         if let marca = candidato.marca { Insignia(texto: marca) }
                     }
                     if candidato.origen == .envase {
-                        Text("Valores leídos por la IA de la etiqueta: compáralos con el envase antes de guardar.")
+                        Text(candidato.leidoPor.map { "Leído por: \($0). Compara los valores con el envase antes de guardar." }
+                             ?? "Valores leídos por la IA de la etiqueta: compáralos con el envase antes de guardar.")
                             .font(Tipo.pie)
                             .foregroundStyle(paleta.aviso)
                             .fixedSize(horizontal: false, vertical: true)

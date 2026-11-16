@@ -15,6 +15,8 @@ struct Candidato: Hashable {
     var cantidadMedida: Double? = nil
     /// Open Food Facts sin algún macro: se avisa.
     var datosIncompletos: Bool = false
+    /// Quién leyó la etiqueta (iPhone, memoria, Gemini o Groq), si aplica.
+    var leidoPor: String? = nil
 
     init(alimento: AlimentoBase) {
         nombre = alimento.nombre
@@ -85,6 +87,7 @@ struct Candidato: Hashable {
         por100g = etiqueta.por100g
         origen = .envase
         self.codigoBarras = codigoBarras
+        leidoPor = etiqueta.capa?.nombre
         if let porcion = etiqueta.porcionGramos {
             let medidaPorcion = MedidaCasera(nombre: "porción del envase", gramos: porcion, estimada: false)
             medidas = [medidaPorcion]
