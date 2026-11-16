@@ -648,7 +648,7 @@ private struct SeccionRespaldo: View {
         VStack(alignment: .leading, spacing: Espacio.xs) {
             TituloSeccion("Respaldo")
             VStack(alignment: .leading, spacing: Espacio.s) {
-                Text("Guarda una copia de tus registros y ajustes en Archivos (por ejemplo, antes de reinstalar). La clave de la IA no se incluye.")
+                Text("Guarda una copia de tus registros y ajustes en Archivos (por ejemplo, antes de reinstalar). La clave de la IA no se incluye. Ojo: el respaldo es texto sin cifrar con tus comidas, pesos y medidas; guárdalo en un lugar privado y no lo compartas. Las fotos de progreso no se incluyen.")
                     .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
                 ViewThatFits(in: .horizontal) {
@@ -672,8 +672,14 @@ private struct SeccionRespaldo: View {
             case .success(let url):
                 let acceso = url.startAccessingSecurityScopedResource()
                 defer { if acceso { url.stopAccessingSecurityScopedResource() } }
-                if let datos = try? Data(contentsOf: url), let leidos = almacen.leerRespaldo(datos) {
-                    pendiente = leidos
+                if let tamano = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                   tamano > ValidacionRespaldo.tamanoMaximo {
+                    mensaje = "Ese archivo es demasiado grande para ser un respaldo de Sazón."
+                } else if let datos = try? Data(contentsOf: url), let leidos = almacen.leerRespaldo(datos) {
+                    pendiente = leidos.datos
+                    if leidos.descartados > 0 {
+                        mensaje = "Se omitirán \(leidos.descartados) datos con valores no válidos."
+                    }
                 } else {
                     mensaje = "Ese archivo no es un respaldo válido de Sazón."
                 }

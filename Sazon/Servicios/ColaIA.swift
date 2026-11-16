@@ -76,7 +76,7 @@ final class ColaIA {
 
     /// Solo un nombre de archivo, sin carpetas (por si un respaldo trae algo raro).
     static func esNombreSeguro(_ nombre: String) -> Bool {
-        !nombre.isEmpty && !nombre.contains("/") && !nombre.contains("..")
+        ValidacionRespaldo.esNombreArchivoSeguro(nombre)
     }
 
     // MARK: Procesar

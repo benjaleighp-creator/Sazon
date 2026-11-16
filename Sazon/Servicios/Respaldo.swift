@@ -39,12 +39,16 @@ extension Almacen {
     }
 
     /// Solo acepta archivos que parecen un respaldo de Sazón (con «version»
-    /// y «registros»). Cualquier otro JSON se leería como datos vacíos y
-    /// borraría todo al restaurarlo.
-    func leerRespaldo(_ contenido: Data) -> DatosApp? {
-        guard let raiz = try? JSONSerialization.jsonObject(with: contenido) as? [String: Any],
-              raiz["version"] != nil, raiz["registros"] is [Any] else { return nil }
-        return try? DatosApp.decodificador.decode(DatosApp.self, from: contenido)
+    /// y «registros») y de tamaño razonable. Cualquier otro JSON se leería
+    /// como datos vacíos y borraría todo al restaurarlo. Luego se revisan
+    /// los valores (ValidacionRespaldo): nombres de fotos, rangos, largo de
+    /// textos, y el aviso de la IA no se importa.
+    func leerRespaldo(_ contenido: Data) -> ValidacionRespaldo.Resultado? {
+        guard contenido.count <= ValidacionRespaldo.tamanoMaximo,
+              let raiz = try? JSONSerialization.jsonObject(with: contenido) as? [String: Any],
+              raiz["version"] != nil, raiz["registros"] is [Any],
+              let leidos = try? DatosApp.decodificador.decode(DatosApp.self, from: contenido) else { return nil }
+        return ValidacionRespaldo.revisar(leidos, conservando: datos)
     }
 
     func restaurar(_ respaldo: DatosApp) {

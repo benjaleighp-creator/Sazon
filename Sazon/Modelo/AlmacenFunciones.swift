@@ -28,7 +28,9 @@ extension Almacen {
         for a in acciones {
             switch a.tipo {
             case .agua:
-                d.agua.append(RegistroAgua(fecha: a.fecha, ml: a.ml ?? d.vasoMl))
+                // El archivo de acciones está fuera de la app: se acota la cantidad.
+                let ml = a.ml.flatMap { $0.isFinite && $0 > 0 && $0 <= 2000 ? $0 : nil } ?? d.vasoMl
+                d.agua.append(RegistroAgua(fecha: min(a.fecha, Date()), ml: ml))
             case .favorito:
                 guard let f = d.favoritos.first(where: { $0.id.uuidString == a.favoritoID }) else { continue }
                 nuevos += Copiado.copiar(f.registros, aDia: a.fecha, comida: f.comidaHabitual).map { r in
@@ -101,7 +103,8 @@ extension Almacen {
     }
 
     func imagen(de foto: FotoProgreso) -> UIImage? {
-        UIImage(contentsOfFile: Almacen.carpetaFotos.appendingPathComponent(foto.archivo).path)
+        guard ValidacionRespaldo.esNombreArchivoSeguro(foto.archivo) else { return nil }
+        return UIImage(contentsOfFile: Almacen.carpetaFotos.appendingPathComponent(foto.archivo).path)
     }
 
     /// Miniatura de una foto de progreso: se genera una sola vez (lado
@@ -120,7 +123,10 @@ extension Almacen {
 
     func eliminarFoto(_ foto: FotoProgreso) {
         MiniaturasFotos.cache.removeObject(forKey: foto.archivo as NSString)
-        try? FileManager.default.removeItem(at: Almacen.carpetaFotos.appendingPathComponent(foto.archivo))
+        // Solo se borra dentro de la carpeta de fotos (nunca «../otro-archivo»).
+        if ValidacionRespaldo.esNombreArchivoSeguro(foto.archivo) {
+            try? FileManager.default.removeItem(at: Almacen.carpetaFotos.appendingPathComponent(foto.archivo))
+        }
         datos.fotos.removeAll { $0.id == foto.id }
     }
 
