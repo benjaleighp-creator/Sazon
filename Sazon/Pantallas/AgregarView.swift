@@ -20,7 +20,7 @@ struct Candidato: Hashable {
         nombre = alimento.nombre
         por100g = alimento.por100g
         // Tus alimentos ("P:") y recetas ("R:") no son de la tabla del INS.
-        let propio = alimento.codigo.hasPrefix("P:") || alimento.codigo.hasPrefix("R:")
+        let propio = alimento.esPropio
         origen = propio ? .manual : .ins
         codigoINS = propio ? nil : alimento.codigo
         medidas = alimento.medidas

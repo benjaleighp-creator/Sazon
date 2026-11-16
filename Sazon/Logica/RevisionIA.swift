@@ -74,7 +74,12 @@ struct ItemRevision: Identifiable, Equatable {
 
     var confianzaEsBaja: Bool { confianza < ItemRevision.confianzaBaja }
 
-    var origen: OrigenDato { usarINS && ins != nil ? .ins : .estimadoIA }
+    /// De dónde salen los valores. Un alimento o receta tuyos («P:» o
+    /// «R:») elegidos con «Elegir otro de la tabla» son «Manual», no INS.
+    var origen: OrigenDato {
+        guard usarINS, let ins else { return .estimadoIA }
+        return ins.esPropio ? .manual : .ins
+    }
 
     var por100g: Nutrientes {
         if usarINS, let ins { return ins.por100g }
