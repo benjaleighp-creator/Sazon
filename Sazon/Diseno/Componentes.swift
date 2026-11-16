@@ -568,6 +568,7 @@ private struct FondoAccionFlotante: ViewModifier {
     @Environment(\.paleta) private var paleta
     @Environment(\.colorScheme) private var esquema
 
+    @ViewBuilder
     func body(content: Content) -> some View {
         #if compiler(>=6.2)
         if #available(iOS 26, *) {
