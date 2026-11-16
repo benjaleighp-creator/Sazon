@@ -5,7 +5,8 @@
 #
 # Se ejecuta:
 # - solo, cada vez que subes cambios de código a la rama principal
-#   (los cambios en README, Marca o herramientas no compilan), y
+#   (los cambios en README, Marca o herramientas no compilan),
+# - en cada pull request (para revisar los cambios antes de unirlos), y
 # - a mano: pestaña "Actions" > "Compilar IPA" > "Run workflow".
 # ============================================================
 name: Compilar IPA
@@ -17,7 +18,15 @@ on:
       - "README.md"
       - "Marca/**"
       - "herramientas/**"
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "Marca/**"
   workflow_dispatch:
+
+# El token de GitHub Actions solo puede leer el código (no escribir).
+permissions:
+  contents: read
 
 jobs:
   compilar:
