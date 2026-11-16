@@ -5,7 +5,7 @@ import Foundation
 /// Los datos de Open Food Facts tienen licencia Open Database License (ODbL).
 enum ServicioOpenFoodFacts {
 
-    static func buscar(codigo bruto: String, sesion: URLSession = .shared) async throws -> ProductoEnvasado {
+    static func buscar(codigo bruto: String, sesion: URLSession = RedIA.sesion) async throws -> ProductoEnvasado {
         guard let codigo = LectorOpenFoodFacts.codigoValido(bruto),
               let url = LectorOpenFoodFacts.url(codigo: codigo) else {
             throw ErrorOpenFoodFacts.codigoInvalido

@@ -15,7 +15,7 @@ import Foundation
 struct ProveedorGroq: ProveedorIA {
     let clave: String
     var modelo: String = PoliticaIA.modeloGroq
-    var sesion: SesionRed = URLSession.shared
+    var sesion: SesionRed = RedIA.sesion
 
     func analizar(texto: String) async throws -> AnalisisIA {
         try await analisis(.texto, texto: texto, imagen: nil)

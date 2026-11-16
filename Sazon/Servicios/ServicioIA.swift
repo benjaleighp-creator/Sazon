@@ -110,7 +110,7 @@ struct ProveedorGemini: ProveedorIA {
     let clave: String
     let modelo: String
     let formato: FormatoPeticionIA
-    var sesion: SesionRed = URLSession.shared
+    var sesion: SesionRed = RedIA.sesion
     /// Avisa de reintentos y cambios de modelo (no cambia cuándo se reintenta).
     var alAvanzar: AvisoPasoIA? = nil
     var cuota: RegistroCuota = .compartido
@@ -238,7 +238,10 @@ struct ProveedorGemini: ProveedorIA {
 
     /// Una llamada a Gemini con un modelo. Devuelve el texto de la respuesta.
     private func llamar(_ cuerpo: Data, modelo nombre: String, tope: TimeInterval) async throws -> String {
-        guard let ruta = nombre.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+        // El nombre se puede escribir en Ajustes: solo letras, números, «.» y «-»
+        // (nada de «/» que cambie la dirección a la que va la clave).
+        guard PoliticaIA.nombreModeloValido(nombre),
+              let ruta = nombre.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
               let url = URL(string: Self.base + ruta + ":generateContent") else {
             throw ErrorIA.modeloNoDisponible(nombre)
         }
@@ -263,8 +266,32 @@ struct ProveedorGemini: ProveedorIA {
     }
 }
 
+/// Rechaza cualquier redirección: la respuesta 3xx llega tal cual y se
+/// trata como error. Así una clave nunca viaja a otra dirección.
+final class SinRedirecciones: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask,
+                    willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(nil)
+    }
+}
+
 /// Envío común de Gemini y Groq: traduce los errores de red.
 enum RedIA {
+    /// Sesión para la IA y Open Food Facts: efímera (sin caché en disco ni
+    /// cookies), sin seguir redirecciones y con tope de tiempo. ATS ya exige
+    /// HTTPS (no hay excepciones en el Info.plist).
+    static let sesion: URLSession = {
+        let c = URLSessionConfiguration.ephemeral
+        c.urlCache = nil
+        c.httpCookieStorage = nil
+        c.httpShouldSetCookies = false
+        c.requestCachePolicy = .reloadIgnoringLocalCacheData
+        c.timeoutIntervalForResource = 60
+        return URLSession(configuration: c, delegate: SinRedirecciones(), delegateQueue: nil)
+    }()
+
     static func enviar(_ peticion: URLRequest, con sesion: SesionRed) async throws -> (Data, URLResponse) {
         do {
             return try await sesion.respuesta(a: peticion)

@@ -24,6 +24,16 @@ enum PoliticaIA {
     static let modeloGroq = "qwen/qwen3.8-27b"
     static let urlGroq = "https://api.groq.com/openai/v1/chat/completions"
 
+    /// Nombre de modelo aceptable (se escribe en Ajustes o llega en un
+    /// respaldo): de 1 a 64 caracteres, solo minúsculas, números, «.» y «-».
+    static func nombreModeloValido(_ nombre: String) -> Bool {
+        guard (1...64).contains(nombre.count), let primero = nombre.first,
+              primero.isASCII, primero.isLetter || primero.isNumber else { return false }
+        return nombre.allSatisfy { c in
+            c.isASCII && (c.isLowercase || c.isNumber || c == "." || c == "-")
+        }
+    }
+
     /// Espera creciente con algo de azar antes del intento `n` (1, 2, …):
     /// 1 s, 2 s, 4 s… (tope 4 s) más hasta 0,5 s al azar, para que muchos
     /// reintentos no lleguen todos a la vez.
