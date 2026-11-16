@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 // MARK: - Estado común
@@ -167,8 +166,6 @@ struct RegistroFotoView: View {
     @Environment(\.paleta) private var paleta
     @State private var tarea = TareaIA()
     @State private var imagen: UIImage?
-    @State private var seleccion: PhotosPickerItem?
-    @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
     @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
@@ -178,8 +175,6 @@ struct RegistroFotoView: View {
     @State private var visibles = 0
     @State private var exitos = 0
     @Environment(\.accessibilityReduceMotion) private var reducir
-
-    private var camaraDisponible: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
     var body: some View {
         ScrollView {
@@ -201,10 +196,7 @@ struct RegistroFotoView: View {
                     EstadoVacio(icono: "camera", titulo: "Toma o elige una foto",
                                 texto: "Que se vea todo el plato, con buena luz y desde arriba o un poco inclinada.")
                 }
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Espacio.s) { botones }
-                    VStack(spacing: Espacio.s) { botones }
-                }
+                BotonesFoto(alElegir: usarFoto, alFallar: { errorFoto = $0 })
                 if let errorFoto {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
@@ -233,30 +225,6 @@ struct RegistroFotoView: View {
             .padding(.horizontal, Espacio.margen)
             .padding(.bottom, Espacio.xs)
             .barraInferior()
-        }
-        .fullScreenCover(isPresented: $mostrarCamara) {
-            Camara { foto in
-                cancelar()
-                imagen = foto
-                estado = .inactivo
-                fase = .inactiva
-            }
-            .ignoresSafeArea()
-        }
-        .onChange(of: seleccion) { _, nueva in
-            guard let nueva else { return }
-            Task {
-                if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
-                    // Foto nueva: la petición anterior ya no sirve.
-                    cancelar()
-                    imagen = foto
-                    errorFoto = nil
-                    estado = .inactivo
-                    fase = .inactiva
-                } else {
-                    errorFoto = "No se pudo abrir esa foto. Prueba con otra."
-                }
-            }
         }
         .navigationDestination(isPresented: $revisar) {
             RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
@@ -298,16 +266,13 @@ struct RegistroFotoView: View {
         revisar = true
     }
 
-    @ViewBuilder
-    private var botones: some View {
-        if camaraDisponible {
-            Button { mostrarCamara = true } label: { Label("Tomar foto", systemImage: "camera") }
-                .buttonStyle(.secundario)
-        }
-        PhotosPicker(selection: $seleccion, matching: .images) {
-            Label("Elegir de la galería", systemImage: "photo.on.rectangle")
-        }
-        .buttonStyle(.secundario)
+    /// Foto nueva (cámara o galería): la petición anterior ya no sirve.
+    private func usarFoto(_ foto: UIImage) {
+        cancelar()
+        imagen = foto
+        errorFoto = nil
+        estado = .inactivo
+        fase = .inactiva
     }
 
     private func analizar() {
@@ -347,41 +312,6 @@ struct RegistroFotoView: View {
         tarea.cancelar()
         if estado == .analizando { estado = .inactivo }
         if case .esperando = fase { fase = .inactiva }
-    }
-}
-
-/// Cámara del sistema (UIImagePickerController).
-struct Camara: UIViewControllerRepresentable {
-    let alTomar: (UIImage) -> Void
-    @Environment(\.dismiss) private var cerrar
-
-    func makeCoordinator() -> Coordinador { Coordinador(self) }
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let selector = UIImagePickerController()
-        selector.sourceType = .camera
-        selector.cameraCaptureMode = .photo
-        selector.delegate = context.coordinator
-        return selector
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    final class Coordinador: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let padre: Camara
-        init(_ padre: Camara) { self.padre = padre }
-
-        func imagePickerController(_ picker: UIImagePickerController,
-                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let foto = info[.originalImage] as? UIImage {
-                padre.alTomar(foto)
-            }
-            padre.cerrar()
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            padre.cerrar()
-        }
     }
 }
 

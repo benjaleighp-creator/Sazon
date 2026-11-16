@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 /// Lee con IA la tabla nutricional de un envase (para productos que no
@@ -13,14 +12,10 @@ struct EtiquetaView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @State private var imagen: UIImage?
-    @State private var seleccion: PhotosPickerItem?
-    @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
     @State private var tarea = TareaIA()
     @State private var errorFoto: String?
     @State private var envios = 0
-
-    private var camaraDisponible: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
     var body: some View {
         ScrollView {
@@ -51,10 +46,7 @@ struct EtiquetaView: View {
                         .accessibilityLabel("Foto de la etiqueta elegida")
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Espacio.s) { botones }
-                    VStack(spacing: Espacio.s) { botones }
-                }
+                BotonesFoto(alElegir: usarFoto, alFallar: { errorFoto = $0 })
                 if let errorFoto {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
@@ -81,27 +73,6 @@ struct EtiquetaView: View {
                 .padding(.bottom, Espacio.xs)
                 .barraInferior()
         }
-        .fullScreenCover(isPresented: $mostrarCamara) {
-            Camara { foto in
-                cancelar()
-                imagen = foto
-                estado = .inactivo
-            }
-            .ignoresSafeArea()
-        }
-        .onChange(of: seleccion) { _, nueva in
-            guard let nueva else { return }
-            Task {
-                if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
-                    cancelar()
-                    imagen = foto
-                    errorFoto = nil
-                    estado = .inactivo
-                } else {
-                    errorFoto = "No se pudo abrir esa foto. Prueba con otra."
-                }
-            }
-        }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
             if case .error = nuevo { return true } else { return false }
@@ -112,16 +83,11 @@ struct EtiquetaView: View {
         }
     }
 
-    @ViewBuilder
-    private var botones: some View {
-        if camaraDisponible {
-            Button { mostrarCamara = true } label: { Label("Tomar foto", systemImage: "camera") }
-                .buttonStyle(.secundario)
-        }
-        PhotosPicker(selection: $seleccion, matching: .images) {
-            Label("Elegir de la galería", systemImage: "photo.on.rectangle")
-        }
-        .buttonStyle(.secundario)
+    private func usarFoto(_ foto: UIImage) {
+        cancelar()
+        imagen = foto
+        errorFoto = nil
+        estado = .inactivo
     }
 
     private func analizar() {
