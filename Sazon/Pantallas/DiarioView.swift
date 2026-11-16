@@ -12,6 +12,7 @@ struct SolicitudRegistro: Identifiable {
 struct DiarioView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @Environment(\.dynamicTypeSize) private var tamanoLetra
     @State private var solicitud: SolicitudRegistro?
     @State private var editando: Registro?
     @State private var mostrarMeta = false
@@ -72,7 +73,11 @@ struct DiarioView: View {
                     // 4. Complementos del día.
                     VStack(spacing: Espacio.s) {
                         EncabezadoSeccion(titulo: "Tu día", icono: "sun.max")
-                        HStack(spacing: Espacio.s) {
+                        // Con letra de accesibilidad, una tarjeta debajo de la otra.
+                        let pila = tamanoLetra.isAccessibilitySize
+                            ? AnyLayout(VStackLayout(spacing: Espacio.s))
+                            : AnyLayout(HStackLayout(spacing: Espacio.s))
+                        pila {
                             TarjetaAgua()
                             BotonCoach { mostrarCoach = true }
                         }
@@ -194,6 +199,7 @@ extension TipoComida {
 private struct Saludo: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @ScaledMetric(relativeTo: .title2) private var ladoLogo: CGFloat = 44
 
     var body: some View {
         let hora = Calendar.current.component(.hour, from: Date())
@@ -213,8 +219,8 @@ private struct Saludo: View {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .frame(width: min(ladoLogo, 64), height: min(ladoLogo, 64))
+                .clipShape(RoundedRectangle(cornerRadius: Radio.chico, style: .continuous))
                 .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -680,6 +686,8 @@ private struct TarjetaAgua: View {
 private struct BotonCoach: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
+    @Environment(\.dynamicTypeSize) private var tamanoLetra
+    @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 150
 
     var body: some View {
         Button(action: accion) {
@@ -697,6 +705,6 @@ private struct BotonCoach: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: 150)
+        .frame(maxWidth: tamanoLetra.isAccessibilitySize ? .infinity : min(ancho, 220))
     }
 }

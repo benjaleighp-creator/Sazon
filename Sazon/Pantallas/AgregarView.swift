@@ -329,6 +329,7 @@ private struct TarjetaFavorito: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
     @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 170
+    @ScaledMetric(relativeTo: .body) private var alto: CGFloat = 132
 
     var body: some View {
         Button(action: accion) {
@@ -349,7 +350,7 @@ private struct TarjetaFavorito: View {
                     .font(Tipo.micro.monospacedDigit())
                     .foregroundStyle(paleta.textoSecundario)
             }
-            .frame(width: min(ancho, 240), height: 132, alignment: .topLeading)
+            .frame(width: min(ancho, 240), height: min(alto, 280), alignment: .topLeading)
             .tarjeta(relleno: Espacio.s)
             .contentShape(Rectangle())
         }
@@ -366,6 +367,7 @@ private struct TarjetaReciente: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
     @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 150
+    @ScaledMetric(relativeTo: .body) private var alto: CGFloat = 120
 
     var body: some View {
         Button(action: accion) {
@@ -384,7 +386,7 @@ private struct TarjetaReciente: View {
                     .font(Tipo.micro)
                     .foregroundStyle(paleta.textoSecundario)
             }
-            .frame(width: min(ancho, 230), height: 120, alignment: .topLeading)
+            .frame(width: min(ancho, 230), height: min(alto, 260), alignment: .topLeading)
             .tarjeta(relleno: Espacio.s)
             .contentShape(Rectangle())
         }
