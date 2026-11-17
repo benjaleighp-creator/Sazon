@@ -72,6 +72,10 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
   y peso; guarda tu peso y, si lo activas, las calorías y macros de cada
   comida.
 - Exportar comidas y pesos a CSV; respaldo completo.
+- **Aviso de caducidad**: Ajustes › Instalación muestra cuándo caduca esta
+  instalación (7 días con Apple ID gratuito); si faltan 2 días o menos,
+  aparece un aviso para renovar y, si ya diste permiso de notificaciones,
+  llega una notificación 1 día antes.
 
 Cada registro muestra su origen: INS, Open Food Facts, etiqueta del envase,
 «≈ estimado por IA» o manual. Todas las cifras son estimaciones editables,
@@ -251,6 +255,22 @@ conectado por cable).
 - Si dice «Could not find AltServer»: revisa que el iPhone y la PC estén
   en la misma Wi-Fi y permite AltServer en el Firewall de Windows.
 
+**Si AltServer da el error -80046.**
+1. Instala la versión más reciente de AltServer desde
+   [la guía oficial para Windows](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows)
+   y reinstala AltStore encima, sin borrarlo.
+2. Usa iTunes e iCloud descargados de la web de Apple, no de la Microsoft
+   Store ([solución de problemas](https://faq.altstore.io/altstore-classic/troubleshooting-guide)).
+
+Contexto (consultado el 16-nov-2026): en el issue público
+[altstoreio/AltStore#1848](https://github.com/altstoreio/AltStore/issues/1848)
+(25-oct-2026, iPadOS 26.5, Windows), el error -80046 aparecía con
+AltServer 1.8.0.0 y el autor dijo que una actualización lo resolvió. No
+está confirmado en las notas oficiales de AltServer, que solo llegan hasta
+la 1.7.4. Una guía de terceros afirma que desde octubre de 2026 Apple
+rechaza muchos inicios de sesión de herramientas de sideload; Apple no lo
+ha confirmado.
+
 **Límites de la cuenta gratuita.**
 - 3 apps a la vez, y AltStore cuenta como una (AltStore + Remanso +
   Sazón = 3).
@@ -263,6 +283,19 @@ conectado por cable).
 - Al pasar de Sideloadly a AltStore, iOS podría tratar Sazón como otra
   app y empezar sin datos: **exporta el respaldo antes** y, si hace
   falta, impórtalo después.
+
+**Comprobar que todo funciona tras instalar con AltStore.**
+
+| Qué probar | Cómo | Qué deberías ver |
+|---|---|---|
+| Widget de calorías | Añádelo a la pantalla de inicio y registra algo en Sazón | Muestra tus calorías reales del día |
+| Widget «+ agua» | Toca «+ agua» en el widget | Al abrir Sazón, el agua sumada aparece en la app |
+| Apple Salud | En Sazón › Ajustes › Apple Salud, activa «Conectar con Apple Salud» y «Guardar mis comidas en Salud»; luego registra una comida | La comida aparece en la app Salud › Nutrición |
+| Fecha de caducidad | Abre Sazón › Ajustes | La sección «Instalación» muestra cuándo caduca |
+
+Si los widgets no muestran tus datos, AltStore no conservó el App Group:
+usa `Sazon-sencilla.ipa` o vuelve a Sideloadly. Recuerda: **exporta un
+respaldo antes** de cambiar de Sideloadly a AltStore.
 
 #### Alternativa manual: repetir Sideloadly
 
