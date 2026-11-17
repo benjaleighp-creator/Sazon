@@ -51,8 +51,8 @@ jobs:
 
     steps:
       - name: Descargar el código
-        # Fijada por commit (v4.4.0), no por etiqueta: una etiqueta se puede mover.
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        # Fijada por commit (v7.0.1, Node 24), no por etiqueta: una etiqueta se puede mover.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -137,7 +137,10 @@ jobs:
           ls -lh Sazon-*.ipa
 
       - name: Subir los .ipa como artefacto descargable
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        # Fijada por commit (v7.0.2, Node 24). Los parámetros usados (name,
+        # path, retention-days, if-no-files-found) siguen igual en v7 y
+        # «archive» queda en true: se sube un .zip como antes.
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Sazon-ipa-version-${{ github.run_number }}
           path: |
@@ -154,7 +157,7 @@ jobs:
 
       - name: Subir el registro si algo falló
         if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: registro-de-compilacion
           path: build.log
@@ -170,8 +173,8 @@ jobs:
 
     steps:
       - name: Descargar el código
-        # Fijada por commit (v4.4.0), no por etiqueta: una etiqueta se puede mover.
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        # Fijada por commit (v7.0.1, Node 24), no por etiqueta: una etiqueta se puede mover.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
