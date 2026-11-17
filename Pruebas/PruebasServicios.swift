@@ -191,6 +191,25 @@ final class PruebasRevisionIA: XCTestCase {
         XCTAssertEqual(r.total.kcal, 1050, accuracy: 0.001)
     }
 
+    func testAlimentoPropioElegidoNoSeMarcaComoINS() {
+        // ES-3: «Elegir otro de la tabla» puede devolver un alimento tuyo o una receta.
+        let propio = AlimentoBase(codigo: "P:1234", nombre: "Mi granola", grupo: "Mis alimentos",
+                                  por100g: Nutrientes(kcal: 420, proteina: 10, carbohidratos: 60, grasas: 15))
+        var item = ItemRevision(identificado: identificado("Granola", gramos: 40), coincidencia: nil)
+        item.ins = propio
+        item.usarINS = true
+        XCTAssertEqual(item.origen, .manual)
+        XCTAssertEqual(item.por100g, propio.por100g)
+        let r = item.registro(fecha: fecha(2026, 11, 1, 8), comida: .desayuno)
+        XCTAssertEqual(r.origen, .manual)
+        XCTAssertNil(r.codigoINS, "Un código P: o R: no es un código del INS")
+        let receta = AlimentoBase(codigo: "R:abcd", nombre: "Mi ají", grupo: "Mis recetas", por100g: .cero)
+        item.ins = receta
+        XCTAssertEqual(item.origen, .manual)
+        XCTAssertTrue(receta.esPropio)
+        XCTAssertFalse(tablaPrueba[0].esPropio)
+    }
+
     func testPuedesElegirLaEstimacionAunqueHayaCoincidencia() {
         var item = ItemRevision(identificado: identificado("Palta", gramos: 50), coincidencia: tablaPrueba[2])
         item.usarINS = false

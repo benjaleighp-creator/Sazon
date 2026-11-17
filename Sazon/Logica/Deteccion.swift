@@ -33,6 +33,20 @@ enum Deteccion {
     /// Cantidad de puntos según el ahorro de batería.
     static func cantidadPuntos(ahorro: Bool) -> Int { ahorro ? 10 : 28 }
 
+    /// Segundos entre cuadros de la animación: unos 30 cuadros por segundo
+    /// (15 con ahorro de batería). Más no se nota en puntos que se mueven
+    /// lento y gasta batería durante toda la espera de la IA.
+    static func intervaloCuadro(ahorro: Bool) -> Double { ahorro ? 1.0 / 15 : 1.0 / 30 }
+
+    /// Texto que VoiceOver lee cuando llegan los resultados (todos los
+    /// alimentos, tengan o no caja en la foto).
+    static func anuncio(_ alimentos: [(nombre: String, gramos: Double)]) -> String {
+        guard !alimentos.isEmpty else { return "No se detectaron alimentos." }
+        let lista = alimentos.map { "\($0.nombre), unos \(Formato.entero($0.gramos)) gramos" }
+        let cabeza = alimentos.count == 1 ? "Se detectó 1 alimento: " : "Se detectaron \(alimentos.count) alimentos: "
+        return cabeza + lista.joined(separator: "; ") + ". Revisa antes de guardar."
+    }
+
     /// Tiempo entre una etiqueta y la siguiente: la revelación completa dura
     /// como máximo 1,2 s para no alargar la espera.
     static func intervaloEtiquetas(_ n: Int) -> Double {

@@ -15,15 +15,20 @@ struct Candidato: Hashable {
     var cantidadMedida: Double? = nil
     /// Open Food Facts sin algún macro: se avisa.
     var datosIncompletos: Bool = false
+    /// Quién leyó la etiqueta (iPhone, memoria, Gemini o Groq), si aplica.
+    var leidoPor: String? = nil
+    /// Micronutrientes del INS por 100 g, si la tabla los trae.
+    var micros: Micronutrientes? = nil
 
     init(alimento: AlimentoBase) {
         nombre = alimento.nombre
         por100g = alimento.por100g
         // Tus alimentos ("P:") y recetas ("R:") no son de la tabla del INS.
-        let propio = alimento.codigo.hasPrefix("P:") || alimento.codigo.hasPrefix("R:")
+        let propio = alimento.esPropio
         origen = propio ? .manual : .ins
         codigoINS = propio ? nil : alimento.codigo
         medidas = alimento.medidas
+        micros = alimento.micros
         if propio, let porcion = alimento.medidas.first, alimento.codigo.hasPrefix("R:") {
             gramos = porcion.gramos
             medida = porcion
@@ -85,6 +90,7 @@ struct Candidato: Hashable {
         por100g = etiqueta.por100g
         origen = .envase
         self.codigoBarras = codigoBarras
+        leidoPor = etiqueta.capa?.nombre
         if let porcion = etiqueta.porcionGramos {
             let medidaPorcion = MedidaCasera(nombre: "porción del envase", gramos: porcion, estimada: false)
             medidas = [medidaPorcion]
@@ -223,9 +229,9 @@ struct AgregarView: View {
             .navigationDestination(for: DestinoRegistro.self) { destino in
                 switch destino {
                 case .foto:
-                    RegistroFotoView(comida: $comida, alGuardar: guardar)
+                    RegistroFotoView(comida: $comida, alGuardar: guardar, alSalir: cambiarA)
                 case .texto:
-                    RegistroTextoView(comida: $comida, alGuardar: guardar)
+                    RegistroTextoView(comida: $comida, alGuardar: guardar, alSalir: cambiarA)
                 case .escanear:
                     EscanerView(
                         alResolver: { candidato in ruta.append(.porcion(candidato)) },
@@ -233,7 +239,7 @@ struct AgregarView: View {
                         alBuscarTabla: { ruta.append(.buscar) }
                     )
                 case .etiqueta(let codigo):
-                    EtiquetaView(codigo: codigo) { candidato in ruta.append(.porcion(candidato)) }
+                    EtiquetaView(codigo: codigo, alLeer: { candidato in ruta.append(.porcion(candidato)) }, alSalir: cambiarA)
                 case .buscar:
                     BuscarView { alimento in ruta.append(.porcion(Candidato(alimento: alimento))) }
                 case .manual:
@@ -272,6 +278,13 @@ struct AgregarView: View {
         } else {
             pedirAviso = destino
         }
+    }
+
+    /// Cambia la pantalla actual por otra (por ejemplo, del error de la IA
+    /// a la tabla): al volver atrás se llega al menú, no al error.
+    private func cambiarA(_ destino: DestinoRegistro) {
+        if !ruta.isEmpty { ruta.removeLast() }
+        ruta.append(destino)
     }
 
     private func guardar(_ registros: [Registro]) {
@@ -322,6 +335,7 @@ private struct TarjetaFavorito: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
     @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 170
+    @ScaledMetric(relativeTo: .body) private var alto: CGFloat = 132
 
     var body: some View {
         Button(action: accion) {
@@ -342,7 +356,7 @@ private struct TarjetaFavorito: View {
                     .font(Tipo.micro.monospacedDigit())
                     .foregroundStyle(paleta.textoSecundario)
             }
-            .frame(width: min(ancho, 240), height: 132, alignment: .topLeading)
+            .frame(width: min(ancho, 240), height: min(alto, 280), alignment: .topLeading)
             .tarjeta(relleno: Espacio.s)
             .contentShape(Rectangle())
         }
@@ -359,6 +373,7 @@ private struct TarjetaReciente: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
     @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 150
+    @ScaledMetric(relativeTo: .body) private var alto: CGFloat = 120
 
     var body: some View {
         Button(action: accion) {
@@ -377,7 +392,7 @@ private struct TarjetaReciente: View {
                     .font(Tipo.micro)
                     .foregroundStyle(paleta.textoSecundario)
             }
-            .frame(width: min(ancho, 230), height: 120, alignment: .topLeading)
+            .frame(width: min(ancho, 230), height: min(alto, 260), alignment: .topLeading)
             .tarjeta(relleno: Espacio.s)
             .contentShape(Rectangle())
         }

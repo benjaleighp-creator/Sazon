@@ -119,6 +119,11 @@ struct PantallaSalud: View {
                         .disabled(cargando)
                 }
                 Section {
+                    Toggle("Guardar mis comidas en Salud", isOn: $a.datos.saludEscribirComidas)
+                } footer: {
+                    Text("Escribe en Apple Salud las calorías, proteína, carbohidratos y grasas de cada comida que registres desde ahora (si editas o borras una, se actualiza). Necesita el permiso de escritura que te pedirá Salud.")
+                }
+                Section {
                     Toggle("Sumar calorías activas a mi meta", isOn: $a.datos.sumarActividad)
                 } footer: {
                     Text("Si lo activas, la meta del día sube con lo que gastas haciendo ejercicio según Salud. Úsalo solo si elegiste «Sedentario» o «Ligera» en tu actividad, para no contar el ejercicio dos veces. Los relojes y teléfonos estiman ese gasto, y puede no ser exacto.")
@@ -140,6 +145,17 @@ struct PantallaSalud: View {
             Task {
                 error = await Salud.compartido.pedirPermiso()
                 if error != nil { almacen.datos.saludActiva = false } else { actualizar() }
+            }
+        }
+        .onChange(of: almacen.datos.saludEscribirComidas) { _, escribir in
+            guard escribir else { return }
+            Task {
+                error = await Salud.compartido.pedirPermiso(escribirComidas: true)
+                if error != nil {
+                    almacen.datos.saludEscribirComidas = false
+                } else {
+                    almacen.empezarSincronizacionSalud()
+                }
             }
         }
         .task { if almacen.datos.saludActiva { actualizar() } }
@@ -221,12 +237,21 @@ struct PantallaExportar: View {
             archivoComidas = escribir("Sazón comidas.csv", Exportar.csvRegistros(almacen.datos.registros))
             archivoPesos = escribir("Sazón pesos.csv", Exportar.csvPesos(almacen.datos.pesos))
         }
+        // Los CSV traen tus comidas y pesos: al salir de la pantalla se
+        // borran de la carpeta temporal (la copia que compartiste queda donde la mandaste).
+        .onDisappear {
+            for url in [archivoComidas, archivoPesos].compactMap({ $0 }) {
+                try? FileManager.default.removeItem(at: url)
+            }
+            archivoComidas = nil
+            archivoPesos = nil
+        }
     }
 
     private func escribir(_ nombre: String, _ texto: String) -> URL? {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(nombre)
         do {
-            try Data(texto.utf8).write(to: url, options: .atomic)
+            try Data(texto.utf8).write(to: url, options: [.atomic, .completeFileProtection])
             return url
         } catch {
             return nil

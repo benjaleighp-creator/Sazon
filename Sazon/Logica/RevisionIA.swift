@@ -20,8 +20,15 @@ struct ItemRevision: Identifiable, Equatable {
     /// Rango probable de gramos que dio la IA.
     var gramosMin: Double?
     var gramosMax: Double?
+    /// Porción que propuso la IA (para aprender si la corriges).
+    var gramosIA: Double
+    /// True si `gramos` sale de tu porción habitual (la corregiste antes).
+    var porcionAprendida: Bool
 
-    init(identificado: AlimentoIdentificado, coincidencia: AlimentoBase?) {
+    /// - aprendida: tu porción habitual para este alimento, si la hay.
+    init(identificado: AlimentoIdentificado, coincidencia: AlimentoBase?, aprendida: Double? = nil) {
+        gramosIA = identificado.gramos
+        porcionAprendida = aprendida != nil
         gramosMin = identificado.gramosMin
         gramosMax = identificado.gramosMax
         id = identificado.id
@@ -33,6 +40,7 @@ struct ItemRevision: Identifiable, Equatable {
         estimacion = identificado.por100g
         ins = coincidencia
         usarINS = coincidencia != nil
+        if let aprendida { gramos = aprendida }
     }
 
     /// Ingrediente que no se veía (aceite, mayonesa…), agregado desde la
@@ -49,6 +57,8 @@ struct ItemRevision: Identifiable, Equatable {
         usarINS = true
         gramosMin = nil
         gramosMax = nil
+        gramosIA = gramos
+        porcionAprendida = false
     }
 
     /// Calorías mínima y máxima según el rango de la IA (nil si no hay rango).
@@ -74,7 +84,12 @@ struct ItemRevision: Identifiable, Equatable {
 
     var confianzaEsBaja: Bool { confianza < ItemRevision.confianzaBaja }
 
-    var origen: OrigenDato { usarINS && ins != nil ? .ins : .estimadoIA }
+    /// De dónde salen los valores. Un alimento o receta tuyos («P:» o
+    /// «R:») elegidos con «Elegir otro de la tabla» son «Manual», no INS.
+    var origen: OrigenDato {
+        guard usarINS, let ins else { return .estimadoIA }
+        return ins.esPropio ? .manual : .ins
+    }
 
     var por100g: Nutrientes {
         if usarINS, let ins { return ins.por100g }

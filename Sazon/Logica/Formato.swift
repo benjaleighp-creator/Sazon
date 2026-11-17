@@ -8,13 +8,42 @@ enum Formato {
 
     /// Número con hasta `decimales` decimales, sin ceros sobrantes: 2,5 · 70 · 1,375.
     static func numero(_ valor: Double, decimales: Int = 1) -> String {
+        let d = max(0, decimales)
+        let f = d < formateadoresNumero.count ? formateadoresNumero[d] : nuevoFormateadorNumero(d)
+        return f.string(from: NSNumber(value: valor)) ?? String(valor)
+    }
+
+    // Los formateadores cuestan crearlos: se crean una vez y se reutilizan
+    // (formatear con ellos es seguro desde cualquier hilo; no se modifican).
+    private static let formateadoresNumero: [NumberFormatter] = (0...4).map(nuevoFormateadorNumero)
+
+    private static func nuevoFormateadorNumero(_ decimales: Int) -> NumberFormatter {
         let f = NumberFormatter()
         f.locale = Locale(identifier: "es_ES")   // coma decimal, sin separador raro
         f.numberStyle = .decimal
         f.usesGroupingSeparator = false
         f.minimumFractionDigits = 0
         f.maximumFractionDigits = decimales
-        return f.string(from: NSNumber(value: valor)) ?? String(valor)
+        return f
+    }
+
+    private static let candadoFechas = NSLock()
+    private static var formateadoresFecha: [String: DateFormatter] = [:]
+
+    /// Formateador de fechas en español de Perú para un formato y un
+    /// calendario (se guarda por formato, calendario y zona horaria).
+    static func formateadorFecha(_ formato: String, calendario: Calendar = .current) -> DateFormatter {
+        let clave = "\(formato)|\(calendario.identifier)|\(calendario.timeZone.identifier)"
+        candadoFechas.lock()
+        defer { candadoFechas.unlock() }
+        if let f = formateadoresFecha[clave] { return f }
+        let f = DateFormatter()
+        f.locale = locale
+        f.calendar = calendario
+        f.timeZone = calendario.timeZone
+        f.dateFormat = formato
+        formateadoresFecha[clave] = f
+        return f
     }
 
     /// Entero redondeado: 1834.
@@ -31,12 +60,7 @@ enum Formato {
 
     /// "Domingo, 1 de noviembre".
     static func diaLargo(_ fecha: Date, calendario: Calendar = .current) -> String {
-        let f = DateFormatter()
-        f.locale = locale
-        f.calendar = calendario
-        f.timeZone = calendario.timeZone
-        f.dateFormat = "EEEE, d 'de' MMMM"
-        return primeraMayuscula(f.string(from: fecha))
+        primeraMayuscula(formateadorFecha("EEEE, d 'de' MMMM", calendario: calendario).string(from: fecha))
     }
 
     /// "Hoy", "Ayer", "Mañana" o el día largo.
@@ -54,11 +78,7 @@ enum Formato {
 
     /// "14:05".
     static func hora(_ fecha: Date, calendario: Calendar = .current) -> String {
-        let f = DateFormatter()
-        f.locale = locale
-        f.timeZone = calendario.timeZone
-        f.dateFormat = "HH:mm"
-        return f.string(from: fecha)
+        formateadorFecha("HH:mm", calendario: calendario).string(from: fecha)
     }
 
     /// "1834 kcal" o "≈ 1834 kcal" si es estimado.
@@ -91,5 +111,58 @@ extension Formato {
     /// Número del día del mes: "1", "15".
     static func numeroDia(_ fecha: Date, calendario: Calendar = .current) -> String {
         String(calendario.component(.day, from: fecha))
+    }
+}
+
+extension Formato {
+    /// Tiempo de espera corto: "8 s", "1 min 05 s". Negativos o no finitos: "0 s".
+    static func duracionCorta(_ segundos: TimeInterval) -> String {
+        guard segundos.isFinite, segundos > 0 else { return "0 s" }
+        let total = Int(segundos)
+        let minutos = total / 60
+        let resto = total % 60
+        if minutos == 0 { return "\(resto) s" }
+        return "\(minutos) min " + (resto < 10 ? "0\(resto)" : "\(resto)") + " s"
+    }
+
+    /// Lo mismo, dicho en palabras para VoiceOver: "8 segundos", "1 minuto y 5 segundos".
+    static func duracionHablada(_ segundos: TimeInterval) -> String {
+        guard segundos.isFinite, segundos > 0 else { return "0 segundos" }
+        let total = Int(segundos)
+        let minutos = total / 60
+        let resto = total % 60
+        let textoSeg = resto == 1 ? "1 segundo" : "\(resto) segundos"
+        if minutos == 0 { return textoSeg }
+        let textoMin = minutos == 1 ? "1 minuto" : "\(minutos) minutos"
+        return resto == 0 ? textoMin : "\(textoMin) y \(textoSeg)"
+    }
+}
+
+extension Formato {
+    /// Convierte el Markdown sencillo que a veces devuelve la IA en texto
+    /// plano: quita negritas, cursivas de guion bajo, código y títulos,
+    /// cambia viñetas por «•» y los enlaces por su texto (sin enlace que se
+    /// pueda tocar). El «%» queda tal cual.
+    static func textoPlano(_ markdown: String) -> String {
+        var lineas: [String] = []
+        for linea in markdown.components(separatedBy: "\n") {
+            var l = linea
+            // Títulos: "## Cena" → "Cena".
+            if let rango = l.range(of: "^\\s{0,3}#{1,6}\\s+", options: .regularExpression) {
+                l.removeSubrange(rango)
+            }
+            // Viñetas: "* arroz" o "- arroz" → "• arroz".
+            if let rango = l.range(of: "^(\\s*)[*+-]\\s+", options: .regularExpression) {
+                let sangria = l[rango].prefix { $0 == " " || $0 == "\t" }
+                l.replaceSubrange(rango, with: String(sangria) + "• ")
+            }
+            // Enlaces: "[texto](https://…)" → "texto".
+            l = l.replacingOccurrences(of: "\\[([^\\]]*)\\]\\([^)]*\\)", with: "$1", options: .regularExpression)
+            for marca in ["**", "__", "`"] {
+                l = l.replacingOccurrences(of: marca, with: "")
+            }
+            lineas.append(l)
+        }
+        return lineas.joined(separator: "\n")
     }
 }

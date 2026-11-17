@@ -402,6 +402,12 @@ final class PruebasDeteccion: XCTestCase {
         let p = Deteccion.deambular(3, t: 5)
         XCTAssertEqual(inicio.x, p.x, accuracy: 0.0001)
         XCTAssertEqual(Deteccion.cantidadPuntos(ahorro: true) < Deteccion.cantidadPuntos(ahorro: false), true)
+        // Unos 30 cuadros por segundo (15 con ahorro), nunca sin límite.
+        XCTAssertEqual(Deteccion.intervaloCuadro(ahorro: false), 1.0 / 30, accuracy: 0.0001)
+        XCTAssertGreaterThan(Deteccion.intervaloCuadro(ahorro: true), Deteccion.intervaloCuadro(ahorro: false))
+        XCTAssertEqual(Deteccion.anuncio([]), "No se detectaron alimentos.")
+        XCTAssertEqual(Deteccion.anuncio([(nombre: "Arroz", gramos: 150.4)]),
+                       "Se detectó 1 alimento: Arroz, unos 150 gramos. Revisa antes de guardar.")
     }
 
     func testSinCajasSeReunenEnElCentro() {

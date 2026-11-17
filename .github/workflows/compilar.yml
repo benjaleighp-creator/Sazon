@@ -5,7 +5,8 @@
 #
 # Se ejecuta:
 # - solo, cada vez que subes cambios de código a la rama principal
-#   (los cambios en README, Marca o herramientas no compilan), y
+#   (los cambios en README, Marca o herramientas no compilan),
+# - en cada pull request (para revisar los cambios antes de unirlos), y
 # - a mano: pestaña "Actions" > "Compilar IPA" > "Run workflow".
 # ============================================================
 name: Compilar IPA
@@ -17,7 +18,28 @@ on:
       - "README.md"
       - "Marca/**"
       - "herramientas/**"
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "Marca/**"
   workflow_dispatch:
+
+# El token de GitHub Actions solo puede leer el código (no escribir).
+permissions:
+  contents: read
+
+# Si subes otro cambio a la misma rama, se cancela la compilación vieja
+# (así no se hace cola esperando Macs).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Versión fija de XcodeGen y su huella SHA-256 (calculada el 16-nov-2026 al
+# descargar el xcodegen.zip oficial de la versión 2.46.0 en GitHub). Si la
+# huella no coincide, la compilación se detiene.
+env:
+  XCODEGEN_VERSION: "2.46.0"
+  XCODEGEN_SHA256: "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806"
 
 jobs:
   compilar:
@@ -29,7 +51,10 @@ jobs:
 
     steps:
       - name: Descargar el código
-        uses: actions/checkout@v4
+        # Fijada por commit (v7.0.1, Node 24), no por etiqueta: una etiqueta se puede mover.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Usar Xcode 26 si está instalado (estilo de iOS 26)
         run: |
@@ -53,8 +78,15 @@ jobs:
               sys.exit(1)
           PY
 
-      - name: Instalar XcodeGen
-        run: brew install xcodegen
+      - name: Instalar XcodeGen (versión fija y huella verificada)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/xcodegen.zip" \
+            "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  $RUNNER_TEMP/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q -o "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/xcodegen/bin/xcodegen" --version
 
       - name: Generar el proyecto de Xcode
         run: xcodegen generate --spec project.yml
@@ -105,7 +137,10 @@ jobs:
           ls -lh Sazon-*.ipa
 
       - name: Subir los .ipa como artefacto descargable
-        uses: actions/upload-artifact@v4
+        # Fijada por commit (v7.0.2, Node 24). Los parámetros usados (name,
+        # path, retention-days, if-no-files-found) siguen igual en v7 y
+        # «archive» queda en true: se sube un .zip como antes.
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Sazon-ipa-version-${{ github.run_number }}
           path: |
@@ -122,11 +157,12 @@ jobs:
 
       - name: Subir el registro si algo falló
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: registro-de-compilacion
           path: build.log
           if-no-files-found: ignore
+          retention-days: 3
 
   pruebas:
     name: Pruebas automáticas
@@ -137,7 +173,10 @@ jobs:
 
     steps:
       - name: Descargar el código
-        uses: actions/checkout@v4
+        # Fijada por commit (v7.0.1, Node 24), no por etiqueta: una etiqueta se puede mover.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Verificar el contraste de los temas
         run: python3 herramientas/verificar_contraste.py
@@ -148,8 +187,15 @@ jobs:
           if [ -n "$NUEVO" ]; then sudo xcode-select -s "$NUEVO"; fi
           xcodebuild -version
 
-      - name: Instalar XcodeGen
-        run: brew install xcodegen
+      - name: Instalar XcodeGen (versión fija y huella verificada)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/xcodegen.zip" \
+            "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  $RUNNER_TEMP/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q -o "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/xcodegen/bin/xcodegen" --version
 
       - name: Generar el proyecto de Xcode
         run: xcodegen generate --spec project.yml

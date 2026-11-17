@@ -245,6 +245,24 @@ final class PruebasFormato: XCTestCase {
         XCTAssertEqual(Formato.entero(1834.6), "1835")
     }
 
+    func testTextoPlano() {
+        XCTAssertEqual(Formato.textoPlano("**Cena:** arroz con pollo"), "Cena: arroz con pollo")
+        XCTAssertEqual(Formato.textoPlano("## Ideas\n* quinua\n- huevo"), "Ideas\n• quinua\n• huevo")
+        XCTAssertEqual(Formato.textoPlano("Mira [esta guía](https://ejemplo.com) al 100 %"), "Mira esta guía al 100 %")
+        XCTAssertEqual(Formato.textoPlano("2 * 3 = 6"), "2 * 3 = 6")
+    }
+
+    func testDuracionCorta() {
+        XCTAssertEqual(Formato.duracionCorta(0), "0 s")
+        XCTAssertEqual(Formato.duracionCorta(-3), "0 s")
+        XCTAssertEqual(Formato.duracionCorta(8.9), "8 s")
+        XCTAssertEqual(Formato.duracionCorta(65), "1 min 05 s")
+        XCTAssertEqual(Formato.duracionCorta(.infinity), "0 s")
+        XCTAssertEqual(Formato.duracionHablada(1), "1 segundo")
+        XCTAssertEqual(Formato.duracionHablada(65), "1 minuto y 5 segundos")
+        XCTAssertEqual(Formato.duracionHablada(120), "2 minutos")
+    }
+
     func testPrimeraMayuscula() {
         XCTAssertEqual(Formato.primeraMayuscula("domingo, 1 de noviembre"), "Domingo, 1 de noviembre")
         XCTAssertEqual(Formato.primeraMayuscula(""), "")
@@ -297,6 +315,66 @@ final class PruebasDatosGuardados: XCTestCase {
     }
 }
 
+final class PruebasLecturaTolerante: XCTestCase {
+
+    private func leer(_ json: String) throws -> DatosApp {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return try d.decode(DatosApp.self, from: Data(json.utf8))
+    }
+
+    func testValoresDesconocidosNoBorranLosDatos() throws {
+        // Valores de una versión futura: comida, origen, apariencia y formato que esta versión no conoce.
+        let json = #"{"version": 2, "apariencia": "sepia", "formatoPeticionIA": "futuro", "registros": [{"nombre": "Pan", "gramos": 50, "comida": "brunch", "origen": "satelite"}, {"nombre": "Palta", "gramos": 80, "comida": "cena", "origen": "ins"}]}"#
+        let d = try leer(json)
+        XCTAssertEqual(d.registros.count, 2, "Un valor desconocido no debe hacer perder los registros")
+        XCTAssertEqual(d.registros[0].comida, .snacks)
+        XCTAssertEqual(d.registros[0].origen, .manual)
+        XCTAssertEqual(d.registros[1].comida, .cena)
+        XCTAssertEqual(d.apariencia, .sistema)
+        XCTAssertEqual(d.formatoPeticionIA, .actual)
+    }
+
+    func testElementoDanadoSoloSeDescartaEse() throws {
+        let json = #"{"version": 1, "registros": [{"nombre": "Pan", "gramos": 50}, 42, {"nombre": "Palta", "gramos": "mucho"}], "agua": [{"ml": 250}, "x"]}"#
+        let d = try leer(json)
+        XCTAssertEqual(d.registros.map(\.nombre), ["Pan", "Palta"])
+        XCTAssertEqual(d.registros[1].gramos, 100, "Un campo con otro tipo usa su valor por defecto")
+        XCTAssertEqual(d.agua.count, 1)
+    }
+
+    func testCampoDeOtroTipoEnLaRaiz() throws {
+        let d = try leer(#"{"version": "uno", "nombre": 5, "vasoMl": "grande", "favoritos": {}}"#)
+        XCTAssertEqual(d.version, 1)
+        XCTAssertEqual(d.nombre, "")
+        XCTAssertEqual(d.vasoMl, 250)
+        XCTAssertTrue(d.favoritos.isEmpty)
+    }
+
+    func testMensajeCoachConCamposFaltantes() throws {
+        let d = try leer(#"{"version": 1, "coach": [{"texto": "Hola"}, {"autor": "usuario"}, {"autor": "robot", "texto": "?"}]}"#)
+        XCTAssertEqual(d.coach.count, 3)
+        XCTAssertEqual(d.coach[0].texto, "Hola")
+        XCTAssertEqual(d.coach[0].autor, .coach)
+        XCTAssertEqual(d.coach[1].autor, .usuario)
+        XCTAssertEqual(d.coach[1].texto, "")
+        XCTAssertEqual(d.coach[2].autor, .coach)
+    }
+
+    func testPerfilConEnumDesconocido() throws {
+        let d = try leer(#"{"version": 1, "perfil": {"sexo": "otro", "edad": 30, "objetivo": "volar", "dieta": "carnivora"}}"#)
+        XCTAssertEqual(d.perfil?.edad, 30)
+        XCTAssertEqual(d.perfil?.sexo, .masculino)
+        XCTAssertEqual(d.perfil?.objetivo, .mantener)
+        XCTAssertEqual(d.perfil?.dieta, .equilibrada)
+    }
+
+    func testRaizQueNoEsObjetoSigueFallando() {
+        // Así el almacén sabe que el archivo no es de Sazón y no lo reemplaza.
+        XCTAssertThrowsError(try leer("[1, 2, 3]"))
+    }
+}
+
 final class PruebasSemanaYSaludo: XCTestCase {
 
     func testInicioDeSemanaEsLunes() {
@@ -338,5 +416,70 @@ final class PruebasSemanaYSaludo: XCTestCase {
         XCTAssertEqual(Formato.inicialDia(fecha(2026, 11, 1), calendario: calendarioPrueba), "D")
         XCTAssertEqual(Formato.inicialDia(fecha(2026, 11, 2), calendario: calendarioPrueba), "L")
         XCTAssertEqual(Formato.numeroDia(fecha(2026, 11, 1), calendario: calendarioPrueba), "1")
+    }
+}
+
+final class PruebasFase2Funciones: XCTestCase {
+
+    func testMetaPorDiaDeLaSemana() throws {
+        var d = DatosApp()
+        d.perfil = Perfil(sexo: .masculino, edad: 30, pesoKg: 70, tallaCm: 175, actividad: .ligero, objetivo: .mantener)
+        let base = try XCTUnwrap(CalculoMeta.metaVigente(d))
+        d.ajustesPorDia = ["7": 300]   // sábado
+        let sabado = fecha(2026, 11, 21)   // sábado
+        let lunes = fecha(2026, 11, 16)
+        XCTAssertEqual(CalculoMeta.claveDia(sabado, calendario: calendarioPrueba), "7")
+        let metaSabado = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: sabado, calendario: calendarioPrueba))
+        XCTAssertEqual(metaSabado.kcal, base.kcal + 300, accuracy: 10)
+        let metaLunes = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: lunes, calendario: calendarioPrueba))
+        XCTAssertEqual(metaLunes.kcal, base.kcal)
+        // Meta manual: el ajuste va a los carbohidratos.
+        d.metaManual = Nutrientes(kcal: 2000, proteina: 120, carbohidratos: 200, grasas: 70)
+        let manualSabado = try XCTUnwrap(CalculoMeta.metaVigente(d, dia: sabado, calendario: calendarioPrueba))
+        XCTAssertEqual(manualSabado.kcal, 2300)
+        XCTAssertEqual(manualSabado.carbohidratos, 275)
+        XCTAssertEqual(CalculoMeta.ajusteDelDia(["7": 99999], dia: sabado, calendario: calendarioPrueba), 1000, "Con tope")
+    }
+
+    func testPorcionesAprendidas() {
+        var a: [String: Double] = [:]
+        a = PorcionesAprendidas.aprender(a, nombre: "Arroz blanco cocido", gramosIA: 150, gramosFinal: 200)
+        XCTAssertEqual(PorcionesAprendidas.sugerida(a, nombre: "arroz blanco cocido"), 200)
+        // Un cambio mínimo no se aprende.
+        let b = PorcionesAprendidas.aprender([:], nombre: "Pan", gramosIA: 60, gramosFinal: 62)
+        XCTAssertTrue(b.isEmpty)
+        // Volver a lo que dijo la IA olvida la porción.
+        a = PorcionesAprendidas.aprender(a, nombre: "Arroz blanco cocido", gramosIA: 150, gramosFinal: 150)
+        XCTAssertNil(PorcionesAprendidas.sugerida(a, nombre: "Arroz blanco cocido"))
+    }
+
+    func testRevisionUsaLaPorcionAprendida() {
+        let ia = AlimentoIdentificado(nombre: "Arroz", gramos: 150, confianza: 0.9, medida: nil, cantidadMedida: nil,
+                                      por100g: Nutrientes(kcal: 130, proteina: 2, carbohidratos: 28, grasas: 0))
+        let item = ItemRevision(identificado: ia, coincidencia: nil, aprendida: 210)
+        XCTAssertEqual(item.gramos, 210)
+        XCTAssertEqual(item.gramosIA, 150)
+        XCTAssertTrue(item.porcionAprendida)
+        XCTAssertFalse(ItemRevision(identificado: ia, coincidencia: nil).porcionAprendida)
+    }
+
+    func testMicronutrientesOpcionales() throws {
+        let json = #"{"fuente": "x", "alimentos": [{"codigo": "A1", "nombre": "Kiwicha", "por100g": {"kcal": 351}, "micros": {"hierro": 7.5, "calcio": "mucho"}}, {"codigo": "A2", "nombre": "Arroz", "por100g": {"kcal": 115}}]}"#
+        let t = try ArchivoTabla.leer(Data(json.utf8))
+        let m = try XCTUnwrap(t.alimentos[0].micros)
+        XCTAssertEqual(m.hierro, 7.5)
+        XCTAssertNil(m.calcio, "Un valor que no es número no se inventa")
+        XCTAssertEqual(m.filas(gramos: 50).map(\.nombre), ["Hierro"])
+        XCTAssertEqual(m.filas(gramos: 50).first?.valor, 3.75)
+        XCTAssertNil(t.alimentos[1].micros)
+    }
+
+    func testColaSinConexionSeLeeConValoresPorDefecto() throws {
+        let json = #"{"version": 1, "colaIA": [{"tipo": "foto", "archivoFoto": "a.jpg", "comida": "cena"}, {"tipo": "otro"}]}"#
+        let d = try DatosApp.decodificadorPrueba.decode(DatosApp.self, from: Data(json.utf8))
+        XCTAssertEqual(d.colaIA.count, 2)
+        XCTAssertEqual(d.colaIA[0].estado, .esperando)
+        XCTAssertEqual(d.colaIA[0].comida, .cena)
+        XCTAssertEqual(d.colaIA[1].tipo, .texto)
     }
 }

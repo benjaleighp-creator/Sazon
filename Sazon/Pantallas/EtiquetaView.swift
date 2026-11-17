@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 /// Lee con IA la tabla nutricional de un envase (para productos que no
@@ -7,17 +6,16 @@ import SwiftUI
 struct EtiquetaView: View {
     let codigo: String?
     let alLeer: (Candidato) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @State private var imagen: UIImage?
-    @State private var seleccion: PhotosPickerItem?
-    @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
+    @State private var tarea = TareaIA()
     @State private var errorFoto: String?
     @State private var envios = 0
-
-    private var camaraDisponible: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
     var body: some View {
         ScrollView {
@@ -48,26 +46,15 @@ struct EtiquetaView: View {
                         .accessibilityLabel("Foto de la etiqueta elegida")
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Espacio.s) { botones }
-                    VStack(spacing: Espacio.s) { botones }
-                }
+                BotonesFoto(alElegir: usarFoto, alFallar: { errorFoto = $0 })
                 if let errorFoto {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                switch estado {
-                case .inactivo:
-                    EmptyView()
-                case .analizando:
-                    HStack(spacing: Espacio.s) {
-                        ProgressView()
-                        Text("Gemini está leyendo la etiqueta…").font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
-                    }
-                case .error(let e):
-                    Aviso(icono: "exclamationmark.triangle", titulo: e.titulo, texto: e.mensaje, color: paleta.aviso)
-                }
-                Text("Solo se envía la foto de la etiqueta, reducida y sin ubicación. Después revisas y corriges los números antes de guardar.")
+                EstadoIAVista(estado: estado, texto: "Leyendo la etiqueta…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir,
+                              destinoManual: .porcion(Candidato(manual: "", codigoBarras: codigo)))
+                Text("Primero se intenta leer en tu iPhone, sin internet. Solo si no alcanza, se envía la foto de la etiqueta (reducida y sin ubicación) a la IA. Después revisas y corriges los números antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -86,62 +73,60 @@ struct EtiquetaView: View {
                 .padding(.bottom, Espacio.xs)
                 .barraInferior()
         }
-        .fullScreenCover(isPresented: $mostrarCamara) {
-            Camara { foto in
-                imagen = foto
-                estado = .inactivo
-            }
-            .ignoresSafeArea()
-        }
-        .onChange(of: seleccion) { _, nueva in
-            guard let nueva else { return }
-            Task {
-                if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
-                    imagen = foto
-                    errorFoto = nil
-                    estado = .inactivo
-                } else {
-                    errorFoto = "No se pudo abrir esa foto. Prueba con otra."
-                }
-            }
-        }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
+        .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
+            if case .error = nuevo { return true } else { return false }
+        }
+        .onDisappear {
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
+        }
     }
 
-    @ViewBuilder
-    private var botones: some View {
-        if camaraDisponible {
-            Button { mostrarCamara = true } label: { Label("Tomar foto", systemImage: "camera") }
-                .buttonStyle(.secundario)
-        }
-        PhotosPicker(selection: $seleccion, matching: .images) {
-            Label("Elegir de la galería", systemImage: "photo.on.rectangle")
-        }
-        .buttonStyle(.secundario)
+    private func usarFoto(_ foto: UIImage) {
+        cancelar()
+        imagen = foto
+        errorFoto = nil
+        estado = .inactivo
     }
 
     private func analizar() {
         guard let imagen else { return }
-        // La etiqueta necesita más detalle que un plato: lado de 1600 px.
-        guard let jpeg = ProcesadorFoto.prepararParaIA(imagen, ladoMaximo: 1600, calidad: 0.7) else {
-            errorFoto = "No se pudo preparar la foto."
-            return
-        }
         envios += 1
         estado = .analizando
-        Task {
+        errorFoto = nil
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                // 1. En el iPhone, sin red ni cuota (Vision).
+                if let local = await LectorEtiquetaLocal.leer(imagen) {
+                    try Task.checkCancellation()
+                    estado = .inactivo
+                    alLeer(Candidato(etiqueta: local, codigoBarras: codigo))
+                    return
+                }
+                try Task.checkCancellation()
+                // 2. Si el texto no alcanzó, la IA en la nube. La etiqueta
+                // necesita más detalle que un plato: lado de 1600 px.
+                guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen, ladoMaximo: 1600, calidad: 0.7) else {
+                    errorFoto = "No se pudo preparar la foto."
+                    estado = .inactivo
+                    return
+                }
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 let leida = try await proveedor.leerEtiqueta(fotoJPEG: jpeg)
+                try Task.checkCancellation()
                 estado = .inactivo
                 alLeer(Candidato(etiqueta: leida, codigoBarras: codigo))
-            } catch let e as ErrorIA {
-                estado = .error(e)
-            } catch is CancellationError {
-                estado = .inactivo
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
             }
         }
+    }
+
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
     }
 }

@@ -44,7 +44,8 @@ struct PorcionView: View {
                         if let marca = candidato.marca { Insignia(texto: marca) }
                     }
                     if candidato.origen == .envase {
-                        Text("Valores leídos por la IA de la etiqueta: compáralos con el envase antes de guardar.")
+                        Text(candidato.leidoPor.map { "Leído por: \($0). Compara los valores con el envase antes de guardar." }
+                             ?? "Valores leídos por la IA de la etiqueta: compáralos con el envase antes de guardar.")
                             .font(Tipo.pie)
                             .foregroundStyle(paleta.aviso)
                             .fixedSize(horizontal: false, vertical: true)
@@ -119,6 +120,17 @@ struct PorcionView: View {
                         .foregroundStyle(paleta.textoSecundario)
                 }
                 .tarjeta()
+
+                // Micronutrientes (solo si la tabla del INS los trae).
+                if let micros = candidato.micros, !micros.filas(gramos: gramos).isEmpty {
+                    VStack(alignment: .leading, spacing: Espacio.xs) {
+                        TituloSeccion("Micronutrientes (INS)")
+                        ForEach(micros.filas(gramos: gramos), id: \.nombre) { fila in
+                            FilaValor(titulo: fila.nombre, valor: Formato.numero(fila.valor, decimales: fila.valor < 10 ? 1 : 0) + " " + fila.unidad)
+                        }
+                    }
+                    .tarjeta()
+                }
 
                 SelectorComida(comida: $comida)
             }

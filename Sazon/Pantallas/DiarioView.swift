@@ -12,10 +12,12 @@ struct SolicitudRegistro: Identifiable {
 struct DiarioView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @Environment(\.dynamicTypeSize) private var tamanoLetra
     @State private var solicitud: SolicitudRegistro?
     @State private var editando: Registro?
     @State private var mostrarMeta = false
     @State private var mostrarCoach = false
+    @State private var mostrarCola = false
     @State private var guardados = 0
 
     var body: some View {
@@ -25,6 +27,10 @@ struct DiarioView: View {
             ScrollView {
                 VStack(spacing: Espacio.l) {
                     Saludo()
+
+                    if !almacen.datos.colaIA.isEmpty {
+                        AvisoColaIA(cola: almacen.datos.colaIA) { mostrarCola = true }
+                    }
 
                     // 1. Lo más importante: cuánto te queda hoy.
                     if let meta = almacen.meta {
@@ -72,7 +78,11 @@ struct DiarioView: View {
                     // 4. Complementos del día.
                     VStack(spacing: Espacio.s) {
                         EncabezadoSeccion(titulo: "Tu día", icono: "sun.max")
-                        HStack(spacing: Espacio.s) {
+                        // Con letra de accesibilidad, una tarjeta debajo de la otra.
+                        let pila = tamanoLetra.isAccessibilitySize
+                            ? AnyLayout(VStackLayout(spacing: Espacio.s))
+                            : AnyLayout(HStackLayout(spacing: Espacio.s))
+                        pila {
                             TarjetaAgua()
                             BotonCoach { mostrarCoach = true }
                         }
@@ -121,6 +131,9 @@ struct DiarioView: View {
             .sheet(item: $editando) { registro in
                 EditarRegistroView(original: registro)
                     .entornoSazon(almacen)
+            }
+            .sheet(isPresented: $mostrarCola) {
+                ColaIAView().entornoSazon(almacen)
             }
             .sheet(isPresented: $mostrarCoach) {
                 CoachView().entornoSazon(almacen)
@@ -194,6 +207,7 @@ extension TipoComida {
 private struct Saludo: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @ScaledMetric(relativeTo: .title2) private var ladoLogo: CGFloat = 44
 
     var body: some View {
         let hora = Calendar.current.component(.hour, from: Date())
@@ -213,8 +227,8 @@ private struct Saludo: View {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .frame(width: min(ladoLogo, 64), height: min(ladoLogo, 64))
+                .clipShape(RoundedRectangle(cornerRadius: Radio.chico, style: .continuous))
                 .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -251,10 +265,7 @@ private struct CabeceraSemana: View {
     }
 
     private func mesCorto(_ fecha: Date) -> String {
-        let f = DateFormatter()
-        f.locale = Formato.locale
-        f.dateFormat = "MMMM"
-        return f.string(from: fecha)
+        Formato.formateadorFecha("MMMM").string(from: fecha)
     }
 
     private func flecha(_ simbolo: String, _ etiqueta: String, _ dias: Int) -> some View {
@@ -264,8 +275,9 @@ private struct CabeceraSemana: View {
             Image(systemName: simbolo)
                 .font(Tipo.iconoChico)
                 .foregroundStyle(paleta.acento)
-                .frame(width: 40, height: 40)
+                .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
                 .background(Circle().fill(paleta.acentoSuave))
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(etiqueta)
@@ -587,12 +599,10 @@ struct FilaRegistro: View {
 private struct BotonFlotante: View {
     let alElegir: (DestinoRegistro?) -> Void
     @Environment(\.paleta) private var paleta
-    @Environment(\.colorScheme) private var esquema
     @ScaledMetric(relativeTo: .title) private var lado: CGFloat = 64
 
     var body: some View {
         let l = min(lado, 84)
-        let sombra = Sombra.elevada(esquema)
         Menu {
             Button { alElegir(.foto) } label: { Label("Foto del plato", systemImage: "camera") }
             Button { alElegir(.texto) } label: { Label("Escribir o dictar", systemImage: "text.bubble") }
@@ -602,11 +612,8 @@ private struct BotonFlotante: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: l * 0.4, weight: .bold))
-                .foregroundStyle(paleta.textoHero)
                 .frame(width: l, height: l)
-                .background(Circle().fill(paleta.degradadoHero))
-                .overlay(Circle().strokeBorder(paleta.textoHero.opacity(0.25), lineWidth: 1))
-                .shadow(color: paleta.heroFin.opacity(0.45), radius: sombra.radio, x: 0, y: sombra.y)
+                .fondoAccionFlotante()
         } primaryAction: {
             alElegir(nil)
         }
@@ -620,6 +627,9 @@ private struct BotonFlotante: View {
 private struct TarjetaAgua: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    /// Sube con cada toque de − o + (no con cada cambio de ml, por ejemplo
+    /// al cambiar de día o al sincronizar con Salud).
+    @State private var toques = 0
 
     var body: some View {
         let ml = almacen.aguaVisible
@@ -642,21 +652,25 @@ private struct TarjetaAgua: View {
             HStack(spacing: Espacio.xs) {
                 Button {
                     animar(.enfasis) { almacen.quitarAgua() }
+                    toques += 1
                 } label: {
                     Image(systemName: "minus")
-                        .frame(width: 40, height: 40)
+                        .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
                         .background(Circle().fill(paleta.superficieAlta))
+                        .contentShape(Circle())
                 }
                 .disabled(ml <= 0)
                 .accessibilityLabel("Quitar un vaso")
                 Button {
                     animar(.enfasis) { almacen.agregarAgua(almacen.datos.vasoMl) }
+                    toques += 1
                 } label: {
                     Label("\(Formato.entero(almacen.datos.vasoMl)) ml", systemImage: "plus")
                         .font(Tipo.pie)
                         .foregroundStyle(paleta.textoSobreAcento)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: Medida.toqueMinimo)
                         .background(Capsule().fill(paleta.acento))
+                        .contentShape(Capsule())
                 }
                 .accessibilityLabel("Sumar un vaso de \(Formato.entero(almacen.datos.vasoMl)) mililitros")
             }
@@ -665,13 +679,15 @@ private struct TarjetaAgua: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .tarjeta()
-        .sensoryFeedback(.impact(weight: .light), trigger: ml)
+        .sensoryFeedback(.impact(weight: .light), trigger: toques)
     }
 }
 
 private struct BotonCoach: View {
     let accion: () -> Void
     @Environment(\.paleta) private var paleta
+    @Environment(\.dynamicTypeSize) private var tamanoLetra
+    @ScaledMetric(relativeTo: .body) private var ancho: CGFloat = 150
 
     var body: some View {
         Button(action: accion) {
@@ -689,6 +705,6 @@ private struct BotonCoach: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: 150)
+        .frame(maxWidth: tamanoLetra.isAccessibilitySize ? .infinity : min(ancho, 220))
     }
 }

@@ -65,11 +65,34 @@ enum CalculoMeta {
     }
 
     /// Meta que usa la app: la manual si existe; si no, la calculada; si
-    /// tampoco hay perfil, nil.
-    static func metaVigente(_ datos: DatosApp, actividadSalud: Double = 0) -> Nutrientes? {
-        if let manual = datos.metaManual { return manual }
-        if let perfil = datos.perfil { return meta(perfil, extraKcal: extraKcal(datos, actividadSalud: actividadSalud)) }
+    /// tampoco hay perfil, nil. Con `dia`, suma el ajuste de ese día de la
+    /// semana (por ejemplo, más calorías el sábado o los días que entrenas).
+    static func metaVigente(_ datos: DatosApp, actividadSalud: Double = 0, dia: Date? = nil,
+                            calendario: Calendar = .current) -> Nutrientes? {
+        let delDia = dia.map { ajusteDelDia(datos.ajustesPorDia, dia: $0, calendario: calendario) } ?? 0
+        if let manual = datos.metaManual {
+            guard delDia != 0 else { return manual }
+            // Meta manual: el ajuste del día va a los carbohidratos.
+            var m = manual
+            m.kcal = max(caloriasMinimas, manual.kcal + delDia)
+            m.carbohidratos = max(0, manual.carbohidratos + (m.kcal - manual.kcal) / 4)
+            return m
+        }
+        if let perfil = datos.perfil {
+            return meta(perfil, extraKcal: extraKcal(datos, actividadSalud: actividadSalud) + delDia)
+        }
         return nil
+    }
+
+    /// Clave del día de la semana: "1" = domingo … "7" = sábado.
+    static func claveDia(_ dia: Date, calendario: Calendar = .current) -> String {
+        String(calendario.component(.weekday, from: dia))
+    }
+
+    /// Ajuste en kcal del día de la semana de `dia` (0 si no hay), con tope de ±1000.
+    static func ajusteDelDia(_ ajustes: [String: Double], dia: Date, calendario: Calendar = .current) -> Double {
+        let v = ajustes[claveDia(dia, calendario: calendario)] ?? 0
+        return v.isFinite ? min(max(v, -1000), 1000) : 0
     }
 
     /// Pasos del cálculo con los números de tu perfil, para mostrarlos.

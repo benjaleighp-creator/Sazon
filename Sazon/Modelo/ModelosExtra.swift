@@ -17,9 +17,9 @@ struct RegistroAgua: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        fecha = try c.decodeIfPresent(Date.self, forKey: .fecha) ?? Date()
-        ml = try c.decodeIfPresent(Double.self, forKey: .ml) ?? 250
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
+        ml = c.tolerante(Double.self, .ml) ?? 250
     }
 }
 
@@ -36,9 +36,9 @@ struct RegistroPeso: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        fecha = try c.decodeIfPresent(Date.self, forKey: .fecha) ?? Date()
-        kg = try c.decodeIfPresent(Double.self, forKey: .kg) ?? 0
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
+        kg = c.tolerante(Double.self, .kg) ?? 0
     }
 }
 
@@ -63,15 +63,15 @@ struct RegistroMedidas: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        fecha = try c.decodeIfPresent(Date.self, forKey: .fecha) ?? Date()
-        cuello = try c.decodeIfPresent(Double.self, forKey: .cuello)
-        cintura = try c.decodeIfPresent(Double.self, forKey: .cintura)
-        cadera = try c.decodeIfPresent(Double.self, forKey: .cadera)
-        pecho = try c.decodeIfPresent(Double.self, forKey: .pecho)
-        brazo = try c.decodeIfPresent(Double.self, forKey: .brazo)
-        muslo = try c.decodeIfPresent(Double.self, forKey: .muslo)
-        grasaManual = try c.decodeIfPresent(Double.self, forKey: .grasaManual)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
+        cuello = c.tolerante(Double.self, .cuello)
+        cintura = c.tolerante(Double.self, .cintura)
+        cadera = c.tolerante(Double.self, .cadera)
+        pecho = c.tolerante(Double.self, .pecho)
+        brazo = c.tolerante(Double.self, .brazo)
+        muslo = c.tolerante(Double.self, .muslo)
+        grasaManual = c.tolerante(Double.self, .grasaManual)
     }
 }
 
@@ -89,10 +89,10 @@ struct FotoProgreso: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        fecha = try c.decodeIfPresent(Date.self, forKey: .fecha) ?? Date()
-        archivo = try c.decodeIfPresent(String.self, forKey: .archivo) ?? ""
-        nota = try c.decodeIfPresent(String.self, forKey: .nota) ?? ""
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
+        archivo = c.tolerante(String.self, .archivo) ?? ""
+        nota = c.tolerante(String.self, .nota) ?? ""
     }
 }
 
@@ -139,10 +139,10 @@ struct SesionAyuno: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        inicio = try c.decodeIfPresent(Date.self, forKey: .inicio) ?? Date()
-        horas = try c.decodeIfPresent(Double.self, forKey: .horas) ?? 16
-        finReal = try c.decodeIfPresent(Date.self, forKey: .finReal)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        inicio = c.tolerante(Date.self, .inicio) ?? Date()
+        horas = c.tolerante(Double.self, .horas) ?? 16
+        finReal = c.tolerante(Date.self, .finReal)
     }
 
     var finPlaneado: Date { inicio.addingTimeInterval(horas * 3600) }
@@ -163,10 +163,10 @@ struct AlimentoPropio: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Alimento"
-        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
-        medidas = try c.decodeIfPresent([MedidaCasera].self, forKey: .medidas) ?? []
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        nombre = c.tolerante(String.self, .nombre) ?? "Alimento"
+        por100g = c.tolerante(Nutrientes.self, .por100g) ?? .cero
+        medidas = c.listaTolerante(MedidaCasera.self, .medidas) ?? []
     }
 }
 
@@ -185,12 +185,12 @@ struct Ingrediente: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Ingrediente"
-        gramos = try c.decodeIfPresent(Double.self, forKey: .gramos) ?? 100
-        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
-        origen = try c.decodeIfPresent(OrigenDato.self, forKey: .origen) ?? .manual
-        codigoINS = try c.decodeIfPresent(String.self, forKey: .codigoINS)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        nombre = c.tolerante(String.self, .nombre) ?? "Ingrediente"
+        gramos = c.tolerante(Double.self, .gramos) ?? 100
+        por100g = c.tolerante(Nutrientes.self, .por100g) ?? .cero
+        origen = c.enumTolerante(OrigenDato.self, .origen) ?? .manual
+        codigoINS = c.tolerante(String.self, .codigoINS)
     }
 
     var total: Nutrientes { por100g * (gramos / 100) }
@@ -214,13 +214,13 @@ struct Receta: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Receta"
-        porciones = try c.decodeIfPresent(Double.self, forKey: .porciones) ?? 1
-        ingredientes = try c.decodeIfPresent([Ingrediente].self, forKey: .ingredientes) ?? []
-        pasos = try c.decodeIfPresent([String].self, forKey: .pasos) ?? []
-        pesoFinal = try c.decodeIfPresent(Double.self, forKey: .pesoFinal)
-        creada = try c.decodeIfPresent(Date.self, forKey: .creada) ?? Date()
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        nombre = c.tolerante(String.self, .nombre) ?? "Receta"
+        porciones = c.tolerante(Double.self, .porciones) ?? 1
+        ingredientes = c.listaTolerante(Ingrediente.self, .ingredientes) ?? []
+        pasos = c.listaTolerante(String.self, .pasos) ?? []
+        pesoFinal = c.tolerante(Double.self, .pesoFinal)
+        creada = c.tolerante(Date.self, .creada) ?? Date()
     }
 }
 
@@ -246,15 +246,15 @@ struct ItemPlan: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        comida = try c.decodeIfPresent(TipoComida.self, forKey: .comida) ?? .almuerzo
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Alimento"
-        gramos = try c.decodeIfPresent(Double.self, forKey: .gramos) ?? 100
-        por100g = try c.decodeIfPresent(Nutrientes.self, forKey: .por100g) ?? .cero
-        origen = try c.decodeIfPresent(OrigenDato.self, forKey: .origen) ?? .ins
-        codigoINS = try c.decodeIfPresent(String.self, forKey: .codigoINS)
-        recetaID = try c.decodeIfPresent(UUID.self, forKey: .recetaID)
-        hecho = try c.decodeIfPresent(Bool.self, forKey: .hecho) ?? false
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        comida = c.enumTolerante(TipoComida.self, .comida) ?? .almuerzo
+        nombre = c.tolerante(String.self, .nombre) ?? "Alimento"
+        gramos = c.tolerante(Double.self, .gramos) ?? 100
+        por100g = c.tolerante(Nutrientes.self, .por100g) ?? .cero
+        origen = c.enumTolerante(OrigenDato.self, .origen) ?? .ins
+        codigoINS = c.tolerante(String.self, .codigoINS)
+        recetaID = c.tolerante(UUID.self, .recetaID)
+        hecho = c.tolerante(Bool.self, .hecho) ?? false
     }
 
     var total: Nutrientes { por100g * (gramos / 100) }
@@ -272,8 +272,8 @@ struct PlanDia: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        dia = try c.decodeIfPresent(Date.self, forKey: .dia) ?? Date()
-        items = try c.decodeIfPresent([ItemPlan].self, forKey: .items) ?? []
+        dia = c.tolerante(Date.self, .dia) ?? Date()
+        items = c.listaTolerante(ItemPlan.self, .items) ?? []
     }
 }
 
@@ -310,16 +310,16 @@ struct ConfigRecordatorios: Codable, Equatable {
     init(from decoder: Decoder) throws {
         let base = ConfigRecordatorios()
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        comidasActivas = try c.decodeIfPresent(Bool.self, forKey: .comidasActivas) ?? base.comidasActivas
-        horaDesayuno = try c.decodeIfPresent(Int.self, forKey: .horaDesayuno) ?? base.horaDesayuno
-        horaAlmuerzo = try c.decodeIfPresent(Int.self, forKey: .horaAlmuerzo) ?? base.horaAlmuerzo
-        horaCena = try c.decodeIfPresent(Int.self, forKey: .horaCena) ?? base.horaCena
-        aguaActiva = try c.decodeIfPresent(Bool.self, forKey: .aguaActiva) ?? base.aguaActiva
-        aguaCadaHoras = try c.decodeIfPresent(Int.self, forKey: .aguaCadaHoras) ?? base.aguaCadaHoras
-        pesoActivo = try c.decodeIfPresent(Bool.self, forKey: .pesoActivo) ?? base.pesoActivo
-        pesoDiaSemana = try c.decodeIfPresent(Int.self, forKey: .pesoDiaSemana) ?? base.pesoDiaSemana
-        pesoHora = try c.decodeIfPresent(Int.self, forKey: .pesoHora) ?? base.pesoHora
-        ayunoActivo = try c.decodeIfPresent(Bool.self, forKey: .ayunoActivo) ?? base.ayunoActivo
+        comidasActivas = c.tolerante(Bool.self, .comidasActivas) ?? base.comidasActivas
+        horaDesayuno = c.tolerante(Int.self, .horaDesayuno) ?? base.horaDesayuno
+        horaAlmuerzo = c.tolerante(Int.self, .horaAlmuerzo) ?? base.horaAlmuerzo
+        horaCena = c.tolerante(Int.self, .horaCena) ?? base.horaCena
+        aguaActiva = c.tolerante(Bool.self, .aguaActiva) ?? base.aguaActiva
+        aguaCadaHoras = c.tolerante(Int.self, .aguaCadaHoras) ?? base.aguaCadaHoras
+        pesoActivo = c.tolerante(Bool.self, .pesoActivo) ?? base.pesoActivo
+        pesoDiaSemana = c.tolerante(Int.self, .pesoDiaSemana) ?? base.pesoDiaSemana
+        pesoHora = c.tolerante(Int.self, .pesoHora) ?? base.pesoHora
+        ayunoActivo = c.tolerante(Bool.self, .ayunoActivo) ?? base.ayunoActivo
     }
 }
 
@@ -334,6 +334,14 @@ struct MensajeCoach: Codable, Identifiable, Equatable {
 
     init(id: UUID = UUID(), autor: Autor, texto: String, fecha: Date = Date()) {
         self.id = id; self.autor = autor; self.texto = texto; self.fecha = fecha
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        autor = c.enumTolerante(Autor.self, .autor) ?? .coach
+        texto = c.tolerante(String.self, .texto) ?? ""
+        fecha = c.tolerante(Date.self, .fecha) ?? Date()
     }
 }
 
@@ -355,12 +363,67 @@ struct ComidaFavorita: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        nombre = try c.decodeIfPresent(String.self, forKey: .nombre) ?? "Favorito"
-        registros = try c.decodeIfPresent([Registro].self, forKey: .registros) ?? []
-        comidaHabitual = try c.decodeIfPresent(TipoComida.self, forKey: .comidaHabitual) ?? .desayuno
-        creada = try c.decodeIfPresent(Date.self, forKey: .creada) ?? Date()
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        nombre = c.tolerante(String.self, .nombre) ?? "Favorito"
+        registros = c.listaTolerante(Registro.self, .registros) ?? []
+        comidaHabitual = c.enumTolerante(TipoComida.self, .comidaHabitual) ?? .desayuno
+        creada = c.tolerante(Date.self, .creada) ?? Date()
     }
 
     var total: Nutrientes { registros.reduce(Nutrientes.cero) { $0 + $1.total } }
+}
+
+// MARK: - Cola sin conexión
+
+/// Foto o texto guardado sin internet para analizarlo con la IA cuando
+/// vuelva la red. El resultado nunca se guarda solo: queda «listo para
+/// revisar» y tú lo confirmas.
+struct PendienteIA: Codable, Identifiable, Hashable {
+    enum Tipo: String, Codable { case foto, texto }
+    enum Estado: String, Codable {
+        /// Esperando internet.
+        case esperando
+        /// La IA respondió: falta que lo revises.
+        case listo
+        /// La IA no pudo (se muestra el motivo y puedes reintentar).
+        case fallo
+    }
+
+    var id: UUID
+    var creado: Date
+    var comida: TipoComida
+    var tipo: Tipo
+    /// Texto escrito (vacío si es foto).
+    var texto: String
+    /// Nombre del archivo de la foto reducida (en la carpeta de la app).
+    var archivoFoto: String?
+    var estado: Estado
+    /// Respuesta JSON de la IA (cuando está lista).
+    var respuesta: String?
+    /// Quién respondió (clave de CapaIA).
+    var capa: String?
+    /// Motivo del fallo, para mostrarlo.
+    var error: String?
+    var intentos: Int
+
+    init(id: UUID = UUID(), creado: Date = Date(), comida: TipoComida, tipo: Tipo, texto: String = "",
+         archivoFoto: String? = nil) {
+        self.id = id; self.creado = creado; self.comida = comida; self.tipo = tipo; self.texto = texto
+        self.archivoFoto = archivoFoto; estado = .esperando; respuesta = nil; capa = nil; error = nil; intentos = 0
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = c.tolerante(UUID.self, .id) ?? UUID()
+        creado = c.tolerante(Date.self, .creado) ?? Date()
+        comida = c.enumTolerante(TipoComida.self, .comida) ?? .snacks
+        tipo = c.enumTolerante(Tipo.self, .tipo) ?? .texto
+        texto = c.tolerante(String.self, .texto) ?? ""
+        archivoFoto = c.tolerante(String.self, .archivoFoto)
+        estado = c.enumTolerante(Estado.self, .estado) ?? .esperando
+        respuesta = c.tolerante(String.self, .respuesta)
+        capa = c.tolerante(String.self, .capa)
+        error = c.tolerante(String.self, .error)
+        intentos = c.tolerante(Int.self, .intentos) ?? 0
+    }
 }

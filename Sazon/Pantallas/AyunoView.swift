@@ -7,6 +7,9 @@ struct AyunoView: View {
     @State private var cambiarInicio = false
     @State private var inicioManual = Date()
     @State private var accion = 0
+    /// El anillo crece con el tamaño de letra (con tope) para que el texto
+    /// de adentro no se corte.
+    @ScaledMetric(relativeTo: .title) private var ladoAnillo: CGFloat = Medida.anillo + 40
 
     var body: some View {
         @Bindable var a = almacen
@@ -106,12 +109,15 @@ struct AyunoView: View {
                     }
                 }
                 .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .padding(Espacio.l)
             }
-            .frame(width: Medida.anillo + 40, height: Medida.anillo + 40)
+            .frame(width: min(ladoAnillo, 300), height: min(ladoAnillo, 300))
             .accessibilityElement(children: .combine)
 
             if let activa {
-                HStack(spacing: Espacio.m) {
+                FilaDatos {
                     datoHero("Empezó", Formato.hora(activa.inicio))
                     datoHero("Termina", Formato.hora(activa.finPlaneado))
                     datoHero("Racha", "\(Ayuno.racha(almacen.datos.ayunos))")
@@ -140,7 +146,7 @@ struct AyunoView: View {
     private func datoHero(_ titulo: String, _ valor: String) -> some View {
         VStack(spacing: Espacio.xxxs) {
             Text(titulo).font(Tipo.micro).foregroundStyle(paleta.textoHeroSecundario)
-            Text(valor).font(Tipo.cuerpoFuerte).foregroundStyle(paleta.textoHero)
+            Text(valor).font(Tipo.cuerpoFuerte.monospacedDigit()).foregroundStyle(paleta.textoHero)
         }
         .frame(maxWidth: .infinity)
     }
@@ -178,8 +184,10 @@ struct AyunoView: View {
                             Button("Borrar", role: .destructive) { almacen.eliminarAyuno(s) }
                         } label: {
                             Image(systemName: "ellipsis").foregroundStyle(paleta.textoSecundario)
-                                .frame(width: 32, height: 32)
+                                .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
+                                .contentShape(Rectangle())
                         }
+                        .accessibilityLabel("Más opciones de este ayuno")
                     }
                     BarraProgreso(valor: estado.fraccion, color: estado.completado ? paleta.exito : paleta.aviso, alto: 4)
                 }

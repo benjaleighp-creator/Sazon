@@ -11,16 +11,47 @@ extension Almacen {
     var metaAgua: Double { Agua.meta(datos) }
     var aguaVisible: Double { Agua.delDia(diaVisible, en: datos.agua) }
 
+    /// Suma agua al día de hoy (Siri, Atajos), sin importar el día que muestra el diario.
+    func agregarAguaHoy(_ ml: Double) {
+        datos.agua.append(RegistroAgua(fecha: Date(), ml: ml))
+    }
+
+    /// Aplica lo que se hizo desde los botones del widget («+ agua» y
+    /// «repetir favorito»). Si los datos no se pudieron abrir, la cola
+    /// espera (no se pierde).
+    func procesarAccionesWidget() {
+        guard !archivoProtegido else { return }
+        let acciones = ColaWidget.tomarTodas()
+        guard !acciones.isEmpty else { return }
+        var d = datos
+        var nuevos: [Registro] = []
+        for a in acciones {
+            switch a.tipo {
+            case .agua:
+                // El archivo de acciones está fuera de la app: se acota la cantidad.
+                let ml = a.ml.flatMap { $0.isFinite && $0 > 0 && $0 <= 2000 ? $0 : nil } ?? d.vasoMl
+                d.agua.append(RegistroAgua(fecha: min(a.fecha, Date()), ml: ml))
+            case .favorito:
+                guard let f = d.favoritos.first(where: { $0.id.uuidString == a.favoritoID }) else { continue }
+                nuevos += Copiado.copiar(f.registros, aDia: a.fecha, comida: f.comidaHabitual).map { r in
+                    var r = r
+                    r.fecha = a.fecha
+                    return r
+                }
+            }
+        }
+        datos = d
+        agregar(nuevos)
+    }
+
     func agregarAgua(_ ml: Double) {
         datos.agua.append(RegistroAgua(fecha: Diario.fechaParaRegistrar(enDia: diaVisible), ml: ml))
-        avisarCambios()
     }
 
     /// Quita el último vaso del día visible.
     func quitarAgua() {
         guard let i = datos.agua.lastIndex(where: { Calendar.current.isDate($0.fecha, inSameDayAs: diaVisible) }) else { return }
         datos.agua.remove(at: i)
-        avisarCambios()
     }
 
     // MARK: Peso, medidas y fotos
@@ -72,11 +103,30 @@ extension Almacen {
     }
 
     func imagen(de foto: FotoProgreso) -> UIImage? {
-        UIImage(contentsOfFile: Almacen.carpetaFotos.appendingPathComponent(foto.archivo).path)
+        guard ValidacionRespaldo.esNombreArchivoSeguro(foto.archivo) else { return nil }
+        return UIImage(contentsOfFile: Almacen.carpetaFotos.appendingPathComponent(foto.archivo).path)
+    }
+
+    /// Miniatura de una foto de progreso: se genera una sola vez (lado
+    /// mayor de `MiniaturasFotos.lado` px) y queda en memoria. Antes se
+    /// leía el JPEG completo de 1600 px en cada dibujo de la lista.
+    func miniatura(de foto: FotoProgreso) -> UIImage? {
+        let clave = foto.archivo as NSString
+        if let guardada = MiniaturasFotos.cache.object(forKey: clave) { return guardada }
+        guard let completa = imagen(de: foto) else { return nil }
+        let escala = MiniaturasFotos.lado / max(completa.size.width, completa.size.height, 1)
+        let tamano = CGSize(width: completa.size.width * min(escala, 1), height: completa.size.height * min(escala, 1))
+        let mini = completa.preparingThumbnail(of: tamano) ?? completa
+        MiniaturasFotos.cache.setObject(mini, forKey: clave)
+        return mini
     }
 
     func eliminarFoto(_ foto: FotoProgreso) {
-        try? FileManager.default.removeItem(at: Almacen.carpetaFotos.appendingPathComponent(foto.archivo))
+        MiniaturasFotos.cache.removeObject(forKey: foto.archivo as NSString)
+        // Solo se borra dentro de la carpeta de fotos (nunca «../otro-archivo»).
+        if ValidacionRespaldo.esNombreArchivoSeguro(foto.archivo) {
+            try? FileManager.default.removeItem(at: Almacen.carpetaFotos.appendingPathComponent(foto.archivo))
+        }
         datos.fotos.removeAll { $0.id == foto.id }
     }
 
@@ -104,7 +154,6 @@ extension Almacen {
         datos.ayunos.append(s)
         Recordatorios.programarFinAyuno(s, activo: datos.recordatorios.ayunoActivo)
         ActividadAyuno.iniciar(s, tema: tema)
-        avisarCambios()
     }
 
     func terminarAyuno(_ fin: Date = Date()) {
@@ -112,7 +161,6 @@ extension Almacen {
         datos.ayunos[i].finReal = max(fin, datos.ayunos[i].inicio)
         Recordatorios.cancelarFinAyuno()
         ActividadAyuno.terminar()
-        avisarCambios()
     }
 
     func eliminarAyuno(_ s: SesionAyuno) {
@@ -145,9 +193,9 @@ extension Almacen {
         datos.recetas.removeAll { $0.id == r.id }
     }
 
-    /// Todo lo que se puede buscar: tabla del INS, tus alimentos y tus recetas.
-    /// Los tuyos llevan código "P:" (propio) o "R:" (receta).
-    var alimentosBuscables: [AlimentoBase] {
+    /// Tus alimentos y tus recetas como alimentos buscables.
+    /// Llevan código "P:" (propio) o "R:" (receta).
+    var alimentosPropiosYRecetas: [AlimentoBase] {
         let propios = datos.alimentosPropios.map {
             AlimentoBase(codigo: "P:\($0.id.uuidString)", nombre: $0.nombre, grupo: "Mis alimentos", por100g: $0.por100g, medidas: $0.medidas)
         }
@@ -155,11 +203,15 @@ extension Almacen {
             AlimentoBase(codigo: "R:\(r.id.uuidString)", nombre: r.nombre, grupo: "Mis recetas", por100g: Recetas.por100g(r),
                          medidas: [MedidaCasera(nombre: "porción", gramos: Recetas.gramosPorPorcion(r), estimada: false)])
         }
-        return propios + recetas + tabla.alimentos
+        return propios + recetas
     }
 
     func buscarTodo(_ texto: String, limite: Int = 50) -> [Coincidencia] {
-        Busqueda.buscar(texto, en: alimentosBuscables, limite: limite)
+        // Tus alimentos y recetas son pocos: se buscan directo. La tabla del
+        // INS usa su índice ya normalizado.
+        let tuyos = Busqueda.buscar(texto, en: alimentosPropiosYRecetas, limite: limite)
+        let tabla = Busqueda.buscar(texto, en: self.tabla.indice, limite: limite)
+        return Busqueda.ordenar(tuyos + tabla, limite: limite)
     }
 
     // MARK: Plan de comidas
@@ -242,6 +294,25 @@ extension Almacen {
         datos.favoritos.removeAll { $0.id == f.id }
     }
 
+    /// Lo que se repite para una comida: tu favorito de esa comida o, si no
+    /// tienes, lo que comiste en ella el último día (hasta 14 días atrás).
+    /// Devuelve una descripción («tu favorito «Desayuno de siempre»») y los registros.
+    func ultimaComida(_ comida: TipoComida, hoy: Date = Date()) -> (String, [Registro])? {
+        if let f = datos.favoritos.first(where: { $0.comidaHabitual == comida }), !f.registros.isEmpty {
+            return ("tu favorito «\(f.nombre)»", f.registros)
+        }
+        let cal = Calendar.current
+        let inicioHoy = cal.startOfDay(for: hoy)
+        let grupos = Diario.porDia(datos.registros.filter { $0.comida == comida && $0.fecha < inicioHoy })
+        for atras in 1...14 {
+            guard let dia = cal.date(byAdding: .day, value: -atras, to: inicioHoy),
+                  let lista = grupos[dia], !lista.isEmpty else { continue }
+            return (atras == 1 ? "el \(comida.nombre.lowercased()) de ayer" : "el \(comida.nombre.lowercased()) del \(Formato.diaLargo(dia).lowercased())",
+                    lista.sorted { $0.fecha < $1.fecha })
+        }
+        return nil
+    }
+
     /// Registros listos para guardar a partir de un favorito, en el día visible.
     func registrosDe(_ f: ComidaFavorita, comida: TipoComida) -> [Registro] {
         Copiado.copiar(f.registros, aDia: diaVisible, comida: comida).map { r in
@@ -254,7 +325,22 @@ extension Almacen {
     // MARK: Widgets
 
     /// Escribe el resumen que leen los widgets y les pide actualizarse.
+    /// Lo llama el guardado (una vez por grupo de cambios) y la app al
+    /// volver a primer plano.
     func avisarCambios() {
         ResumenWidget.desde(self).guardarYRecargar()
     }
+}
+
+/// Memoria de miniaturas de las fotos de progreso (iOS la vacía sola si
+/// falta memoria).
+enum MiniaturasFotos {
+    /// Lado mayor en píxeles (la miniatura se ve de 96 × 128 pt; × 3 en
+    /// pantallas Retina).
+    static let lado: CGFloat = 400
+    static let cache: NSCache<NSString, UIImage> = {
+        let c = NSCache<NSString, UIImage>()
+        c.countLimit = 120
+        return c
+    }()
 }

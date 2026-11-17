@@ -219,6 +219,7 @@ struct EditorAlimentoPropio: View {
     @State private var calculando = false
     @State private var errorIA: ErrorIA?
     @State private var estimadoIA = false
+    @State private var tareaIA: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -275,6 +276,8 @@ struct EditorAlimentoPropio: View {
             .navigationTitle(alimento.nombre.isEmpty ? "Nuevo alimento" : alimento.nombre)
             .sensoryFeedback(.success, trigger: estimadoIA)
             .navigationBarTitleDisplayMode(.inline)
+            // Si cierras el editor, la petición a Gemini se corta.
+            .onDisappear { tareaIA?.cancel() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancelar") { cerrar() } }
                 ToolbarItem(placement: .confirmationAction) {
@@ -293,11 +296,13 @@ struct EditorAlimentoPropio: View {
         errorIA = nil
         calculando = true
         let pedido = alimento.nombre
-        Task {
+        tareaIA?.cancel()
+        tareaIA = Task {
             defer { calculando = false }
             do {
                 let proveedor = try ServicioIA.proveedorActual(almacen.datos)
-                let lista = try await proveedor.analizar(texto: pedido).alimentos
+                let lista = try await proveedor.analizarAlimentoPropio(nombre: pedido).alimentos
+                try Task.checkCancellation()
                 let gramos = lista.reduce(0) { $0 + $1.gramos }
                 guard gramos > 0 else { throw ErrorIA.sinAlimentos }
                 let total = lista.reduce(Nutrientes.cero) { $0 + $1.por100g * ($1.gramos / 100) }
@@ -306,10 +311,9 @@ struct EditorAlimentoPropio: View {
                     alimento.medidas.append(MedidaCasera(nombre: "porción", gramos: gramos.rounded(), estimada: true))
                 }
                 estimadoIA = true
-            } catch let e as ErrorIA {
-                errorIA = e
             } catch {
-                errorIA = .desconocido(error.localizedDescription)
+                if Task.isCancelled || error is CancellationError { return }
+                errorIA = (error as? ErrorIA) ?? .desconocido(error.localizedDescription)
             }
         }
     }

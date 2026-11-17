@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 // MARK: - Estado común
@@ -9,24 +8,37 @@ enum EstadoIA: Equatable {
     case error(ErrorIA)
 }
 
-/// Bloque que muestra el estado de la IA (cargando o error con salida).
-private struct EstadoIAVista: View {
+/// Bloque que muestra el estado de la IA: espera (con tiempo, avisos y
+/// Cancelar) o error (con salidas al modo manual).
+struct EstadoIAVista: View {
     let estado: EstadoIA
     let texto: String
-    @Environment(\.paleta) private var paleta
+    let tarea: TareaIA
+    let alCancelar: () -> Void
+    /// Salida al modo manual (nil: el error no ofrece salidas).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
+    /// A dónde lleva «Agregar a mano».
+    var destinoManual: DestinoRegistro = .manual
+    /// Sin internet: guardar para analizar después (nil: no se ofrece).
+    var alGuardarParaDespues: (() -> Void)? = nil
 
     var body: some View {
         switch estado {
         case .inactivo:
             EmptyView()
         case .analizando:
-            HStack(spacing: Espacio.s) {
-                ProgressView()
-                Text(texto).font(Tipo.nota).foregroundStyle(paleta.textoSecundario)
-            }
-            .accessibilityElement(children: .combine)
+            TarjetaEsperaIA(titulo: texto, inicio: tarea.inicio, paso: tarea.paso, alCancelar: alCancelar,
+                            alBuscarTabla: alSalir.map { salir in { salir(.buscar) } },
+                            alAgregarAMano: alSalir.map { salir in { salir(destinoManual) } })
         case .error(let e):
-            Aviso(icono: "exclamationmark.triangle", titulo: e.titulo, texto: e.mensaje, color: paleta.aviso)
+            if let alSalir {
+                TarjetaErrorIA(error: e,
+                               alBuscarTabla: { alSalir(.buscar) },
+                               alAgregarAMano: { alSalir(destinoManual) },
+                               alGuardarParaDespues: alGuardarParaDespues)
+            } else {
+                TarjetaErrorIA(error: e, alGuardarParaDespues: alGuardarParaDespues)
+            }
         }
     }
 }
@@ -37,15 +49,19 @@ private struct EstadoIAVista: View {
 struct RegistroTextoView: View {
     @Binding var comida: TipoComida
     let alGuardar: ([Registro]) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @State private var texto = ""
     @State private var estado: EstadoIA = .inactivo
+    @State private var tarea = TareaIA()
     @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
     @State private var envios = 0
     @State private var dictado = Dictado()
+    @State private var guardadoEnCola = false
 
     var body: some View {
         ScrollView {
@@ -75,8 +91,14 @@ struct RegistroTextoView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está identificando los alimentos…")
-                Text("Solo se envía este texto a Google Gemini. Después revisas y corriges antes de guardar.")
+                EstadoIAVista(estado: estado, texto: "Identificando los alimentos…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir, alGuardarParaDespues: guardarParaDespues)
+                if guardadoEnCola {
+                    Aviso(icono: "tray.and.arrow.down", titulo: "Guardado para después",
+                          texto: "Se analizará solo cuando vuelva internet. Lo verás en el Diario, listo para revisar.",
+                          color: paleta.exito)
+                }
+                Text("Solo se envía este texto a Google Gemini (o a Groq, si pusiste su clave de respaldo). Si ya lo analizaste en las últimas 24 h, la respuesta sale de la memoria del iPhone. Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -88,7 +110,11 @@ struct RegistroTextoView: View {
         .onChange(of: dictado.texto) { _, nuevo in
             if dictado.escuchando { texto = nuevo }
         }
-        .onDisappear { dictado.detener() }
+        .onDisappear {
+            dictado.detener()
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
+        }
         .navigationTitle("Escribir o dictar")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -104,7 +130,8 @@ struct RegistroTextoView: View {
             .barraInferior()
         }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida,
+                           capa: analisis.capa, segundos: analisis.segundos, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.warning, trigger: estado) { _, nuevo in
@@ -112,25 +139,37 @@ struct RegistroTextoView: View {
         }
     }
 
+    private func guardarParaDespues() {
+        guard ColaIA.compartida.guardar(foto: nil, texto: texto, comida: comida, en: almacen) else { return }
+        estado = .inactivo
+        guardadoEnCola = true
+        texto = ""
+    }
+
     private func analizar() {
         dictado.detener()
+        guardadoEnCola = false
         envios += 1
         estado = .analizando
         let pedido = texto
-        Task {
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 analisis = try await proveedor.analizar(texto: pedido)
+                try Task.checkCancellation()
                 estado = .inactivo
                 revisar = true
-            } catch let e as ErrorIA {
-                estado = .error(e)
-            } catch is CancellationError {
-                estado = .inactivo
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
             }
         }
+    }
+
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
     }
 }
 
@@ -140,12 +179,13 @@ struct RegistroTextoView: View {
 struct RegistroFotoView: View {
     @Binding var comida: TipoComida
     let alGuardar: ([Registro]) -> Void
+    /// Salida al modo manual cuando la IA falla (tabla o a mano).
+    var alSalir: ((DestinoRegistro) -> Void)? = nil
 
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
+    @State private var tarea = TareaIA()
     @State private var imagen: UIImage?
-    @State private var seleccion: PhotosPickerItem?
-    @State private var mostrarCamara = false
     @State private var estado: EstadoIA = .inactivo
     @State private var analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
     @State private var revisar = false
@@ -154,9 +194,8 @@ struct RegistroFotoView: View {
     @State private var fase: FaseDeteccion = .inactiva
     @State private var visibles = 0
     @State private var exitos = 0
+    @State private var guardadoEnCola = false
     @Environment(\.accessibilityReduceMotion) private var reducir
-
-    private var camaraDisponible: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
     var body: some View {
         ScrollView {
@@ -178,16 +217,19 @@ struct RegistroFotoView: View {
                     EstadoVacio(icono: "camera", titulo: "Toma o elige una foto",
                                 texto: "Que se vea todo el plato, con buena luz y desde arriba o un poco inclinada.")
                 }
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Espacio.s) { botones }
-                    VStack(spacing: Espacio.s) { botones }
-                }
+                BotonesFoto(alElegir: usarFoto, alFallar: { errorFoto = $0 })
                 if let errorFoto {
                     Text(errorFoto).font(Tipo.pie).foregroundStyle(paleta.peligro)
                 }
                 FormularioClaveSiFalta()
-                EstadoIAVista(estado: estado, texto: "Gemini está mirando la foto…")
-                Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini. Después revisas y corriges antes de guardar.")
+                EstadoIAVista(estado: estado, texto: "Mirando la foto…", tarea: tarea,
+                              alCancelar: cancelar, alSalir: alSalir, alGuardarParaDespues: guardarParaDespues)
+                if guardadoEnCola {
+                    Aviso(icono: "tray.and.arrow.down", titulo: "Foto guardada para después",
+                          texto: "Se analizará solo cuando vuelva internet. La verás en el Diario, lista para revisar.",
+                          color: paleta.exito)
+                }
+                Text("Solo se envía la foto, reducida y sin datos de ubicación, a Google Gemini (o a Groq, si pusiste su clave de respaldo). Después revisas y corriges antes de guardar.")
                     .font(Tipo.pie)
                     .foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
@@ -210,29 +252,9 @@ struct RegistroFotoView: View {
             .padding(.bottom, Espacio.xs)
             .barraInferior()
         }
-        .fullScreenCover(isPresented: $mostrarCamara) {
-            Camara { foto in
-                imagen = foto
-                estado = .inactivo
-                fase = .inactiva
-            }
-            .ignoresSafeArea()
-        }
-        .onChange(of: seleccion) { _, nueva in
-            guard let nueva else { return }
-            Task {
-                if let datos = try? await nueva.loadTransferable(type: Data.self), let foto = UIImage(data: datos) {
-                    imagen = foto
-                    errorFoto = nil
-                    estado = .inactivo
-                    fase = .inactiva
-                } else {
-                    errorFoto = "No se pudo abrir esa foto. Prueba con otra."
-                }
-            }
-        }
         .navigationDestination(isPresented: $revisar) {
-            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida, alGuardar: alGuardar)
+            RevisionIAView(identificados: analisis.alimentos, posiblesOcultos: analisis.posiblesOcultos, comida: $comida,
+                           capa: analisis.capa, segundos: analisis.segundos, alGuardar: alGuardar)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: envios)
         .sensoryFeedback(.selection, trigger: visibles)
@@ -243,6 +265,10 @@ struct RegistroFotoView: View {
         .onChange(of: revisar) { _, abierto in
             // Al volver de la revisión, la foto queda limpia.
             if !abierto { fase = .inactiva; visibles = 0 }
+        }
+        .onDisappear {
+            // Si sales de la pantalla, la petición a Gemini se corta.
+            cancelar()
         }
     }
 
@@ -262,87 +288,78 @@ struct RegistroFotoView: View {
             try? await Task.sleep(nanoseconds: UInt64(paso * 1e9))
         }
         try? await Task.sleep(nanoseconds: 350_000_000)
+        guard !Task.isCancelled else { return }
         exitos += 1
         revisar = true
     }
 
-    @ViewBuilder
-    private var botones: some View {
-        if camaraDisponible {
-            Button { mostrarCamara = true } label: { Label("Tomar foto", systemImage: "camera") }
-                .buttonStyle(.secundario)
+    /// Sin internet: guarda la foto reducida para analizarla después.
+    private func guardarParaDespues() {
+        guard let imagen else { return }
+        Task {
+            guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen),
+                  ColaIA.compartida.guardar(foto: jpeg, texto: "", comida: comida, en: almacen) else {
+                errorFoto = "No se pudo guardar la foto."
+                return
+            }
+            estado = .inactivo
+            fase = .inactiva
+            guardadoEnCola = true
         }
-        PhotosPicker(selection: $seleccion, matching: .images) {
-            Label("Elegir de la galería", systemImage: "photo.on.rectangle")
-        }
-        .buttonStyle(.secundario)
+    }
+
+    /// Foto nueva (cámara o galería): la petición anterior ya no sirve.
+    private func usarFoto(_ foto: UIImage) {
+        guardadoEnCola = false
+        cancelar()
+        imagen = foto
+        errorFoto = nil
+        estado = .inactivo
+        fase = .inactiva
     }
 
     private func analizar() {
         guard let imagen else { return }
-        guard let jpeg = ProcesadorFoto.prepararParaIA(imagen) else {
-            errorFoto = "No se pudo preparar la foto."
-            return
-        }
         envios += 1
         estado = .analizando
         visibles = 0
+        errorFoto = nil
         analisis = AnalisisIA(alimentos: [], posiblesOcultos: [])
         let inicio = Date()
         fase = .esperando(inicio: inicio)
-        Task {
+        tarea.iniciar { alAvanzar in
             do {
-                let proveedor = try ServicioIA.proveedorActual(almacen.datos)
+                // La foto se reduce fuera del hilo principal (con fotos de
+                // 12-48 MP podía congelar la pantalla).
+                guard let jpeg = await ProcesadorFoto.prepararEnSegundoPlano(imagen) else {
+                    errorFoto = "No se pudo preparar la foto."
+                    estado = .inactivo
+                    fase = .inactiva
+                    return
+                }
+                let proveedor = try ServicioIA.proveedorActual(almacen.datos, alAvanzar: alAvanzar)
                 analisis = try await proveedor.analizar(fotoJPEG: jpeg)
+                try Task.checkCancellation()
                 estado = .inactivo
                 fase = .detectando(inicio: Date(), desdeEspera: Date().timeIntervalSince(inicio))
+                // VoiceOver lee todos los alimentos detectados (la capa de
+                // puntos y cajas es solo decorativa).
+                UIAccessibility.post(notification: .announcement,
+                                     argument: Deteccion.anuncio(analisis.alimentos.map { (nombre: $0.nombre, gramos: $0.gramos) }))
                 await revelar()
-            } catch let e as ErrorIA {
-                estado = .error(e)
-                fase = .detenida
-            } catch is CancellationError {
-                estado = .inactivo
-                fase = .inactiva
             } catch {
-                estado = .error(.desconocido(error.localizedDescription))
+                if Task.isCancelled || error is CancellationError { return }
+                estado = .error((error as? ErrorIA) ?? .desconocido(error.localizedDescription))
                 fase = .detenida
             }
         }
     }
-}
 
-/// Cámara del sistema (UIImagePickerController).
-struct Camara: UIViewControllerRepresentable {
-    let alTomar: (UIImage) -> Void
-    @Environment(\.dismiss) private var cerrar
-
-    func makeCoordinator() -> Coordinador { Coordinador(self) }
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let selector = UIImagePickerController()
-        selector.sourceType = .camera
-        selector.cameraCaptureMode = .photo
-        selector.delegate = context.coordinator
-        return selector
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    final class Coordinador: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let padre: Camara
-        init(_ padre: Camara) { self.padre = padre }
-
-        func imagePickerController(_ picker: UIImagePickerController,
-                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let foto = info[.originalImage] as? UIImage {
-                padre.alTomar(foto)
-            }
-            padre.cerrar()
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            padre.cerrar()
-        }
+    private func cancelar() {
+        guard tarea.enCurso else { return }
+        tarea.cancelar()
+        if estado == .analizando { estado = .inactivo }
+        if case .esperando = fase { fase = .inactiva }
     }
 }
 

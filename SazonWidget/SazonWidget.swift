@@ -1,6 +1,7 @@
 import WidgetKit
 import SwiftUI
 import ActivityKit
+import AppIntents
 
 // Widgets de Sazón: calorías y macros, agua, ayuno y la Actividad en vivo
 // del ayuno. Leen el resumen que escribe la app en el App Group. Si no hay
@@ -11,6 +12,7 @@ struct SazonWidgets: WidgetBundle {
     var body: some Widget {
         WidgetCalorias()
         WidgetAgua()
+        WidgetAccesos()
         WidgetAyuno()
         WidgetBloqueo()
         ActividadAyunoWidget()
@@ -65,12 +67,32 @@ func colorHex(_ hex: String) -> Color {
                  blue: Double(v & 0xFF) / 255, opacity: 1)
 }
 
-func entero(_ v: Double) -> String {
+private let formateadorEntero: NumberFormatter = {
     let f = NumberFormatter()
     f.locale = Locale(identifier: "es_PE")
     f.maximumFractionDigits = 0
     f.numberStyle = .decimal
-    return f.string(from: NSNumber(value: v.rounded())) ?? "\(Int(v.rounded()))"
+    return f
+}()
+
+func entero(_ v: Double) -> String {
+    formateadorEntero.string(from: NSNumber(value: v.rounded())) ?? "\(Int(v.rounded()))"
+}
+
+/// Tipografía de los widgets: estilos de texto del sistema (respetan el
+/// tamaño de letra elegido) con diseño redondeado, como la app.
+extension Font {
+    static func estiloWidget(_ estilo: Font.TextStyle, _ peso: Font.Weight) -> Font {
+        .system(estilo, design: .rounded, weight: peso)
+    }
+}
+
+/// Tope del tamaño de letra en los widgets: crece con Dynamic Type, pero
+/// sin pasar de «XXL» para que el contenido quepa en el espacio fijo.
+extension View {
+    func letraWidget() -> some View {
+        dynamicTypeSize(...DynamicTypeSize.xxLarge)
+    }
 }
 
 func fraccion(_ valor: Double, _ meta: Double) -> Double {
@@ -104,7 +126,7 @@ struct AvisoEjemplo: View {
     let r: ResumenWidget
     var body: some View {
         Text("Abre Sazón para ver tus datos")
-            .font(.system(size: 10, weight: .medium, design: .rounded))
+            .font(.estiloWidget(.caption2, .medium))
             .foregroundStyle(colorHex(r.colorSecundario))
             .lineLimit(2)
     }
@@ -145,7 +167,7 @@ struct VistaCalorias: View {
                             AvisoEjemplo(r: r)
                         } else if r.racha > 0 {
                             Label("\(r.racha) \(r.racha == 1 ? "día" : "días") seguidos", systemImage: "flame.fill")
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(.estiloWidget(.caption2, .semibold))
                                 .foregroundStyle(secundario)
                         }
                     }
@@ -157,6 +179,7 @@ struct VistaCalorias: View {
                 }
             }
         }
+        .letraWidget()
         .containerBackground(for: .widget) { FondoSazon(r: r) }
     }
 
@@ -165,12 +188,14 @@ struct VistaCalorias: View {
             Anillo(progreso: fraccion(r.kcal, r.metaKcal), color: texto, grosor: 9)
             VStack(spacing: 0) {
                 Text(entero(restante))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.estiloWidget(.title2, .bold))
                     .foregroundStyle(texto)
                     .minimumScaleFactor(0.6)
                 Text("kcal restantes")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .font(.estiloWidget(.caption2, .medium))
                     .foregroundStyle(secundario)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .padding(8)
         }
@@ -179,11 +204,15 @@ struct VistaCalorias: View {
     private func macro(_ nombre: String, _ valor: Double, _ meta: Double, _ texto: Color, _ secundario: Color) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack {
-                Text(nombre).font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(texto)
+                Text(nombre).font(.estiloWidget(.caption, .semibold)).foregroundStyle(texto)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Spacer()
                 Text("\(entero(valor))/\(entero(meta)) g")
-                    .font(.system(size: 10, weight: .medium, design: .rounded).monospacedDigit())
+                    .font(.estiloWidget(.caption2, .medium).monospacedDigit())
                     .foregroundStyle(secundario)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             GeometryReader { g in
                 ZStack(alignment: .leading) {
@@ -216,14 +245,16 @@ struct VistaAgua: View {
         let texto = colorHex(r.colorTexto)
         VStack(alignment: .leading, spacing: 6) {
             Label("Agua", systemImage: "drop.fill")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.estiloWidget(.footnote, .semibold))
                 .foregroundStyle(texto)
             Spacer(minLength: 0)
             Text(String(format: "%.1f L", r.aguaMl / 1000).replacingOccurrences(of: ".", with: ","))
-                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .font(.estiloWidget(.title, .bold))
                 .foregroundStyle(texto)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text("de " + String(format: "%.1f L", r.metaAguaMl / 1000).replacingOccurrences(of: ".", with: ","))
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.estiloWidget(.caption, .medium))
                 .foregroundStyle(colorHex(r.colorSecundario))
             GeometryReader { g in
                 ZStack(alignment: .leading) {
@@ -232,9 +263,90 @@ struct VistaAgua: View {
                 }
             }
             .frame(height: 6)
-            if e.esEjemplo { AvisoEjemplo(r: r) }
+            if e.esEjemplo {
+                AvisoEjemplo(r: r)
+            } else {
+                // Botón interactivo (iOS 17): suma un vaso sin abrir la app.
+                Button(intent: SumarAguaWidgetIntent()) {
+                    BotonWidget(texto: "+ \(entero(r.vasoMl ?? 250)) ml", simbolo: "plus", r: r)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .letraWidget()
+        .containerBackground(for: .widget) { FondoSazon(r: r) }
+    }
+}
+
+/// Botón con forma de cápsula para los widgets interactivos.
+struct BotonWidget: View {
+    let texto: String
+    let simbolo: String
+    let r: ResumenWidget
+
+    var body: some View {
+        Label(texto, systemImage: simbolo)
+            .font(.estiloWidget(.caption, .bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(colorHex(r.colorInicio))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(Capsule().fill(colorHex(r.colorTexto)))
+    }
+}
+
+// MARK: - Accesos rápidos (interactivo)
+
+struct WidgetAccesos: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "SazonAccesos", provider: ProveedorSazon()) { e in
+            VistaAccesos(e: e)
+        }
+        .configurationDisplayName("Registro rápido")
+        .description("Suma un vaso de agua o repite tu comida favorita sin abrir la app.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+struct VistaAccesos: View {
+    let e: EntradaSazon
+
+    var body: some View {
+        let r = e.resumen
+        let texto = colorHex(r.colorTexto)
+        let secundario = colorHex(r.colorSecundario)
+        VStack(alignment: .leading, spacing: 6) {
+            Text("\(entero(r.kcal)) kcal · \(String(format: "%.1f L", r.aguaMl / 1000).replacingOccurrences(of: ".", with: ","))")
+                .font(.estiloWidget(.footnote, .semibold))
+                .foregroundStyle(texto)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            if e.esEjemplo {
+                AvisoEjemplo(r: r)
+            } else {
+                Button(intent: SumarAguaWidgetIntent()) {
+                    BotonWidget(texto: "+ \(entero(r.vasoMl ?? 250)) ml de agua", simbolo: "drop.fill", r: r)
+                }
+                .buttonStyle(.plain)
+                if let id = r.favoritoID, let nombre = r.favoritoNombre {
+                    Button(intent: RepetirFavoritoWidgetIntent(favoritoID: id)) {
+                        BotonWidget(texto: "Repetir: \(nombre)", simbolo: "star.fill", r: r)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Text("Guarda un favorito en la app para repetirlo desde aquí.")
+                        .font(.estiloWidget(.caption2, .medium))
+                        .foregroundStyle(secundario)
+                        .lineLimit(2)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .letraWidget()
         .containerBackground(for: .widget) { FondoSazon(r: r) }
     }
 }
@@ -260,36 +372,39 @@ struct VistaAyuno: View {
         let secundario = colorHex(r.colorSecundario)
         VStack(alignment: .leading, spacing: 6) {
             Label("Ayuno", systemImage: "timer")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.estiloWidget(.footnote, .semibold))
                 .foregroundStyle(texto)
             Spacer(minLength: 0)
             if let inicio = r.ayunoInicio, let horas = r.ayunoHoras {
                 let fin = inicio.addingTimeInterval(horas * 3600)
                 if fin > Date() {
                     Text(timerInterval: Date()...fin, countsDown: true)
-                        .font(.system(size: 26, weight: .bold, design: .rounded).monospacedDigit())
+                        .font(.estiloWidget(.title, .bold).monospacedDigit())
                         .foregroundStyle(texto)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                     Text("para tus \(entero(horas)) h")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.estiloWidget(.caption, .medium))
                         .foregroundStyle(secundario)
                 } else {
                     Text("¡Listo!")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.estiloWidget(.title, .bold))
                         .foregroundStyle(texto)
                     Text("Completaste \(entero(horas)) h")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.estiloWidget(.caption, .medium))
                         .foregroundStyle(secundario)
                 }
             } else {
                 Text("Sin ayuno")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.estiloWidget(.title3, .bold))
                     .foregroundStyle(texto)
                 Text("Empieza uno en la app")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.estiloWidget(.caption, .medium))
                     .foregroundStyle(secundario)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .letraWidget()
         .containerBackground(for: .widget) { FondoSazon(r: r) }
     }
 }
@@ -333,6 +448,7 @@ struct VistaBloqueo: View {
                 Text("\(entero(restante)) kcal restantes")
             }
         }
+        .letraWidget()
         .containerBackground(for: .widget) { Color.clear }
     }
 }
@@ -346,19 +462,19 @@ struct ActividadAyunoWidget: Widget {
             let texto = colorHex(a.colorTexto)
             HStack(spacing: 14) {
                 Image(systemName: "timer")
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.estiloWidget(.title, .semibold))
                     .foregroundStyle(texto)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Ayuno de \(entero(a.horas)) h")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.estiloWidget(.subheadline, .semibold))
                         .foregroundStyle(texto)
                     if contexto.state.fin > Date() {
                         Text(timerInterval: Date()...contexto.state.fin, countsDown: true)
-                            .font(.system(size: 28, weight: .bold, design: .rounded).monospacedDigit())
+                            .font(.estiloWidget(.title, .bold).monospacedDigit())
                             .foregroundStyle(texto)
                     } else {
                         Text("¡Completado!")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.estiloWidget(.title, .bold))
                             .foregroundStyle(texto)
                     }
                 }
@@ -368,6 +484,7 @@ struct ActividadAyunoWidget: Widget {
                     .tint(texto)
             }
             .padding(16)
+            .letraWidget()
             .activityBackgroundTint(colorHex(a.colorFin))
             .activitySystemActionForegroundColor(texto)
         } dynamicIsland: { contexto in
@@ -380,7 +497,7 @@ struct ActividadAyunoWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     Text(timerInterval: Date()...max(contexto.state.fin, Date()), countsDown: true)
-                        .font(.system(size: 30, weight: .bold, design: .rounded).monospacedDigit())
+                        .font(.estiloWidget(.title, .bold).monospacedDigit())
                 }
             } compactLeading: {
                 Image(systemName: "timer")

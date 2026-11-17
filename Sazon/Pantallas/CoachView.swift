@@ -5,7 +5,11 @@ struct CoachView: View {
     @Environment(Almacen.self) private var almacen
     @Environment(\.paleta) private var paleta
     @Environment(\.dismiss) private var cerrar
+    @Environment(\.accessibilityReduceMotion) private var reducir
     @State private var texto = ""
+    @State private var tarea: Task<Void, Never>?
+    /// Sube solo cuando llega una respuesta del coach (para el háptico).
+    @State private var respuestas = 0
     @State private var enviando = false
     @State private var error: ErrorIA?
     @State private var pedirAviso = false
@@ -42,11 +46,15 @@ struct CoachView: View {
                             HStack(spacing: Espacio.xs) {
                                 ProgressView()
                                 Text("El coach está escribiendo…").font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                                Spacer(minLength: Espacio.xs)
+                                Button("Cancelar", action: cancelar)
+                                    .buttonStyle(.texto)
+                                    .frame(minHeight: Medida.toqueMinimo)
                             }
                             .id("escribiendo")
                         }
                         if let error {
-                            Aviso(icono: "exclamationmark.triangle", titulo: error.titulo, texto: error.mensaje, color: paleta.peligro)
+                            TarjetaErrorIA(error: error)
                         }
                     }
                     .padding(.horizontal, Espacio.margen)
@@ -54,7 +62,9 @@ struct CoachView: View {
                 }
                 .onChange(of: almacen.datos.coach.count) { _, _ in
                     if let id = almacen.datos.coach.last?.id {
-                        withAnimation { lector.scrollTo(id, anchor: .bottom) }
+                        withAnimation(Movimiento.estandar.animacion(reducir: reducir)) {
+                            lector.scrollTo(id, anchor: .bottom)
+                        }
                     }
                 }
                 .onAppear {
@@ -100,8 +110,19 @@ struct CoachView: View {
                 }
                 .entornoSazon(almacen)
             }
-            .sensoryFeedback(.impact(weight: .light), trigger: almacen.datos.coach.count)
+            // Vibra solo cuando responde el coach o hay un error (no con
+            // tus propios mensajes ni al borrar la conversación).
+            .sensoryFeedback(.impact(weight: .light), trigger: respuestas)
+            .sensoryFeedback(.warning, trigger: error) { _, nuevo in nuevo != nil }
+            .onDisappear { cancelar() }
         }
+    }
+
+    /// Corta la petición en curso (botón Cancelar o al cerrar el coach).
+    private func cancelar() {
+        tarea?.cancel()
+        tarea = nil
+        enviando = false
     }
 
     private var cabecera: some View {
@@ -110,8 +131,8 @@ struct CoachView: View {
             VStack(alignment: .leading, spacing: Espacio.xxxs) {
                 Text("Coach Sazón").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
                 Text(almacen.datos.coachCompartirResumen
-                     ? "Se envía a Gemini lo que escribes y un resumen de tus números de hoy (sin tu nombre)."
-                     : "Se envía a Gemini solo lo que escribes. Puedes compartir tu resumen del día en el menú ⋯.")
+                     ? "Se envía a Gemini (o a Groq, si es el respaldo) lo que escribes y un resumen de tus números de hoy (sin tu nombre)."
+                     : "Se envía a Gemini (o a Groq, si es el respaldo) solo lo que escribes. Puedes compartir tu resumen del día en el menú ⋯.")
                     .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
                 Text("No es un profesional de salud: sus respuestas son orientativas y pueden equivocarse.")
@@ -140,18 +161,20 @@ struct CoachView: View {
         enviando = true
         let mensajes = almacen.datos.coach
         let contexto = almacen.contextoCoach()
-        Task {
+        tarea = Task {
             do {
                 let respuesta = try await proveedor.conversar(mensajes: mensajes, contexto: contexto)
+                try Task.checkCancellation()
                 almacen.datos.coach.append(MensajeCoach(autor: .coach, texto: respuesta))
+                respuestas += 1
                 // Se guardan como máximo los últimos 60 mensajes.
                 if almacen.datos.coach.count > 60 { almacen.datos.coach.removeFirst(almacen.datos.coach.count - 60) }
-            } catch let e as ErrorIA {
-                error = e
             } catch {
-                self.error = .desconocido(error.localizedDescription)
+                if Task.isCancelled || error is CancellationError { return }
+                self.error = (error as? ErrorIA) ?? .desconocido(error.localizedDescription)
             }
             enviando = false
+            tarea = nil
         }
     }
 }
@@ -164,7 +187,8 @@ private struct Burbuja: View {
         let mio = mensaje.autor == .usuario
         HStack {
             if mio { Spacer(minLength: Espacio.xl) }
-            Text(LocalizedStringKey(mensaje.texto))
+            // Texto plano: sin enlaces que se puedan tocar ni formato oculto.
+            Text(verbatim: mio ? mensaje.texto : Formato.textoPlano(mensaje.texto))
                 .font(Tipo.cuerpo)
                 .foregroundStyle(mio ? paleta.textoSobreAcento : paleta.texto)
                 .padding(.horizontal, Espacio.m)
@@ -176,6 +200,7 @@ private struct Burbuja: View {
                 .textSelection(.enabled)
             if !mio { Spacer(minLength: Espacio.xl) }
         }
-        .accessibilityLabel((mio ? "Tú: " : "Coach: ") + mensaje.texto)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel((mio ? "Tú: " : "Coach: ") + (mio ? mensaje.texto : Formato.textoPlano(mensaje.texto)))
     }
 }

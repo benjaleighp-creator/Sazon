@@ -308,6 +308,17 @@ struct ProgresoView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Lo que VoiceOver dice de la gráfica de nutrientes: promedio, meta y
+    /// cuántos días tienen registros.
+    private func resumenNutrientes(dias: [(fecha: Date, total: Nutrientes)], promedio: Nutrientes, meta: Double?) -> String {
+        let unidad = macroGrafico == .calorias ? "kilocalorías" : "gramos"
+        let conDatos = dias.filter { $0.total.kcal > 0 }.count
+        var partes = ["Promedio \(Formato.entero(macroGrafico.valor(promedio))) \(unidad)"]
+        if let meta, meta > 0 { partes.append("meta \(Formato.entero(meta)) \(unidad)") }
+        partes.append("\(conDatos) de \(dias.count) días con registros")
+        return partes.joined(separator: ", ")
+    }
+
     private var graficoNutrientes: some View {
         let dias = Series.nutrientesPorDia(almacen.datos.registros, hasta: Date(), dias: diasNutrientes)
         let promedio = Series.promedio(dias)
@@ -345,6 +356,9 @@ struct ProgresoView: View {
                 }
             }
             .frame(height: 180)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Gráfica de \(macroGrafico.nombre.lowercased()) por día, últimos \(diasNutrientes) días")
+            .accessibilityValue(resumenNutrientes(dias: dias, promedio: promedio, meta: meta))
             HStack {
                 Text("Promedio de los días con registros")
                     .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
@@ -637,7 +651,7 @@ struct FotosProgreso: View {
 
     @ViewBuilder
     private func miniatura(_ f: FotoProgreso) -> some View {
-        if let img = almacen.imagen(de: f) {
+        if let img = almacen.miniatura(de: f) {
             Image(uiImage: img).resizable().scaledToFill()
                 .frame(width: 96, height: 128)
                 .clipShape(RoundedRectangle(cornerRadius: Radio.medio, style: .continuous))

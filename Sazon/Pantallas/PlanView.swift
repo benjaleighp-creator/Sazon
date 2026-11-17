@@ -239,8 +239,12 @@ struct PlanView: View {
                             almacen.guardarPlan(p)
                         }
                     } label: {
-                        Image(systemName: "ellipsis").foregroundStyle(paleta.textoSecundario).frame(width: 28, height: 28)
+                        Image(systemName: "ellipsis")
+                            .foregroundStyle(paleta.textoSecundario)
+                            .frame(width: Medida.toqueMinimo, height: Medida.toqueMinimo)
+                            .contentShape(Rectangle())
                     }
+                    .accessibilityLabel("Más opciones de \(item.nombre)")
                 }
             }
             if items.isEmpty {
@@ -268,7 +272,10 @@ enum PDFPlan {
             contexto.closePDF()
             ok = true
         }
-        return ok ? url : nil
+        guard ok else { return nil }
+        // Protección completa: cifrado mientras el iPhone está bloqueado.
+        try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: url.path)
+        return url
     }
 }
 

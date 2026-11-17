@@ -61,6 +61,12 @@ enum Diario {
         )
     }
 
+    /// Registros agrupados por día (clave: inicio del día). Recorre la lista
+    /// una sola vez, en vez de filtrar todo el historial para cada día.
+    static func porDia(_ todos: [Registro], calendario: Calendar = .current) -> [Date: [Registro]] {
+        Dictionary(grouping: todos) { calendario.startOfDay(for: $0.fecha) }
+    }
+
     static func suma(_ registros: [Registro]) -> Nutrientes {
         registros.reduce(Nutrientes.cero) { $0 + $1.total }
     }
@@ -125,9 +131,12 @@ extension Diario {
     /// Los 7 días (lunes a domingo) de la semana de `dia`, con sus calorías.
     static func semana(de dia: Date, en todos: [Registro], meta: Nutrientes?, calendario: Calendar = .current) -> [DiaSemana] {
         let lunes = inicioSemana(dia, calendario: calendario)
+        guard let domingo = calendario.date(byAdding: .day, value: 7, to: lunes) else { return [] }
+        // Solo los registros de esta semana, agrupados por día.
+        let grupos = porDia(todos.filter { $0.fecha >= lunes && $0.fecha < domingo }, calendario: calendario)
         return (0..<7).map { (i: Int) -> DiaSemana in
             let fecha = calendario.date(byAdding: .day, value: i, to: lunes) ?? lunes
-            let delDia = registros(de: fecha, en: todos, calendario: calendario)
+            let delDia = grupos[calendario.startOfDay(for: fecha)] ?? []
             let kcal = suma(delDia).kcal
             let fraccion = Progreso(consumido: kcal, meta: meta?.kcal ?? 0).fraccion
             return DiaSemana(fecha: fecha, kcal: kcal, fraccion: fraccion, tieneRegistros: !delDia.isEmpty)

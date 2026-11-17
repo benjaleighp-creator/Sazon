@@ -23,9 +23,7 @@ struct AjustesView: View {
                     GrupoAjustes(titulo: "Perfil") {
                         HStack(spacing: Espacio.s) {
                             AzulejoIcono(simbolo: "person", tamano: 34)
-                            TextField("Tu nombre (para el saludo)", text: $a.datos.nombre)
-                                .font(Tipo.cuerpo)
-                                .foregroundStyle(paleta.texto)
+                            CampoAjusteTexto(titulo: "Tu nombre (para el saludo)", valor: $a.datos.nombre, conFondo: false)
                                 .textContentType(.givenName)
                         }
                         .padding(.vertical, Espacio.xs)
@@ -118,6 +116,10 @@ struct AjustesView: View {
                         .tint(paleta.acento)
                     }
 
+                    if let caduca = Firma.caducidad {
+                        seccionCaducidad(caduca)
+                    }
+
                     GrupoAjustes(titulo: "Datos") {
                         FilaAjuste(simbolo: "externaldrive", titulo: "Respaldo",
                                    valor: "\(almacen.datos.registros.count) registros guardados en este iPhone") {
@@ -135,6 +137,12 @@ struct AjustesView: View {
 
                     if let aviso = almacen.avisoCarga {
                         Aviso(icono: "externaldrive.badge.exclamationmark", titulo: "Problema al abrir tus datos", texto: aviso, color: paleta.peligro)
+                        if almacen.archivoProtegido, aviso.contains("quedó copiado") {
+                            Button("Empezar de cero (el archivo original queda copiado)", role: .destructive) {
+                                almacen.empezarDeCero()
+                            }
+                            .buttonStyle(EstiloBotonTexto(color: paleta.peligro))
+                        }
                     }
                     if let error = almacen.errorGuardado {
                         Aviso(icono: "externaldrive.badge.exclamationmark", titulo: "Error al guardar", texto: error, color: paleta.peligro)
@@ -146,6 +154,38 @@ struct AjustesView: View {
             .fondoDePantalla()
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { hayClave = Llavero.hayClave }
+        }
+    }
+
+    /// Cuándo caduca esta instalación (firma de 7 días con Apple ID
+    /// gratuito). Si faltan 2 días o menos, un aviso para renovar.
+    @ViewBuilder
+    private func seccionCaducidad(_ caduca: Date) -> some View {
+        let ahora = Date()
+        let pronto = CaducidadFirma.necesitaAviso(caduca: caduca, ahora: ahora)
+        let fechaTexto = CaducidadFirma.textoFecha(caduca: caduca, ahora: ahora)
+        let restante = CaducidadFirma.textoRestante(caduca: caduca, ahora: ahora)
+        GrupoAjustes(titulo: "Instalación") {
+            HStack(spacing: Espacio.s) {
+                AzulejoIcono(simbolo: "calendar.badge.clock", tamano: 34, color: pronto ? paleta.aviso : nil)
+                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                    Text(fechaTexto).font(Tipo.cuerpo).foregroundStyle(paleta.texto)
+                    Text("\(restante). Con un Apple ID gratuito la app dura 7 días; renuévala con AltStore para seguir usándola.")
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, Espacio.xs)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Caducidad de esta instalación: \(fechaTexto). \(restante).")
+            .accessibilityHint("Con un Apple ID gratuito la app dura 7 días. Renuévala con AltStore.")
+        }
+        if pronto {
+            Aviso(icono: "clock.badge.exclamationmark",
+                  titulo: caduca <= ahora ? "Esta instalación ya caducó" : "Renueva Sazón pronto",
+                  texto: "\(fechaTexto). Conecta tu iPhone a la misma red Wi-Fi que tu PC con AltServer abierto y, en AltStore › My Apps, toca «Refresh All». Tus datos no se pierden al renovar.",
+                  color: paleta.aviso)
         }
     }
 
@@ -325,7 +365,7 @@ private struct PantallaAcercaDe: View {
                     fuente("book.closed", "Tabla de alimentos",
                            almacen.tabla.fuente.isEmpty ? (almacen.tabla.error ?? "") : almacen.tabla.fuente + " Se autoriza su reproducción citando la fuente.")
                     fuente("barcode", "Productos envasados", "Open Food Facts (openfoodfacts.org), base de datos colaborativa con licencia Open Database License (ODbL).")
-                    fuente("sparkles", "Inteligencia artificial", "Google Gemini con tu clave del plan gratuito. Sus cifras son estimaciones (≈).")
+                    fuente("sparkles", "Inteligencia artificial", "Google Gemini con tu clave del plan gratuito y, si la pones, Groq como respaldo. Las etiquetas se leen primero en tu iPhone (Vision de Apple). Sus cifras son estimaciones (≈).")
                     fuente("heart.text.square", "Importante", "Las calorías y los macros son estimaciones generales y editables, no consejo médico.")
                 }
                 .tarjeta()
@@ -351,6 +391,51 @@ private struct PantallaAcercaDe: View {
     }
 }
 
+// MARK: - Campo de texto con estado local
+
+/// Campo de texto de Ajustes que no escribe en los datos con cada letra:
+/// guarda al tocar «Intro», al dejar de escribir 1 s o al salir.
+private struct CampoAjusteTexto: View {
+    let titulo: String
+    @Binding var valor: String
+    var conFondo = true
+    @Environment(\.paleta) private var paleta
+    @State private var texto = ""
+    @State private var listo = false
+
+    var body: some View {
+        Group {
+            if conFondo {
+                CampoTexto(titulo: titulo, texto: $texto)
+            } else {
+                TextField(titulo, text: $texto)
+                    .font(Tipo.cuerpo)
+                    .foregroundStyle(paleta.texto)
+            }
+        }
+        .onAppear {
+            texto = valor
+            listo = true
+        }
+        .onChange(of: valor) { _, nuevo in
+            // Si el valor cambió por fuera (por ejemplo, «Volver a…»).
+            if nuevo != texto { texto = nuevo }
+        }
+        .onSubmit(confirmar)
+        .onDisappear(perform: confirmar)
+        .task(id: texto) {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            confirmar()
+        }
+    }
+
+    private func confirmar() {
+        guard listo, texto != valor else { return }
+        valor = texto
+    }
+}
+
 // MARK: - Inteligencia artificial
 
 private struct SeccionIA: View {
@@ -360,6 +445,7 @@ private struct SeccionIA: View {
     @State private var nuevaClave = ""
     @State private var mensaje: String?
     @State private var mostrarPasos = false
+    @State private var enMemoria = 0
 
     var body: some View {
         @Bindable var a = almacen
@@ -390,10 +476,10 @@ private struct SeccionIA: View {
 
                 VStack(alignment: .leading, spacing: Espacio.xxs) {
                     Text("Modelo").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
-                    CampoTexto(titulo: DatosApp.modeloPorDefecto, texto: $a.datos.modeloIA)
+                    CampoAjusteTexto(titulo: DatosApp.modeloPorDefecto, valor: $a.datos.modeloIA)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
-                    Text("Por defecto \(DatosApp.modeloPorDefecto), que en noviembre de 2026 figuraba como gratuito en la página de precios de Gemini. Si Google lo cambia, escribe aquí el nombre nuevo.")
+                    Text("Por defecto \(DatosApp.modeloPorDefecto), gratuito según la página de precios de Gemini (16-nov-2026), con el razonamiento al mínimo que admite cada modelo para responder más rápido. Si está saturado o sin cuota se prueban otros modelos gratuitos (máximo 3 intentos y 30 s por registro). Si Google lo cambia, escribe aquí el nombre nuevo.")
                         .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                         .fixedSize(horizontal: false, vertical: true)
                     if almacen.datos.modeloIA != DatosApp.modeloPorDefecto {
@@ -441,6 +527,25 @@ private struct SeccionIA: View {
                 .tint(paleta.acento)
             }
             .tarjeta()
+
+            SeccionGroq()
+                .padding(.top, Espacio.m)
+
+            VStack(alignment: .leading, spacing: Espacio.s) {
+                Text("Memoria de respuestas").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+                Text("Si analizas la misma foto o el mismo texto en 24 h, la respuesta sale de tu iPhone, sin internet ni cuota. Solo se guarda la respuesta, no la foto ni el texto.")
+                    .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Borrar la memoria (\(enMemoria) respuestas)") {
+                    CacheIA.compartido.vaciar()
+                    enMemoria = 0
+                }
+                .buttonStyle(.texto)
+                .disabled(enMemoria == 0)
+            }
+            .tarjeta()
+            .padding(.top, Espacio.m)
+            .onAppear { enMemoria = CacheIA.compartido.cantidad }
         }
     }
 
@@ -476,6 +581,94 @@ private struct SeccionIA: View {
     ]
 }
 
+// MARK: - Groq (respaldo opcional)
+
+/// Segunda clave, opcional: Groq se usa solo si Gemini está saturado o
+/// sin cuota. Se guarda en el Llavero igual que la de Gemini.
+private struct SeccionGroq: View {
+    @Environment(\.paleta) private var paleta
+    @State private var claveOculta = Llavero.claveOculta(de: .groq)
+    @State private var nuevaClave = ""
+    @State private var mensaje: String?
+    @State private var mostrarPasos = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Espacio.s) {
+            Text("Respaldo opcional: Groq").font(Tipo.cuerpoFuerte).foregroundStyle(paleta.texto)
+            Text("Si Gemini está saturado o se acabó su cuota de hoy, Sazón prueba con Groq (modelo \(PoliticaIA.modeloGroq), en vista previa). Sin esta clave todo funciona igual.")
+                .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                .fixedSize(horizontal: false, vertical: true)
+            FilaValor(titulo: "Clave de Groq", valor: claveOculta ?? "Sin clave")
+            SecureField(claveOculta == nil ? "Pega tu clave de Groq" : "Reemplazar clave de Groq", text: $nuevaClave)
+                .textContentType(.password)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .padding(.horizontal, Espacio.m)
+                .frame(minHeight: Medida.toque)
+                .background(RoundedRectangle(cornerRadius: Radio.medio, style: .continuous).fill(paleta.superficieAlta))
+                .accessibilityLabel("Clave de API de Groq")
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: Espacio.s) { botones }
+                VStack(spacing: Espacio.s) { botones }
+            }
+            if let mensaje {
+                Text(mensaje).font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+            }
+            DisclosureGroup("Cómo crear tu clave de Groq gratis", isExpanded: $mostrarPasos) {
+                VStack(alignment: .leading, spacing: Espacio.xs) {
+                    ForEach(Array(Self.pasos.enumerated()), id: \.offset) { i, paso in
+                        HStack(alignment: .top, spacing: Espacio.xs) {
+                            Text("\(i + 1).").font(Tipo.pie.monospacedDigit()).foregroundStyle(paleta.textoSecundario)
+                            Text(paso).font(Tipo.pie).foregroundStyle(paleta.texto)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    if let url = URL(string: "https://console.groq.com/keys") {
+                        Link("Abrir la consola de Groq", destination: url)
+                            .font(Tipo.cuerpoFuerte)
+                    }
+                }
+                .padding(.top, Espacio.xs)
+            }
+            .font(Tipo.cuerpo)
+            .foregroundStyle(paleta.texto)
+            .tint(paleta.acento)
+        }
+        .tarjeta()
+    }
+
+    @ViewBuilder
+    private var botones: some View {
+        Button("Guardar clave de Groq") {
+            if Llavero.guardarClave(nuevaClave, de: .groq) {
+                nuevaClave = ""
+                claveOculta = Llavero.claveOculta(de: .groq)
+                mensaje = "Clave de Groq guardada en el Llavero."
+            } else {
+                mensaje = "No se pudo guardar en el Llavero."
+            }
+        }
+        .buttonStyle(.secundario)
+        .disabled(nuevaClave.trimmingCharacters(in: .whitespaces).isEmpty)
+        if claveOculta != nil {
+            Button("Borrar clave de Groq", role: .destructive) {
+                Llavero.borrarClave(de: .groq)
+                claveOculta = nil
+                mensaje = "Clave de Groq borrada de este iPhone."
+            }
+            .buttonStyle(EstiloBotonTexto(color: paleta.peligro))
+        }
+    }
+
+    static let pasos = [
+        "Entra a console.groq.com y crea una cuenta gratuita (con tu correo o tu cuenta de Google).",
+        "En el menú, abre «API Keys» y toca «Create API Key».",
+        "Ponle un nombre (por ejemplo «Sazón») y copia la clave. Groq la muestra una sola vez.",
+        "Pégala arriba y toca «Guardar clave de Groq». No agregues tarjeta: el plan gratuito basta para uso personal.",
+        "Tus límites reales se ven en la consola de Groq (Settings › Limits)."
+    ]
+}
+
 // MARK: - Respaldo
 
 private struct SeccionRespaldo: View {
@@ -491,7 +684,7 @@ private struct SeccionRespaldo: View {
         VStack(alignment: .leading, spacing: Espacio.xs) {
             TituloSeccion("Respaldo")
             VStack(alignment: .leading, spacing: Espacio.s) {
-                Text("Guarda una copia de tus registros y ajustes en Archivos (por ejemplo, antes de reinstalar). La clave de la IA no se incluye.")
+                Text("Guarda una copia de tus registros y ajustes en Archivos (por ejemplo, antes de reinstalar). La clave de la IA no se incluye. Ojo: el respaldo es texto sin cifrar con tus comidas, pesos y medidas; guárdalo en un lugar privado y no lo compartas. Las fotos de progreso no se incluyen.")
                     .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
                     .fixedSize(horizontal: false, vertical: true)
                 ViewThatFits(in: .horizontal) {
@@ -515,8 +708,14 @@ private struct SeccionRespaldo: View {
             case .success(let url):
                 let acceso = url.startAccessingSecurityScopedResource()
                 defer { if acceso { url.stopAccessingSecurityScopedResource() } }
-                if let datos = try? Data(contentsOf: url), let leidos = almacen.leerRespaldo(datos) {
-                    pendiente = leidos
+                if let tamano = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                   tamano > ValidacionRespaldo.tamanoMaximo {
+                    mensaje = "Ese archivo es demasiado grande para ser un respaldo de Sazón."
+                } else if let datos = try? Data(contentsOf: url), let leidos = almacen.leerRespaldo(datos) {
+                    pendiente = leidos.datos
+                    if leidos.descartados > 0 {
+                        mensaje = "Se omitirán \(leidos.descartados) datos con valores no válidos."
+                    }
                 } else {
                     mensaje = "Ese archivo no es un respaldo válido de Sazón."
                 }

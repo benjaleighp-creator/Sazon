@@ -11,8 +11,11 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
   fibra, sodio y azúcares; semana con flechas para días anteriores.
 - Foto del plato, texto o **voz** (reconocimiento de voz de Apple) analizados
   con Gemini; siempre revisas antes de guardar.
-- Código de barras (Open Food Facts), lectura de etiquetas con IA y
-  productos recordados.
+- Código de barras (Open Food Facts), lectura de etiquetas (primero en el
+  iPhone, sin internet; si no alcanza, con IA) y productos recordados.
+- Sin internet: la foto o el texto se guarda y se analiza solo cuando
+  vuelve la red; lo revisas desde el Diario antes de guardarlo.
+- Recuerda las porciones que corriges a la IA y las propone la próxima vez.
 - Búsqueda en la tabla del INS sin internet, más tus alimentos y recetas.
 - Mis alimentos (a mano o calculados con IA), recetas con ingredientes y
   peso cocido, comparador de alimentos.
@@ -22,12 +25,20 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 - Media mañana y media tarde opcionales (Ajustes › Comidas del día).
 - Animación al analizar la foto: puntos sobre la foto mientras la IA
   trabaja; luego se juntan sobre cada alimento (cajas «box_2d» de Gemini,
-  validadas) o en la lista debajo si no hay caja.
+  validadas) o en la lista debajo si no hay caja. Con VoiceOver se anuncian
+  los alimentos detectados; con «Reducir movimiento» solo hay un fundido.
+- Mientras la IA trabaja se ve cuánto tiempo lleva, un aviso si se prueba
+  otro modelo y un botón **Cancelar** (salir de la pantalla también corta
+  la petición). A los 20 s aparecen **Buscar en la tabla** y **Agregar a
+  mano** (sin cancelar); a los 30 s se cancela sola. Si la IA falla, el
+  aviso trae los mismos botones. La revisión dice quién respondió (memoria,
+  iPhone, Gemini o Groq) y en cuántos segundos.
 
 **Meta**
 - Mifflin-St Jeor con fórmula visible, tipo de dieta (equilibrada, alta en
   proteína, baja en carbohidratos, keto, baja en grasa) o meta a mano.
 - Ajuste dinámico según cómo cambia tu peso (lo apruebas tú).
+- Meta distinta según el día de la semana (por ejemplo, más el sábado).
 - Opcional: sumar calorías activas de Apple Salud.
 
 **Plan**
@@ -50,8 +61,21 @@ Uso personal: no se publica en el App Store. Se compila en GitHub Actions
 **Más**
 - Coach con IA (solo envía lo que escribes; el resumen del día es opcional).
 - Recordatorios locales de comidas, agua, peso y ayuno.
-- Widgets de calorías y macros, agua, ayuno y pantalla bloqueada.
+- Widgets de calorías y macros, agua, ayuno y pantalla bloqueada (su letra
+  sigue el tamaño de texto del iPhone, con un tope para que quepa).
+  **Widgets con botones** (iOS 17): «+ agua» y «Repetir favorito» sin abrir
+  la app (necesitan la versión completa del .ipa, con App Group).
+- **Siri y Atajos**: «Oye Siri, agrega un vaso de agua en Sazón» y «Oye
+  Siri, repite mi desayuno en Sazón» (usa tu favorito de esa comida o lo
+  que comiste en ella el último día).
+- **Apple Salud** (opcional, versión completa): lee pasos, calorías activas
+  y peso; guarda tu peso y, si lo activas, las calorías y macros de cada
+  comida.
 - Exportar comidas y pesos a CSV; respaldo completo.
+- **Aviso de caducidad**: Ajustes › Instalación muestra cuándo caduca esta
+  instalación (7 días con Apple ID gratuito); si faltan 2 días o menos,
+  aparece un aviso para renovar y, si ya diste permiso de notificaciones,
+  llega una notificación 1 día antes.
 
 Cada registro muestra su origen: INS, Open Food Facts, etiqueta del envase,
 «≈ estimado por IA» o manual. Todas las cifras son estimaciones editables,
@@ -71,7 +95,13 @@ INS, Open Food Facts y tus propias recetas.
   Alimentación, Nutrición y Vida Saludable. *Tablas peruanas de composición
   de alimentos*, 11.ª edición digital (TPCA 2023), marzo 2025. El documento
   indica: «Se autoriza su reproducción total o parcial, siempre y cuando se
-  cite la fuente». Incluye 1073 alimentos y 567 platos preparados.
+  cite la fuente». La app trae 1692 entradas: 1125 alimentos y 567 platos
+  preparados (contadas en `Sazon/Datos/alimentos-ins.json`).
+- **Micronutrientes (pendiente):** la app ya puede mostrar hierro, calcio,
+  zinc, vitaminas A y C, etc. si la tabla los trae, pero el archivo aún no
+  los incluye. Para agregarlos hay que confirmar en el PDF oficial del INS
+  en qué columna está cada uno y completarlo en `herramientas/convertir_ins.py`
+  (`COLUMNAS_MICROS`). No se inventan valores.
 - El PDF se convierte con `herramientas/convertir_ins.py` en
   `Sazon/Datos/alimentos-ins.json`, que va dentro de la app. El script
   también deja `herramientas/alimentos-ins.csv` (para revisar a mano) y
@@ -84,19 +114,56 @@ INS, Open Food Facts y tus propias recetas.
   los valores salen de la tabla; si no, se usa la estimación de la IA
   marcada con «≈».
 
-## IA: Google Gemini (plan gratuito)
+## IA: capas, tiempos y privacidad
 
-- Modelo por defecto: `gemini-3.8-flash` (gratuito en la página de precios
-  de Gemini al 1 de noviembre de 2026). Se puede cambiar en Ajustes.
-- La clave de API se pega una vez en Ajustes y se guarda en el **Llavero**
-  del iPhone. Nunca va en este repositorio ni en el código.
-- Una sola llamada por registro, sin reintentos automáticos. Las fotos se
-  reducen a 1024 px y se envían sin metadatos.
-- En el plan gratuito, Google puede usar lo enviado para mejorar sus
-  productos. La app lo avisa la primera vez.
-- Toda la conexión con la IA está en `Sazon/Servicios/ServicioIA.swift`.
+La IA trabaja por capas (de la más rápida y privada a la nube):
 
-### Crear la clave
+1. **Memoria del iPhone**: si analizas la misma foto o el mismo texto en
+   24 h, la respuesta sale de aquí, sin internet ni cuota (se guarda solo
+   la respuesta, con una huella del contenido; máximo 80 respuestas).
+2. **En el iPhone**: las etiquetas nutricionales se leen con Vision de
+   Apple (`VNRecognizeTextRequest`), sin red. Si no se encuentran con
+   seguridad las calorías y los macros, se usa la nube. El dictado se hace
+   en el iPhone cuando el iPhone lo permite (`requiresOnDeviceRecognition`).
+   El modelo de Apple Intelligence no se usa (pide iPhone 15 Pro o posterior).
+3. **Google Gemini** con tu clave. Modelo por defecto `gemini-3.8-flash`;
+   si está saturado o sin cuota se prueban `gemini-3.5-flash-lite`,
+   `gemini-3.6-flash` y `gemini-3.1-flash-lite` (todos gratuitos en
+   <https://ai.google.dev/gemini-api/docs/pricing>, consultada el 16-nov-2026).
+   Cada tarea tiene un prompt corto propio y el razonamiento va al mínimo
+   que admite cada modelo (`low` en 3.8-flash; `minimal` en los demás).
+4. **Groq (opcional)**: si pones una segunda clave, se usa solo cuando
+   Gemini está saturado o sin cuota (modelo `qwen/qwen3.8-27b`, que Groq
+   marca como «Preview»). Sin esa clave, todo funciona igual.
+
+**Reintentos reales** (por cada registro): como máximo **3 llamadas** entre
+todos los modelos y proveedores (con clave de Groq: 2 a Gemini y 1 a Groq),
+espera creciente con algo de azar entre intentos, y **corte total a los
+30 s** (también se corta la petición en curso). Un 429 con cuota diaria
+agotada deja ese modelo sin usar hasta la medianoche hora del Pacífico
+(2:00 o 3:00 a. m. en Lima); un 400 no se reintenta con otros modelos.
+A los 20 s la pantalla ofrece «Buscar en la tabla» y «Agregar a mano».
+
+**Claves**: se pegan en Ajustes › Inteligencia artificial y se guardan en
+el **Llavero** del iPhone (solo con el iPhone desbloqueado y nunca se
+copian a otro dispositivo). Nunca van en este repositorio, en el código, en
+los registros ni en el respaldo.
+
+**Privacidad** (fuentes consultadas el 16-nov-2026):
+- Gemini, plan gratuito: Google usa lo que envías y las respuestas para
+  mejorar sus productos, y **revisores humanos pueden leerlo**; Google pide
+  no enviar información sensible
+  (<https://ai.google.dev/gemini-api/terms>). Por eso solo se envía la foto
+  (reducida y sin ubicación) o el texto; el resumen del día al coach es
+  opcional.
+- Groq: según <https://console.groq.com/docs/your-data>, por defecto no
+  guarda lo que envías para responder (puede guardar registros hasta 30
+  días si hay fallos o abuso).
+- Toda la conexión con la IA está en `Sazon/Servicios/ServicioIA.swift` y
+  `Sazon/Servicios/ProveedorGroq.swift`; las reglas, en
+  `Sazon/Logica/PoliticaIA.swift`.
+
+### Crear la clave de Gemini
 
 1. Entra a <https://aistudio.google.com> con tu cuenta de Google.
 2. Acepta los términos si te los pide.
@@ -104,6 +171,17 @@ INS, Open Food Facts y tus propias recetas.
 4. Copia la clave y pégala en Sazón › Ajustes › Inteligencia artificial.
 5. No configures facturación (así te quedas en el plan gratuito).
 6. Tus límites reales se ven en AI Studio, en la sección de uso y límites.
+
+### Crear la clave de Groq (opcional, respaldo)
+
+1. Entra a <https://console.groq.com> y crea una cuenta gratuita (con tu
+   correo o tu cuenta de Google).
+2. En el menú, abre «API Keys» y toca «Create API Key».
+3. Ponle un nombre (por ejemplo «Sazón») y copia la clave: Groq la muestra
+   una sola vez.
+4. En Sazón › Ajustes › Inteligencia artificial › «Respaldo opcional:
+   Groq», pégala y toca «Guardar clave de Groq».
+5. No agregues tarjeta. Tus límites reales se ven en la consola de Groq.
 
 ## Instalar en el iPhone
 
@@ -117,14 +195,121 @@ INS, Open Food Facts y tus propias recetas.
    Apple ID, y pulsa Start.
 4. Si Sideloadly da error por los permisos o por el límite de apps o de
    identificadores de la cuenta gratuita, instala `Sazon-sencilla.ipa`.
-5. Deja activada la renovación automática.
-6. En Sazón › Ajustes › Widgets puedes ver qué quedó activo en tu firma.
+5. En Sazón › Ajustes › Widgets puedes ver qué quedó activo en tu firma.
+6. Guarda una copia de los `.ipa` en tu PC: GitHub los borra a los 14 días
+   (`retention-days: 14` en `.github/workflows/compilar.yml`).
 
 Por verificar: con una cuenta gratuita, la extensión de widgets puede
 contar dentro del límite de 3 apps y usar un identificador más; y no está
 confirmado que Sideloadly conserve el permiso de Apple Salud. Tus datos se
 guardan en la app, así que instalar una versión encima de la otra no los
 borra (sí se borran si eliminas la app).
+
+### Renovar cada 7 días (gratis)
+
+Con un Apple ID gratuito, la app deja de abrir a los 7 días de firmarla.
+Hay dos formas gratuitas de renovarla. Antes de cualquier cambio, exporta
+un respaldo en Sazón › Ajustes › Respaldo.
+
+Guía oficial de AltStore Classic (consultada el 16-nov-2026):
+[instalar en Windows](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows),
+[AltServer](https://faq.altstore.io/altstore-classic/altserver),
+[tu AltStore](https://faq.altstore.io/altstore-classic/your-altstore),
+[App IDs](https://faq.altstore.io/altstore-classic/app-ids),
+[solución de problemas](https://faq.altstore.io/altstore-classic/troubleshooting-guide).
+
+#### Opción recomendada: AltStore Classic + AltServer
+
+**Cómo funciona.** AltStore (en el iPhone) le pide a AltServer (en tu PC)
+que vuelva a firmar las apps en segundo plano. Para eso la PC debe estar
+encendida, con AltServer abierto y en la misma Wi-Fi que el iPhone (o
+conectado por cable).
+
+**Instalar AltStore (una sola vez).**
+1. Instala iTunes e iCloud **descargados de la web de Apple**, no de la
+   Microsoft Store.
+2. Descarga AltServer desde la guía oficial, descomprime `AltInstaller.zip`
+   y ejecuta `Setup.exe`.
+3. Abre AltServer con clic derecho › «Ejecutar como administrador» y
+   permite el acceso a redes privadas cuando Windows lo pregunte.
+4. Conecta el iPhone por cable, desbloquéalo y toca «Confiar».
+5. En iTunes, inicia sesión y activa la sincronización por Wi-Fi con
+   ese iPhone.
+6. Haz clic en el ícono de AltServer (junto al reloj de Windows) ›
+   «Install AltStore» › tu iPhone, y escribe tu Apple ID y contraseña
+   (según AltStore, solo se envían a Apple).
+7. En el iPhone: Ajustes › General › VPN y gestión de dispositivos › tu
+   Apple ID › «Confiar». Si iOS lo pide, activa el Modo desarrollador
+   (Ajustes › Privacidad y seguridad).
+
+**Instalar Sazón con AltStore.**
+1. Copia `Sazon-completa.ipa` al iPhone (app Archivos, por ejemplo en
+   iCloud Drive).
+2. En AltStore, pestaña **My Apps**, toca el botón para añadir una app y
+   elige el `.ipa` (por verificar el nombre exacto del botón).
+
+**Dejarlo funcionando.**
+- Haz que AltServer se abra al iniciar la PC.
+- En AltStore, deja activado «Background Refresh».
+- Si quieres renovar ya, toca «Refresh All» en My Apps.
+- Si dice «Could not find AltServer»: revisa que el iPhone y la PC estén
+  en la misma Wi-Fi y permite AltServer en el Firewall de Windows.
+
+**Si AltServer da el error -80046.**
+1. Instala la versión más reciente de AltServer desde
+   [la guía oficial para Windows](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows)
+   y reinstala AltStore encima, sin borrarlo.
+2. Usa iTunes e iCloud descargados de la web de Apple, no de la Microsoft
+   Store ([solución de problemas](https://faq.altstore.io/altstore-classic/troubleshooting-guide)).
+
+Contexto (consultado el 16-nov-2026): en el issue público
+[altstoreio/AltStore#1848](https://github.com/altstoreio/AltStore/issues/1848)
+(25-oct-2026, iPadOS 26.5, Windows), el error -80046 aparecía con
+AltServer 1.8.0.0 y el autor dijo que una actualización lo resolvió. No
+está confirmado en las notas oficiales de AltServer, que solo llegan hasta
+la 1.7.4. Una guía de terceros afirma que desde octubre de 2026 Apple
+rechaza muchos inicios de sesión de herramientas de sideload; Apple no lo
+ha confirmado.
+
+**Límites de la cuenta gratuita.**
+- 3 apps a la vez, y AltStore cuenta como una (AltStore + Remanso +
+  Sazón = 3).
+- 10 App IDs por semana, y cada extensión cuenta: Sazón completa usa 2
+  (app + widget); la sencilla usa 1.
+
+**Por verificar.**
+- Que AltStore Classic funcione con iOS 26.5.
+- Que conserve el App Group (widgets) y el permiso de Apple Salud.
+- Al pasar de Sideloadly a AltStore, iOS podría tratar Sazón como otra
+  app y empezar sin datos: **exporta el respaldo antes** y, si hace
+  falta, impórtalo después.
+
+**Comprobar que todo funciona tras instalar con AltStore.**
+
+| Qué probar | Cómo | Qué deberías ver |
+|---|---|---|
+| Widget de calorías | Añádelo a la pantalla de inicio y registra algo en Sazón | Muestra tus calorías reales del día |
+| Widget «+ agua» | Toca «+ agua» en el widget | Al abrir Sazón, el agua sumada aparece en la app |
+| Apple Salud | En Sazón › Ajustes › Apple Salud, activa «Conectar con Apple Salud» y «Guardar mis comidas en Salud»; luego registra una comida | La comida aparece en la app Salud › Nutrición |
+| Fecha de caducidad | Abre Sazón › Ajustes | La sección «Instalación» muestra cuándo caduca |
+
+Si los widgets no muestran tus datos, AltStore no conservó el App Group:
+usa `Sazon-sencilla.ipa` o vuelve a Sideloadly. Recuerda: **exporta un
+respaldo antes** de cambiar de Sideloadly a AltStore.
+
+#### Alternativa manual: repetir Sideloadly
+
+1. Pon un recordatorio **cada 6 días**.
+2. Exporta un respaldo (Ajustes › Respaldo).
+3. Conecta el iPhone a la PC, abre Sideloadly y usa **el mismo `.ipa`**
+   que guardaste en tu PC y **el mismo Apple ID**. Pulsa Start. **No
+   borres la app antes**: se instala encima y tus datos se conservan.
+
+Nota: la FAQ oficial de Sideloadly (https://sideloadly.io/faq.html,
+consultada el 16-nov-2026) describe una renovación automática con
+«Sideloadly Daemon» y la PC encendida, sin mencionar pago; pero, según la
+experiencia del dueño, hoy solo funciona para miembros de Patreon. No se
+pudo confirmar en una fuente oficial, así que esta guía no depende de ella.
 
 ## Estructura
 
@@ -133,7 +318,8 @@ Sazon/App          Entrada de la app y vista raíz
 Sazon/Modelo       Datos (Modelos.swift) y almacén JSON local (Almacen.swift)
 Sazon/Logica       Lógica pura con pruebas: metas, sumas del día, porciones,
                    búsqueda en la tabla, lectura del JSON de la IA y de Open Food Facts
-Sazon/Servicios    Gemini, Open Food Facts, Llavero, fotos, tabla del INS, respaldo
+Sazon/Servicios    Gemini y Groq (IA), Open Food Facts, Llavero, fotos, etiquetas con Vision,
+                   cola sin conexión, Siri y Atajos, Apple Salud, tabla del INS, respaldo
 Sazon/Diseno       Sistema de diseño: espaciado, tipografía, movimiento, temas, componentes
 Sazon/Pantallas    Una vista por pantalla
 Compartido         Código que comparten la app y los widgets
