@@ -25,6 +25,15 @@ enum Firma {
               let contenido = try? FileManager.default.contentsOfDirectory(atPath: url.path) else { return false }
         return contenido.contains { $0.hasSuffix(".appex") }
     }
+
+    /// Fecha en que caduca esta instalación (firma de 7 días con Apple ID
+    /// gratuito). Nil si no hay `embedded.mobileprovision` (simulador) o no
+    /// se puede leer.
+    static let caducidad: Date? = {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let datos = try? Data(contentsOf: url) else { return nil }
+        return CaducidadFirma.fecha(de: datos)
+    }()
 }
 
 // MARK: - Widgets
@@ -72,6 +81,7 @@ enum Recordatorios {
     private static var centro: UNUserNotificationCenter { .current() }
     private static let prefijo = "sazon."
     private static let idAyuno = "sazon.ayuno.fin"
+    private static let idCaducidad = "sazon.caducidad"
 
     /// Pide permiso para notificaciones. Devuelve true si lo diste.
     static func pedirPermiso() async -> Bool {
@@ -86,7 +96,7 @@ enum Recordatorios {
     /// Vuelve a programar comidas, agua y peso según la configuración.
     static func reprogramar(_ c: ConfigRecordatorios) {
         centro.getPendingNotificationRequests { pendientes in
-            let viejos = pendientes.map(\.identifier).filter { $0.hasPrefix(prefijo) && $0 != idAyuno }
+            let viejos = pendientes.map(\.identifier).filter { $0.hasPrefix(prefijo) && $0 != idAyuno && $0 != idCaducidad }
             centro.removePendingNotificationRequests(withIdentifiers: viejos)
 
             if c.comidasActivas {
@@ -147,6 +157,17 @@ enum Recordatorios {
 
     static func cancelarFinAyuno() {
         centro.removePendingNotificationRequests(withIdentifiers: [idAyuno])
+    }
+
+    /// Aviso 1 día antes de que caduque la instalación. Solo se programa si
+    /// ya diste permiso de notificaciones: no lo pide por esto.
+    static func programarCaducidad(_ caduca: Date?) async {
+        centro.removePendingNotificationRequests(withIdentifiers: [idCaducidad])
+        guard let caduca, let momento = CaducidadFirma.momentoNotificacion(caduca: caduca),
+              await permisoConcedido() else { return }
+        agregar(id: idCaducidad, titulo: "Sazón caduca mañana",
+                texto: "Renueva la app con AltStore (o vuelve a instalarla) antes de \(Formato.hora(caduca)) para seguir usándola. Tus datos no se pierden.",
+                disparador: UNTimeIntervalNotificationTrigger(timeInterval: max(1, momento.timeIntervalSinceNow), repeats: false))
     }
 }
 

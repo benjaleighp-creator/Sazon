@@ -26,6 +26,7 @@ struct SazonApp: App {
             ColaIA.compartida.procesar(almacen)
             Task { await Salud.compartido.actualizarHoy(en: almacen) }
             Recordatorios.reprogramar(almacen.datos.recordatorios)
+            Task { await Recordatorios.programarCaducidad(Firma.caducidad) }
             almacen.avisarCambios()
         }
     }

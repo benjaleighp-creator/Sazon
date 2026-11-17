@@ -116,6 +116,10 @@ struct AjustesView: View {
                         .tint(paleta.acento)
                     }
 
+                    if let caduca = Firma.caducidad {
+                        seccionCaducidad(caduca)
+                    }
+
                     GrupoAjustes(titulo: "Datos") {
                         FilaAjuste(simbolo: "externaldrive", titulo: "Respaldo",
                                    valor: "\(almacen.datos.registros.count) registros guardados en este iPhone") {
@@ -150,6 +154,38 @@ struct AjustesView: View {
             .fondoDePantalla()
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { hayClave = Llavero.hayClave }
+        }
+    }
+
+    /// Cuándo caduca esta instalación (firma de 7 días con Apple ID
+    /// gratuito). Si faltan 2 días o menos, un aviso para renovar.
+    @ViewBuilder
+    private func seccionCaducidad(_ caduca: Date) -> some View {
+        let ahora = Date()
+        let pronto = CaducidadFirma.necesitaAviso(caduca: caduca, ahora: ahora)
+        let fechaTexto = CaducidadFirma.textoFecha(caduca: caduca, ahora: ahora)
+        let restante = CaducidadFirma.textoRestante(caduca: caduca, ahora: ahora)
+        GrupoAjustes(titulo: "Instalación") {
+            HStack(spacing: Espacio.s) {
+                AzulejoIcono(simbolo: "calendar.badge.clock", tamano: 34, color: pronto ? paleta.aviso : nil)
+                VStack(alignment: .leading, spacing: Espacio.xxxs) {
+                    Text(fechaTexto).font(Tipo.cuerpo).foregroundStyle(paleta.texto)
+                    Text("\(restante). Con un Apple ID gratuito la app dura 7 días; renuévala con AltStore para seguir usándola.")
+                        .font(Tipo.pie).foregroundStyle(paleta.textoSecundario)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, Espacio.xs)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Caducidad de esta instalación: \(fechaTexto). \(restante).")
+            .accessibilityHint("Con un Apple ID gratuito la app dura 7 días. Renuévala con AltStore.")
+        }
+        if pronto {
+            Aviso(icono: "clock.badge.exclamationmark",
+                  titulo: caduca <= ahora ? "Esta instalación ya caducó" : "Renueva Sazón pronto",
+                  texto: "\(fechaTexto). Conecta tu iPhone a la misma red Wi-Fi que tu PC con AltServer abierto y, en AltStore › My Apps, toca «Refresh All». Tus datos no se pierden al renovar.",
+                  color: paleta.aviso)
         }
     }
 
